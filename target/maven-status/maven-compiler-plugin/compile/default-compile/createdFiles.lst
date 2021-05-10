@@ -1,0 +1,5 @@
+org/couchbase/quickstart/controllers/HealthCheckController.class
+org/couchbase/quickstart/models/Profile.class
+org/couchbase/quickstart/configs/Swagger.class
+org/couchbase/quickstart/controllers/UserProfileController.class
+org/couchbase/quickstart/configs/ConfigProperties.class
