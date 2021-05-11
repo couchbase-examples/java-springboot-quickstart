@@ -1,6 +1,5 @@
-package org.couchbase.quickstart;
+package org.couchbase.quickstart.healthCheck;
 
-import org.couchbase.quickstart.controllers.HealthCheckController;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;

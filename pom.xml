@@ -25,6 +25,7 @@
         <springvault.version>2.2.3.RELEASE</springvault.version>
         <junit.version>4.13.1</junit.version>
         <reactivex.version>1.2.1</reactivex.version>
+        <mavensurefire.version>3.0.0-M5</mavensurefire.version>
     </properties>
 
     <dependencies>
@@ -90,6 +91,11 @@
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.vintage</groupId>
+            <artifactId>junit-vintage-engine</artifactId>
             <scope>test</scope>
         </dependency>
 
