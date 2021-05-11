@@ -23,7 +23,7 @@
         <couchbase.version>3.0.8</couchbase.version>
         <couchbaseEncryption.version>3.0.0</couchbaseEncryption.version>
         <springvault.version>2.2.3.RELEASE</springvault.version>
-        <junit.version>4.12</junit.version>
+        <junit.version>4.13.1</junit.version>
         <reactivex.version>1.2.1</reactivex.version>
     </properties>
 
