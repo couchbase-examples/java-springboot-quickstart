@@ -25,6 +25,24 @@ public class Profile {
         this.password = getEncryptedPassword(password);
     }
 
+    public Profile() { }
+
+    public Profile(UUID pid, String firstName, String lastName, String email, String password){
+        this.pid = pid;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.password = password;
+    }
+
+    public Profile(Profile profile) {
+        this.pid = profile.getPid();
+        this.firstName = profile.getFirstName();
+        this.lastName = profile.getLastName();
+        this.email = profile.getEmail();
+        this.password = profile.getPassword();
+    }
+
     //simple encoding to encrypt the password using BCrypt
     //for a more robust way to encrypt passwords, see documentation:
     //https://docs.couchbase.com/java-sdk/current/concept-docs/encryption.html
@@ -34,5 +52,4 @@ public class Profile {
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         return encoder.encode(decryptedPassword);
     }
-
 }

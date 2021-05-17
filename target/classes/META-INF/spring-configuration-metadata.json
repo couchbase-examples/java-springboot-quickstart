@@ -1,0 +1,11 @@
+{
+  "groups": [
+    {
+      "name": "db",
+      "type": "org.couchbase.quickstart.configs.ConfigProperties",
+      "sourceType": "org.couchbase.quickstart.configs.ConfigProperties"
+    }
+  ],
+  "properties": [],
+  "hints": []
+}

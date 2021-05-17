@@ -16,11 +16,14 @@
     <description>Quickstart Java Project User Profile with Spring Boot</description>
 
     <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
         <swagger.version>3.0.0</swagger.version>
+        <springboot.version>2.4.5</springboot.version>
         <springweb.version>3.0.0</springweb.version>
-        <couchbase.version>3.0.8</couchbase.version>
+        <couchbase.version>3.1.5</couchbase.version>
         <couchbaseEncryption.version>3.0.0</couchbaseEncryption.version>
         <springvault.version>2.2.3.RELEASE</springvault.version>
         <junit.version>4.13.1</junit.version>
@@ -29,6 +32,11 @@
     </properties>
 
     <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot</artifactId>
+            <version>${springboot.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
@@ -50,6 +58,11 @@
             <groupId>org.springframework.vault</groupId>
             <artifactId>spring-vault-core</artifactId>
             <version>${springvault.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+            <optional>true</optional>
         </dependency>
 
         <dependency>
@@ -104,10 +117,17 @@
             <version>${reactivex.version}</version>
             <scope>test</scope>
         </dependency>
-
     </dependencies>
 
     <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <includes>
+                    <include>*.properties</include>
+                </includes>
+            </resource>
+        </resources>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>

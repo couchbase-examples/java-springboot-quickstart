@@ -1,3 +1,4 @@
+META-INF/spring-configuration-metadata.json
 org/couchbase/quickstart/controllers/HealthCheckController.class
 org/couchbase/quickstart/models/Profile.class
 org/couchbase/quickstart/configs/Swagger.class
