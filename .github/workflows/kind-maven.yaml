@@ -47,7 +47,7 @@ jobs:
           echo 'Get IP Address of Cluster'
           echo '*************************'
           kubectl get pod default-couchbase-cluster-0000 --template={{.status.hostIP}}
-          export $envIpAddress = $(kubectl get pod default-couchbase-cluster-0000 --template={{.status.hostIP}})
+          $envIpAddress = $(kubectl get pod default-couchbase-cluster-0000 --template={{.status.hostIP}})
           echo 'IP Address of Cluster -> $envIpAddress'
           echo 'Get Port of Cluster'
           echo '*******************'
