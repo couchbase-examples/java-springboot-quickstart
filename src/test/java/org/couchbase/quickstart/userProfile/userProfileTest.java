@@ -27,7 +27,7 @@ public class userProfileTest {
 
     @Autowired
     private WebTestClient webTestClient;
-
+/*
     @Test
     public void testUserProfileNotFound() {
         //bootstrap database
@@ -41,7 +41,7 @@ public class userProfileTest {
                 .expectStatus().is4xxClientError()
                 .expectHeader().contentType(MediaType.APPLICATION_JSON);
     }
-
+*/
     @Test
     public void testCreateThenDeleteUserProfile() {
         //bootstrap database
