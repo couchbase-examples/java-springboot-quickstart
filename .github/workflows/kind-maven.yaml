@@ -54,9 +54,10 @@ jobs:
           echo $envIpAddress
           echo $envIpPort
           echo "connectionString = $(echo "${envIpAddress}:${envIpPort}?network=external" | sed -e 's/[]$.*[\^]/\\&/g' )" >> $GITHUB_ENV 
-      - name: add gsed
+      - name: add sed
         run: |
-          sudo apt-get install gsed
+          sudo apt-get update -y
+          sudo apt-get install -y sed
       - name: fix connection string
         run: |   
          gsed -i "s|127\.0\.0\.1|$connectionString|" src/main/java/org/couchbase/quickstart/configs/ConfigDb.java
