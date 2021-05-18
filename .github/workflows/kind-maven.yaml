@@ -55,7 +55,7 @@ jobs:
         uses: jacobtomlinson/gha-find-replace@master
         with:
           find: "localhost"
-          replace: ${{ connectionString }}
+          replace: ${{ env.connectionString }}
           include: src/main/java/org/couchbase/quickstart/configs/ConfigDb.java
       - name: fix connection string
         run: |   
