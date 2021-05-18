@@ -47,7 +47,7 @@ public class userProfileTest {
         //bootstrap database
         DatabaseHelper dbHelper = new DatabaseHelper();
         dbHelper.createDb();
-        
+
         //test data
         Profile testProfile = getTestProfile();
 
