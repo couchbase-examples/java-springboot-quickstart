@@ -49,8 +49,12 @@ jobs:
         run: echo "envIpAddress = $(kubectl get nodes -o jsonpath='{.items[*].status.addresses[?(@.type=="InternalIP")].address}')" >> $GITHUB_ENV
       - name: set envIpPort
         run: echo "envIpPort = $(kubectl get svc default-couchbase-cluster-ui -o jsonpath='{.spec.ports[].nodePort}')" >> $GITHUB_ENV
+      - name: install gawk
+        run: |
+          sudo apt-get update
+          sudo apt-get install gawk
       - name: fix connection string
-        run: sed 's|'127.0.0.1'|'"$envIpAddress":"$envIpPort"?network=external' src/main/java/org/couchbase/quickstart/configs/ConfigDb.java
+        run: gawk -i inplace '{sub(/127.0.0.1/,$envIpAddress:$envIpPort?network=external); { print } ' src/main/java/org/couchbase/quickstart/configs/ConfigDb.java
       - name: validate file fix
         run: cat src/main/java/org/couchbase/quickstart/configs/ConfigDb.java 
       - name: Build with Maven
