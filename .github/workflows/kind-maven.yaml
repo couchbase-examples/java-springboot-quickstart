@@ -46,11 +46,10 @@ jobs:
           sleep 60
           echo 'Get Port'
           echo '*************************'
-          kubectl get svc default-couchbase-cluster-ui
           kubectl get svc default-couchbase-cluster-ui -o jsonpath='{.spec.ports[].nodePort}'
-          echo '\nGet IP of Cluster'
+          echo 'Get IP of Cluster'
           echo '*******************'
-          kubectl get nodes -o wide
+          kubectl get nodes -o wide jsonpath='{.spec.internalIP}'
           echo '*******************'
           kubectl port-forward --namespace default default-couchbase-cluster-0000 8091:8091 &
           kubectl port-forward --namespace default default-couchbase-cluster-0000 8092:8092 &
@@ -59,7 +58,7 @@ jobs:
           kubectl port-forward --namespace default default-couchbase-cluster-0000 11210:11210 &
 
       - name: set env port 
-        run: echo "envIpPort = $(kubectl get svc default-couchbase-cluster-ui -o jsonpath='{.spec.ports[].nodePort}'" >> $GITHUB_ENV
+        run: echo "envIpPort = $(kubectl get svc default-couchbase-cluster-ui -o jsonpath=\'{.spec.ports[].nodePort}\'" >> $GITHUB_ENV
       - name: debug results of env
         run: echo $envIpPort
 
