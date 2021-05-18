@@ -51,12 +51,6 @@ jobs:
       - name:  combine to full connection string 
         run: |
           echo "connectionString = $(echo "${envIpAddress}:${envIpPort}?network=external" | sed -e 's/[]$.*[\^]/\\&/g' )" | xargs >> $GITHUB_ENV 
-      - name: replace connection string
-        uses: jacobtomlinson/gha-find-replace@master
-        with:
-          find: "localhost"
-          replace: ${{ env.connectionString }}
-          include: src/main/java/org/couchbase/quickstart/configs/ConfigDb.java
       - name: fix connection string
         run: |   
          chmod 755 deployment/fix.sh
