@@ -56,7 +56,7 @@ jobs:
           echo "connectionString = $(echo "${envIpAddress}:${envIpPort}?network=external" | sed -e 's/[]$.*[\^]/\\&/g' )" >> $GITHUB_ENV 
       - name: fix connection string
         run: |   
-         sed -i "s|127.0.0.1|$connectionString|" src/main/java/org/couchbase/quickstart/configs/ConfigDb.java
+         sed -i "s|127\.0\.0\.1|$connectionString|" src/main/java/org/couchbase/quickstart/configs/ConfigDb.java
       - name: validate file fix
         run: cat src/main/java/org/couchbase/quickstart/configs/ConfigDb.java 
       - name: Build with Maven
