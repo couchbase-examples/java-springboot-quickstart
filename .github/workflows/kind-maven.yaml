@@ -54,7 +54,7 @@ jobs:
       - name: fix connection string
         run: |   
          chmod 755 deployment/fix.sh
-         ./deployment/fix.sh ${connectionString}
+         ./deployment/fix.sh ${{ env.connectionString }}
       - name: Build with Maven
         run: mvn -B package --file pom.xml
 
