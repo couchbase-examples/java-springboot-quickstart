@@ -50,7 +50,7 @@ jobs:
       - name: set envIpPort
         run: echo "envIpPort = $(kubectl get svc default-couchbase-cluster-ui -o jsonpath='{.spec.ports[].nodePort}')" >> $GITHUB_ENV
       - name: fix connection string
-        run: sed -i 's/127\.0\.0\.1/http\:\/\/$envIpAddress:$envIpPort?network=external' src/main/java/org/couchbase/quickstart/configs/ConfigDb.java
+        run: sed -i 's/127\.0\.0\.1/http\:\/\/\$envIpAddress\:\$envIpPort\?network\=external' src/main/java/org/couchbase/quickstart/configs/ConfigDb.java
       - name: validate file fix
         run: cat src/main/java/org/couchbase/quickstart/configs/ConfigDb.java 
       - name: Build with Maven
