@@ -43,11 +43,10 @@ jobs:
           helm install default --values deployment/operator-values.yaml couchbase/couchbase-operator
       - name: wait for cluster to come up 
         run: |
-          sleep 60
-
+          sleep 180 
       - name: set IPAddress 
         run: |
-          echo "ipAddress = $(kubectl get nodes -o jsonpath='{.items[*].status.addresses[?(@.type=="InternalIP")].address}')" >> $GITHUB_ENV
+          echo "ipAddress=$(kubectl get nodes -o jsonpath='{.items[*].status.addresses[?(@.type=="InternalIP")].address}')" >> $GITHUB_ENV
       - name: set envIpPort
         run: |
           echo "ipPort = $(kubectl get svc default-couchbase-cluster-ui -o jsonpath='{.spec.ports[].nodePort}')" >> $GITHUB_ENV
