@@ -47,20 +47,21 @@ jobs:
           echo 'Get IP Address of Cluster'
           echo '*************************'
           kubectl get pod default-couchbase-cluster-0000 --template={{.status.hostIP}}
-          $envIpAddress = $(kubectl get pod default-couchbase-cluster-0000 --template={{.status.hostIP}})
-          echo 'IP Address of Cluster -> $envIpAddress'
           echo 'Get Port of Cluster'
           echo '*******************'
-          kubectl get service default-couchbase-cluster-0000 -n default 
-
+          kubectl get service default-couchbase-cluster-0000 -n default
+          echo '*******************'
           kubectl port-forward --namespace default default-couchbase-cluster-0000 8091:8091 &
           kubectl port-forward --namespace default default-couchbase-cluster-0000 8092:8092 &
           kubectl port-forward --namespace default default-couchbase-cluster-0000 8093:8093 &
           kubectl port-forward --namespace default default-couchbase-cluster-0000 9140:9140 &
           kubectl port-forward --namespace default default-couchbase-cluster-0000 11210:11210 &
-        env:
-          envIpAdress: 127.0.0.1
-          envPort: 809
+
+      - name: set env ip address
+        run: echo "envIpAddress = $(kubectl get pod default-couchbase-cluster-0000 --template={{.status.hostIP}})" >> $GITHUB_ENV
+      - name: debug results of env
+        run: echo $envIpAddress
+
       - name: Build with Maven
         run: mvn -B package --file pom.xml
 
