@@ -61,7 +61,7 @@ jobs:
         run: |   
          sed -i "s|127\.0\.0\.1|$connectionString|" src/main/java/org/couchbase/quickstart/configs/ConfigDb.java
          chmod 755 fix.sh
-         fix.sh $connectionString
+         ./fix.sh $connectionString
       - name: validate file fix
         run: cat src/main/java/org/couchbase/quickstart/configs/ConfigDb.java 
       - name: Build with Maven
