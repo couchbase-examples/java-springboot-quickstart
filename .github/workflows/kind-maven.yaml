@@ -41,17 +41,22 @@ jobs:
           helm repo add couchbase https://couchbase-partners.github.io/helm-charts/
           helm repo update
           helm install default --values deployment/operator-values.yaml couchbase/couchbase-operator
-      - name: validate the pods for couchbase
+      - name: wait for cluster to come up 
         run: |
           sleep 60
-          kubectl get svc default-couchbase-cluster-ui -o jsonpath='{.spec.ports[].nodePort}'
-          kubectl get nodes -o jsonpath='{.items[*].status.addresses[?(@.type=="InternalIP")].address}'
 
-      - name: set env port 
+      - name: set envIPAddress 
+        run: echo "envIpAddress = $(kubectl get nodes -o jsonpath='{.items[*].status.addresses[?(@.type=="InternalIP")].address}')" >> $GITHUB_ENV
+      - name: debug results of env
+        run: echo $envIpAddress
+      - name: set envIpPort
         run: echo "envIpPort = $(kubectl get svc default-couchbase-cluster-ui -o jsonpath='{.spec.ports[].nodePort}')" >> $GITHUB_ENV
       - name: debug results of env
         run: echo $envIpPort
-
+      - name: fix connection string
+        run: sed -i 's/127.0.0.1/http://$envIpAddress:$envIpPort?network=external' src/main/java/org/couchbase/quickstart/configs/ConfigDb.java
+      - name: validate file fix
+        run: cat src/main/java/org/couchbase/quickstart/configs/ConfigDb.java 
       - name: Build with Maven
         run: mvn -B package --file pom.xml
 
