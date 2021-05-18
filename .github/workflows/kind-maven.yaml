@@ -54,8 +54,8 @@ jobs:
       - name: replace connection string
         uses: jacobtomlinson/gha-find-replace@master
         with:
-          find: "127\.0\.0\.1"
-          replace: ${connectionString}
+          find: "localhost"
+          replace: ${{ connectionString }}
           include: src/main/java/org/couchbase/quickstart/configs/ConfigDb.java
       - name: fix connection string
         run: |   
