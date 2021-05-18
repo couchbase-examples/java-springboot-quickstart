@@ -53,8 +53,6 @@ jobs:
           kubectl port-forward --namespace default default-couchbase-cluster-0000 8093:8093 &
           kubectl port-forward --namespace default default-couchbase-cluster-0000 9140:9140 &
           kubectl port-forward --namespace default default-couchbase-cluster-0000 11210:11210 &
-      - name: hack host file to fix connection via client sdk
-        run: sudo echo "127.0.0.1 default-couchbase-cluster-0000.default-couchbase-cluster.default.svc" | sudo tee -a /etc/hosts
       - name: Build with Maven
         run: mvn -B package --file pom.xml
 
