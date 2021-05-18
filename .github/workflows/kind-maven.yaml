@@ -53,7 +53,9 @@ jobs:
           echo "ipPort = $(kubectl get svc default-couchbase-cluster-ui -o jsonpath='{.spec.ports[].nodePort}')" >> $GITHUB_ENV
       - name:  debug ip and port
         run: |
-          echo "IP Address ${ipAddress} Port ${ipPort}"
+          echo "IP Address $ipAddress Port $ipPort"
+          echo $ipAddress
+          echo $ipPort
       - name: fix connection string
         run: |
           awk -i inplace '{gsub(/127.0.0.1/,"${ipAddress}:${ipPort}?network=external"); print }' src/main/java/org/couchbase/quickstart/configs/ConfigDb.java
