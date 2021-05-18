@@ -1,8 +1,12 @@
 package org.couchbase.quickstart.controllers;
 
+import com.couchbase.client.java.*;
+import com.couchbase.client.java.json.JsonObject;
+import com.couchbase.client.java.query.QueryResult;
 import com.couchbase.client.java.kv.GetResult;
 import com.couchbase.client.java.kv.MutationResult;
 import com.couchbase.client.java.kv.ReplaceOptions;
+
 import org.couchbase.quickstart.factories.DatabaseFactory;
 import org.couchbase.quickstart.models.Profile;
 import org.couchbase.quickstart.models.ProfileList;
@@ -17,12 +21,8 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
 
-import java.util.Locale;
 import java.util.UUID;
 
-import com.couchbase.client.java.*;
-import com.couchbase.client.java.json.JsonObject;
-import com.couchbase.client.java.query.QueryResult;
 import static com.couchbase.client.java.query.QueryOptions.queryOptions;
 
 @RestController
@@ -38,7 +38,6 @@ public class UserProfileController {
             @ApiResponse(code = 500, message = "Internal Server Error", response = Error.class)
     })
     public ResponseEntity<ProfileResult> save(@RequestBody final Profile userProfile) {
-
         if (userProfile.getEmail() == null || userProfile.getEmail() == "") {
             return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(null);
         } else if (userProfile.getPassword() == null || userProfile.getPassword() == ""){
@@ -76,7 +75,6 @@ public class UserProfileController {
             @RequestParam(required=false, defaultValue = "5") int limit,
             @RequestParam(required=false, defaultValue = "0") int skip,
             @RequestParam(required=true) String searchFirstName) {
-
         ProfileList profileList = new ProfileList();
         Cluster cluster = DatabaseFactory.getCluster();
         try {
@@ -108,7 +106,6 @@ public class UserProfileController {
                     @ApiResponse(code = 500, message = "Error occurred in getting user profiles", response = Error.class)
             })
     public ResponseEntity<ProfileResult> getProfile(@RequestParam(required=true) UUID pid) {
-
         Cluster cluster = DatabaseFactory.getCluster();
         try {
             Collection collection = DatabaseFactory.getCollection(cluster);
@@ -132,7 +129,6 @@ public class UserProfileController {
             @ApiResponse(code = 500, message = "Internal Server Error", response = Error.class)
     })
     public ResponseEntity<ProfileResult> update( @PathVariable("pid") UUID pid, @RequestBody Profile profile) {
-
         Cluster cluster = DatabaseFactory.getCluster();
         try {
             Collection collection = DatabaseFactory.getCollection(cluster);
@@ -144,6 +140,26 @@ public class UserProfileController {
                     .put("password", profile.getPassword());
             collection.replace(pid.toString(), content, ReplaceOptions.replaceOptions().cas(result.cas()));
             return ResponseEntity.status(HttpStatus.CREATED).body(new ProfileResult(profile, ""));
+        } catch (Exception e){
+            cluster.disconnect();
+            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(new ProfileResult(new Profile(), String.format("Error: %s",e.getMessage())));
+        }
+    }
+
+    @DeleteMapping(path = "/{id}")
+    @ApiOperation(value = "Delete a Users Profile")
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "OK"),
+            @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
+            @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+            @ApiResponse(code = 500, message = "Internal Server Error", response = Error.class)
+    })
+    public ResponseEntity delete(@PathVariable UUID id){
+        Cluster cluster = DatabaseFactory.getCluster();
+        try {
+            Collection collection = DatabaseFactory.getCollection(cluster);
+            MutationResult removed = collection.remove(id.toString());
+            return ResponseEntity.status(HttpStatus.OK).body(null);
         } catch (Exception e){
             cluster.disconnect();
             return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(new ProfileResult(new Profile(), String.format("Error: %s",e.getMessage())));

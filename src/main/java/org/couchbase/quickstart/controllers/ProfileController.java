@@ -4,11 +4,14 @@ import com.couchbase.client.java.Bucket;
 import com.couchbase.client.java.Cluster;
 import com.couchbase.client.java.Collection;
 import com.couchbase.client.java.Scope;
+import com.couchbase.client.java.kv.MutationResult;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.couchbase.quickstart.configs.ConfigDb;
+import org.couchbase.quickstart.factories.DatabaseFactory;
 import org.couchbase.quickstart.models.Profile;
+import org.couchbase.quickstart.models.ProfileResult;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -88,6 +91,21 @@ public class ProfileController {
         /* replace code with implementation here */
 
         return ResponseEntity.status(HttpStatus.CREATED).body(profile);
+    }
+
+    @DeleteMapping(path = "/{id}")
+    @ApiOperation(value = "Delete a Users Profile")
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "OK"),
+            @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
+            @ApiResponse(code = 404, message = "Not Found", response = Error.class),
+            @ApiResponse(code = 500, message = "Internal Server Error", response = Error.class)
+    })
+    public ResponseEntity delete(@PathVariable UUID id){
+
+        /* replace code with implementation here */
+
+        return ResponseEntity.status(HttpStatus.OK).body(null);
     }
 
     private Collection getDbCollection(){
