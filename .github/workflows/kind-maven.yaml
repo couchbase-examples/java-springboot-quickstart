@@ -46,15 +46,17 @@ jobs:
           sleep 60
 
       - name: set IPAddress 
-        run: echo "ipAddress = $(kubectl get nodes -o jsonpath='{.items[*].status.addresses[?(@.type=="InternalIP")].address}')" >> $GITHUB_ENV
+        run: |
+          echo "ipAddress = $(kubectl get nodes -o jsonpath='{.items[*].status.addresses[?(@.type=="InternalIP")].address}')" >> $GITHUB_ENV
       - name: set envIpPort
-        run: echo "ipPort = $(kubectl get svc default-couchbase-cluster-ui -o jsonpath='{.spec.ports[].nodePort}')" >> $GITHUB_ENV
+        run: |
+          echo "ipPort = $(kubectl get svc default-couchbase-cluster-ui -o jsonpath='{.spec.ports[].nodePort}')" >> $GITHUB_ENV
       - name:  debug ip and port
         run: |
-          echo "IP Address ${{ ipAddress }} Port ${{ ipPort }}"
-          echo "IP Address $ipAddres Port $ipPort"
+          echo "IP Address ${ipAddress} Port ${ipPort}"
       - name: fix connection string
-        run: awk -i inplace '{gsub(/127.0.0.1/,"${{ ipAddress }}:${{ ipPort }}?network=external"); print }' src/main/java/org/couchbase/quickstart/configs/ConfigDb.java
+        run: |
+          awk -i inplace '{gsub(/127.0.0.1/,"${ipAddress}:${ipPort}?network=external"); print }' src/main/java/org/couchbase/quickstart/configs/ConfigDb.java
       - name: validate file fix
         run: cat src/main/java/org/couchbase/quickstart/configs/ConfigDb.java 
       - name: Build with Maven
