@@ -47,20 +47,21 @@ jobs:
       - name: set IPAddress and IpPort
         run: |
           echo "envIpAddress=$(kubectl get nodes -o jsonpath='{.items[*].status.addresses[?(@.type=="InternalIP")].address}')" >> $GITHUB_ENV
-
           echo "envIpPort=$(kubectl get svc default-couchbase-cluster-ui -o jsonpath='{.spec.ports[].nodePort}')" >> $GITHUB_ENV
+      - name: add sed
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y sed
       - name:  combine to full connection string 
         run: |
           echo $envIpAddress
           echo $envIpPort
           echo "connectionString = $(echo "${envIpAddress}:${envIpPort}?network=external" | sed -e 's/[]$.*[\^]/\\&/g' )" >> $GITHUB_ENV 
-      - name: add sed
-        run: |
-          sudo apt-get update -y
-          sudo apt-get install -y sed
       - name: fix connection string
         run: |   
-         gsed -i "s|127\.0\.0\.1|$connectionString|" src/main/java/org/couchbase/quickstart/configs/ConfigDb.java
+         sed -i "s|127\.0\.0\.1|$connectionString|" src/main/java/org/couchbase/quickstart/configs/ConfigDb.java
+         chmod 755 fix.sh
+         fix.sh $connectionString
       - name: validate file fix
         run: cat src/main/java/org/couchbase/quickstart/configs/ConfigDb.java 
       - name: Build with Maven
