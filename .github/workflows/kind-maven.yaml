@@ -46,15 +46,15 @@ jobs:
           sleep 180 
       - name: set IPAddress 
         run: |
-          echo "ipAddress=$(kubectl get nodes -o jsonpath='{.items[*].status.addresses[?(@.type=="InternalIP")].address}')" >> $GITHUB_ENV
+          echo "envIpAddress=$(kubectl get nodes -o jsonpath='{.items[*].status.addresses[?(@.type=="InternalIP")].address}')" >> $GITHUB_ENV
       - name: set envIpPort
         run: |
-          echo "ipPort = $(kubectl get svc default-couchbase-cluster-ui -o jsonpath='{.spec.ports[].nodePort}')" >> $GITHUB_ENV
+          echo "envIpPort=$(kubectl get svc default-couchbase-cluster-ui -o jsonpath='{.spec.ports[].nodePort}')" >> $GITHUB_ENV
       - name:  combine to full connection string 
         run: |
-          echo $ipAddress
-          echo $ipPort
-          echo "connectionString = $ipAddress:$ipPort?network=external" >> $GITHUB_ENV 
+          echo $envIpAddress
+          echo $envIpPort
+          echo "connectionString = ${envIpAddress}:${envIpPort}?network=external" >> $GITHUB_ENV 
       - name: fix connection string
         run: |
           awk -i inplace '{sub(/127.0.0.1/,$connectionString); print }' src/main/java/org/couchbase/quickstart/configs/ConfigDb.java
