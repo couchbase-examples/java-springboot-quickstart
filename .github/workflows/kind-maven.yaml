@@ -53,8 +53,11 @@ jobs:
           echo "connectionString = $(echo "${envIpAddress}:${envIpPort}?network=external" | sed -e 's/[]$.*[\^]/\\&/g' )" | xargs >> $GITHUB_ENV 
       - name: fix connection string
         run: |   
-         chmod 755 deployment/fix.sh
-         ./deployment/fix.sh ${{ env.connectionString }}
+          sed -i'' -e "s|localhost|${{ env.connectionString }}|" src/main/java/org/couchbase/quickstart/configs/ConfigDb.java
+          sed -i'' -e "s|localhost|$connectionString|" src/main/resources/application.properties
+
+          cat src/main/java/org/couchbase/quickstart/configs/ConfigDb.java
+          cat src/main/resources/application.properties
       - name: Build with Maven
         run: mvn -B package --file pom.xml
 
