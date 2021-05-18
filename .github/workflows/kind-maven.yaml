@@ -51,10 +51,10 @@ jobs:
         run: echo "ipPort = $(kubectl get svc default-couchbase-cluster-ui -o jsonpath='{.spec.ports[].nodePort}')" >> $GITHUB_ENV
       - name:  debug ip and port
         run: |
-          echo "IP Address ${{ env.ipAddress }} Port ${{ env.ipPort }}"
-          echo "IP Address $env.ipAddres Port $env.ipPort"
+          echo "IP Address ${{ ipAddress }} Port ${{ ipPort }}"
+          echo "IP Address $ipAddres Port $ipPort"
       - name: fix connection string
-        run: awk -i inplace '{gsub(/127.0.0.1/,"$env.ipAddress:$env.ipPort?network=external"); print }' src/main/java/org/couchbase/quickstart/configs/ConfigDb.java
+        run: awk -i inplace '{gsub(/127.0.0.1/,"${{ ipAddress }}:${{ ipPort }}?network=external"); print }' src/main/java/org/couchbase/quickstart/configs/ConfigDb.java
       - name: validate file fix
         run: cat src/main/java/org/couchbase/quickstart/configs/ConfigDb.java 
       - name: Build with Maven
