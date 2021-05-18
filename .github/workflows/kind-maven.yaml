@@ -45,7 +45,7 @@ jobs:
         run: |
           sleep 60
           kubectl get svc default-couchbase-cluster-ui -o jsonpath='{.spec.ports[].nodePort}'
-          kubectl get nodes -o wide jsonpath='{.items[*].status.addresses[?(@.type=="InternalIP")].address}''
+          kubectl get nodes -o json
 
       - name: set env port 
         run: echo "envIpPort = $(kubectl get svc default-couchbase-cluster-ui -o jsonpath=\'{.spec.ports[].nodePort}\'" >> $GITHUB_ENV
