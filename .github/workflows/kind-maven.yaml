@@ -54,7 +54,7 @@ jobs:
         run: |
           echo $ipAddress
           echo $ipPort
-          echo "connectionString = "$ipAddress:$ipPort?network=external" >> $GITHUB_ENV 
+          echo "connectionString = $ipAddress:$ipPort?network=external" >> $GITHUB_ENV 
       - name: fix connection string
         run: |
           awk -i inplace '{sub(/127.0.0.1/,$connectionString); print }' src/main/java/org/couchbase/quickstart/configs/ConfigDb.java
