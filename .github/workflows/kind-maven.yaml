@@ -44,18 +44,8 @@ jobs:
       - name: validate the pods for couchbase
         run: |
           sleep 60
-          echo 'Get Port'
-          echo '*************************'
           kubectl get svc default-couchbase-cluster-ui -o jsonpath='{.spec.ports[].nodePort}'
-          echo 'Get IP of Cluster'
-          echo '*******************'
-          kubectl get nodes -o wide jsonpath='{.spec.internalIP}'
-          echo '*******************'
-          kubectl port-forward --namespace default default-couchbase-cluster-0000 8091:8091 &
-          kubectl port-forward --namespace default default-couchbase-cluster-0000 8092:8092 &
-          kubectl port-forward --namespace default default-couchbase-cluster-0000 8093:8093 &
-          kubectl port-forward --namespace default default-couchbase-cluster-0000 9140:9140 &
-          kubectl port-forward --namespace default default-couchbase-cluster-0000 11210:11210 &
+          kubectl get nodes -o wide jsonpath='{.items[*].status.addresses[?(@.type=="InternalIP")].address}''
 
       - name: set env port 
         run: echo "envIpPort = $(kubectl get svc default-couchbase-cluster-ui -o jsonpath=\'{.spec.ports[].nodePort}\'" >> $GITHUB_ENV
