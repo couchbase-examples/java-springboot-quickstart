@@ -1,6 +1,7 @@
 package org.couchbase.quickstart.userProfile;
 
 import com.couchbase.client.java.json.JsonObject;
+import org.couchbase.quickstart.helpers.DatabaseHelper;
 import org.couchbase.quickstart.models.Profile;
 import org.couchbase.quickstart.models.ProfileResult;
 
@@ -29,6 +30,10 @@ public class userProfileTest {
 
     @Test
     public void testUserProfileNotFound() {
+        //bootstrap database
+        DatabaseHelper dbHelper = new DatabaseHelper();
+        dbHelper.createDb();
+
         this.webTestClient.get()
                 .uri("/api/v1/userprofiles?limit=5&skip=0&searchFirstName=Bob")
                 .accept(MediaType.APPLICATION_JSON)
@@ -39,6 +44,10 @@ public class userProfileTest {
 
     @Test
     public void testCreateThenDeleteUserProfile() {
+        //bootstrap database
+        DatabaseHelper dbHelper = new DatabaseHelper();
+        dbHelper.createDb();
+        
         //test data
         Profile testProfile = getTestProfile();
 
