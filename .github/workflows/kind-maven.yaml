@@ -57,7 +57,7 @@ jobs:
           echo "connectionString = ${envIpAddress}:${envIpPort}?network=external" >> $GITHUB_ENV 
       - name: fix connection string
         run: |
-          awk -i inplace '{sub(/127.0.0.1/,$connectionString); print }' src/main/java/org/couchbase/quickstart/configs/ConfigDb.java
+          sed -i 's/"127.0.0.1"/$connectionString/' src/main/java/org/couchbase/quickstart/configs/ConfigDb.java
       - name: validate file fix
         run: cat src/main/java/org/couchbase/quickstart/configs/ConfigDb.java 
       - name: Build with Maven
