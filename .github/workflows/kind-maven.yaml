@@ -54,7 +54,7 @@ jobs:
           sudo apt-get install -y sed
       - name:  combine to full connection string 
         run: |
-          echo "connectionString = $(echo "${envIpAddress}:${envIpPort}?network=external" | sed -e 's/[]$.*[\^]/\\&/g' )" >> $GITHUB_ENV 
+          echo "connectionString = $(echo "${envIpAddress}:${envIpPort}?network=external" | sed -e 's/[]$.*[\^]/\\&/g' )" | xargs >> $GITHUB_ENV 
       - name: fix connection string
         run: |   
          chmod 755 deployment/fix.sh
