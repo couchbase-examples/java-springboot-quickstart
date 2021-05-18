@@ -54,14 +54,11 @@ jobs:
           sudo apt-get install -y sed
       - name:  combine to full connection string 
         run: |
-          echo $envIpAddress
-          echo $envIpPort
           echo "connectionString = $(echo "${envIpAddress}:${envIpPort}?network=external" | sed -e 's/[]$.*[\^]/\\&/g' )" >> $GITHUB_ENV 
       - name: fix connection string
         run: |   
-         chmod 755 fix.sh
-         ./fix.sh $connectionString
-         sed -i "s|127\.0\.0\.1|$connectionString|" src/main/java/org/couchbase/quickstart/configs/ConfigDb.java
+         chmod 755 deployment/fix.sh
+         ./deployment/fix.sh ${connectionString}
       - name: Build with Maven
         run: mvn -B package --file pom.xml
 
