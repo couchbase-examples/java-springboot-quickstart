@@ -53,13 +53,10 @@ jobs:
         run: |
           echo $envIpAddress
           echo $envIpPort
-          echo "connectionString = ${envIpAddress}:${envIpPort}?network=external" >> $GITHUB_ENV 
+          echo "connectionString = $(echo "${envIpAddress}:${envIpPort}?network=external" | sed -e 's/[]$.*[\^]/\\&/g' )" >> $GITHUB_ENV 
       - name: fix connection string
-        uses: jacobtomlinson/gha-find-replace@master 
-        with:
-          find: "127.0.0.1"
-          replace: $connectionString
-          include: "src/main/java/org/couchbase/quickstart/configs/ConfigDb.java" 
+        run: |   
+         sed -i "s|127.0.0.1|$connectionString|" src/main/java/org/couchbase/quickstart/configs/ConfigDb.java
       - name: validate file fix
         run: cat src/main/java/org/couchbase/quickstart/configs/ConfigDb.java 
       - name: Build with Maven
