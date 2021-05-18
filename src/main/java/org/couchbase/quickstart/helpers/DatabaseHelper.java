@@ -28,12 +28,18 @@ public class DatabaseHelper {
         //Cluster cluster = Cluster.connect(couchbaseConfig.getConnectionString(), couchbaseConfig.getUserName(), couchbaseConfig.getPassword());
 
         //create bucket - if it already exists this will just fail and we can move on
+        System.out.println("*************************************************************");
+        System.out.println("* Trying to create bucket - might fail if it already exists *");
+        System.out.println("*************************************************************");
+
         try {
             cluster.buckets().createBucket(BucketSettings.create(config.getBucketName())
                     .bucketType(BucketType.COUCHBASE)
                     .ramQuotaMB(256));
         } catch (BucketExistsException e) {
             System.out.println(String.format("Bucket <%s> already exists",config.getBucketName()));
+        } catch (Exception e) {
+            System.out.println(String.format("Generic error <%s>",e.getMessage()));
         }
 
         Bucket bucket = cluster.bucket(config.getBucketName());
@@ -46,6 +52,8 @@ public class DatabaseHelper {
             System.out.println(String.format("Scope <%s> already exists",config.getScope()));
         } catch(CouchbaseException e){
             System.out.println(String.format("Generic error <%s> - this probably means default scope already exists, which is ok",config.getScope()));
+        } catch (Exception e) {
+            System.out.println(String.format("Generic error <%s>",e.getMessage()));
         }
 
         //create collection and scope - if already exists this will just fail
@@ -54,6 +62,8 @@ public class DatabaseHelper {
             collectionManager.createCollection(spec);
         } catch (CollectionExistsException e){
             System.out.println(String.format("Collection <%s> already exists",config.getCollection()));
+        } catch (Exception e) {
+            System.out.println(String.format("Generic error <%s>",e.getMessage()));
         }
 
         String createIndexQuery = String.format("CREATE INDEX profile_lower_firstName ON default:%s._default.profile(lower(`firstName`));", config.getBucketName());
@@ -69,6 +79,5 @@ public class DatabaseHelper {
         } catch (Exception e){
             System.out.println(String.format("General error <%s> when trying to create index <%s>",e.getMessage(), createIndexQuery));
         }
-
     }
 }
