@@ -48,7 +48,7 @@ public class ConfigDb {
     }
 
     public static final ConfigDb getInstance(){
-        return new ConfigDb("http://localhost",
+        return new ConfigDb("localhost",
                 "Administrator",
                 "password",
                 "user_profile",
