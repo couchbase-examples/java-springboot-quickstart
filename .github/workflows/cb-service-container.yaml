@@ -6,6 +6,11 @@ jobs:
     runs-on: alpine-latest
     container: alpine-latest
     steps:
+    - name: Setup couchbase
+      run: |
+        curl  -v -X POST http://couchbase:8091/node/controller/setupServices -d 'services=kv%2Cn1ql%2Cindex' || echo "FAILED TO SETUP SERVICES"
+        curl  -v -X POST http://couchbase:8091/pools/default -d 'memoryQuota=256' -d 'indexMemoryQuota=256' || echo "FAILED TO SETUP QUOTAS"
+        curl  -u Administrator:password -v -X POST http://couchbase:8091/settings/web -d 'password=password&username=Administrator&port=SAME' || echo "FAILED TO SETUP LOGIN"
     - name: Set up JDK 8
       uses: actions/setup-java@v2
       with:
