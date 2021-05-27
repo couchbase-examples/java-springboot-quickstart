@@ -1,9 +1,14 @@
 package org.couchbase.quickstart.userProfile;
 
+import com.couchbase.client.core.error.CollectionExistsException;
 import com.couchbase.client.core.error.DocumentNotFoundException;
+import com.couchbase.client.core.error.IndexExistsException;
 import com.couchbase.client.java.Bucket;
 import com.couchbase.client.java.Cluster;
 import com.couchbase.client.java.json.JsonObject;
+import com.couchbase.client.java.manager.collection.CollectionManager;
+import com.couchbase.client.java.manager.collection.CollectionSpec;
+import com.couchbase.client.java.query.QueryResult;
 import org.couchbase.quickstart.configs.CollectionNames;
 import org.couchbase.quickstart.configs.DBProperties;
 import org.couchbase.quickstart.models.Profile;
@@ -50,6 +55,37 @@ public class UserProfileTest {
 
 
     @Before
+    public void init() {
+                try {
+            cluster.queryIndexes().createPrimaryIndex(prop.getBucketName());
+        } catch (Exception e) {
+            System.out.println("Primary index already exists on bucket "+prop.getBucketName());
+        }
+
+        CollectionManager collectionManager = bucket.collections();
+        try {
+            CollectionSpec spec = CollectionSpec.create(CollectionNames.PROFILE, bucket.defaultScope().name());
+            collectionManager.createCollection(spec);
+        } catch (CollectionExistsException e){
+            System.out.println(String.format("Collection <%s> already exists", CollectionNames.PROFILE));
+        } catch (Exception e) {
+            System.out.println(String.format("Generic error <%s>",e.getMessage()));
+        }
+
+        try {
+            final QueryResult result = cluster.query("CREATE PRIMARY INDEX default_profile_index ON "+prop.getBucketName()+"._default."+ CollectionNames.PROFILE);
+            for (JsonObject row : result.rowsAsObject()){
+                System.out.println(String.format("Index Creation Status %s",row.getObject("meta").getString("status")));
+            }
+        } catch (IndexExistsException e){
+            System.out.println(String.format("Collection's primary index already exists"));
+        } catch (Exception e){
+            System.out.println(String.format("General error <%s> when trying to create index ",e.getMessage()));
+        }
+
+        cluster.query("DELETE FROM "+prop.getBucketName()+"._default.profile ");
+    }
+    
     @AfterEach
     public void cleanDB() {
         cluster.query("DELETE FROM "+prop.getBucketName()+"._default.profile ");
