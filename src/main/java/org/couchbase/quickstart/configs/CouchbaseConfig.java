@@ -1,48 +1,36 @@
 package org.couchbase.quickstart.configs;
 
-import org.springframework.beans.factory.annotation.Value;
+import com.couchbase.client.core.error.BucketExistsException;
+import com.couchbase.client.java.Bucket;
+import com.couchbase.client.java.Cluster;
+import com.couchbase.client.java.manager.bucket.BucketSettings;
+import com.couchbase.client.java.manager.bucket.BucketType;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Component;
 
 @Configuration
 public class CouchbaseConfig {
 
-    @Value("${spring.couchbase.bootstrap-hosts}")
-    private String connectionString;
+    @Autowired
+    private DBProperties dbProp;
 
-    @Value("${spring.couchbase.bucket.name}")
-    private String bucket;
-
-    @Value("${spring.couchbase.bucket.user}")
-    private String username;
-
-    @Value("${spring.couchbase.bucket.password}")
-    private String password;
-
-    @Value("${spring.couchbase.bucket.collection}")
-    private String collection;
-
-    @Value("${spring.couchbase.bucket.scope}")
-    private String scope;
-
-    public String getConnectionString() {
-        return connectionString;
+    @Bean
+    public Cluster getCouchbaseCluster(){
+        return Cluster.connect(dbProp.getHostName(), dbProp.getUsername(), dbProp.getPassword());
     }
 
-    public String getUserName() {
-        return username;
+    @Bean
+    public Bucket getCouchbaseBucket(Cluster cluster){
+
+        //Creates the cluster if it does not exist yet
+        if( !cluster.buckets().getAllBuckets().containsKey(dbProp.getBucketName())) {
+            cluster.buckets().createBucket(BucketSettings.create(dbProp.getBucketName())
+                    .bucketType(BucketType.COUCHBASE)
+                    .ramQuotaMB(256));
+        }
+        return cluster.bucket(dbProp.getBucketName());
     }
 
-    public String getPassword() { return password; }
-
-    public String getBucketName() {
-        return bucket;
-    }
-
-    public String getCollection(){
-        return collection;
-    }
-
-    public String getScope() {
-        return scope;
-    }
 }

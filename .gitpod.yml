@@ -1,0 +1,32 @@
+image:
+  file: .gitpod.Dockerfile
+
+tasks:
+- name: Start Couchbase
+  command:  cd /opt/couchbase/ && ./start-cb.sh
+- name: Start app
+  init: ./mvnw package -DskipTests
+  command: while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' -u Administrator:password localhost:8091/pools/default/buckets/user_profile)" != "200" ]]; do sleep 5; done && java -jar target/*.jar
+
+# exposed ports
+ports:
+- port: 8080
+  onOpen: open-preview
+- port: 8091
+  onOpen: notify
+- port: 8092-10000
+  onOpen: ignore
+- port: 4369
+  onOpen: ignore
+
+github:
+  prebuilds:
+    # enable for the master/default branch (defaults to true)
+    master: true
+
+vscode:
+  extensions:
+    - redhat.java
+    - vscjava.vscode-java-debug
+    - vscjava.vscode-java-test
+    - pivotal.vscode-spring-boot

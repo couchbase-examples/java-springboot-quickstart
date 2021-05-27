@@ -3,19 +3,20 @@ package org.couchbase.quickstart.controllers;
 import com.couchbase.client.java.Bucket;
 import com.couchbase.client.java.Cluster;
 import com.couchbase.client.java.Collection;
-import com.couchbase.client.java.Scope;
-import com.couchbase.client.java.kv.MutationResult;
+import com.couchbase.client.java.json.JsonObject;
+import com.couchbase.client.java.query.QueryScanConsistency;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import org.couchbase.quickstart.configs.ConfigDb;
-import org.couchbase.quickstart.factories.DatabaseFactory;
+import static org.couchbase.quickstart.configs.CollectionNames.PROFILE;
 import org.couchbase.quickstart.models.Profile;
 import org.couchbase.quickstart.models.ProfileResult;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import static com.couchbase.client.java.query.QueryOptions.queryOptions;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +26,16 @@ import java.util.UUID;
 @RequestMapping("/api/v1/profiles")
 public class ProfileController {
 
+    private Cluster cluster;
+    private Collection profileCol;
+
+    public ProfileController(Cluster cluster, Bucket bucket) {
+        this.cluster = cluster;
+        this.profileCol = bucket.collection(PROFILE);
+    }
+
+
+    @CrossOrigin(value="*")
     @PostMapping(path = "/", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Post User Profile")
     @ApiResponses({
@@ -33,14 +44,15 @@ public class ProfileController {
             @ApiResponse(code = 404, message = "Not Found", response = Error.class),
             @ApiResponse(code = 500, message = "Internal Server Error", response = Error.class)
     })
-    public ResponseEntity<Profile> save(@RequestBody final Profile userProfile)
-    {
-        /* replace code with implementation here */
-
+    public ResponseEntity<Profile> save(@RequestBody final Profile userProfile) {
+        //generates an id and save the user
+        userProfile.setPid(UUID.randomUUID().toString());
+        profileCol.insert(userProfile.getPid(), userProfile);
         return ResponseEntity.status(HttpStatus.CREATED).body(userProfile);
     }
 
 
+    @CrossOrigin(value="*")
     @GetMapping(path = "/", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Search for User Profiles", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiResponses(
@@ -51,31 +63,33 @@ public class ProfileController {
     public ResponseEntity<List<Profile>> getProfiles(
             @RequestParam(required=false, defaultValue = "5") int limit,
             @RequestParam(required=false, defaultValue = "0") int skip,
-            @RequestParam(required=true) String searchFirstName) {
+            @RequestParam String searchFirstName) {
 
-        /* replace code with implementation here */
-        Collection collection = getDbCollection();
-
-        List<Profile> profiles = new ArrayList<Profile>();
+        final List<Profile> profiles = cluster.query("SELECT p.* FROM user_profile._default.profile p WHERE lower(p.firstName) LIKE $firstName LIMIT $limit OFFSET $skip",
+                    queryOptions().parameters(JsonObject.create()
+                            .put("firstName", "%"+searchFirstName.toLowerCase()+"%")
+                            .put("limit", limit)
+                            .put("skip", skip))
+                            .scanConsistency(QueryScanConsistency.REQUEST_PLUS))
+                            .rowsAs(Profile.class);
         return ResponseEntity.status(HttpStatus.OK).body(profiles);
     }
 
-
+    @CrossOrigin(value="*")
     @GetMapping(path = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "Get a Users Profile", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Get a User Profile", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiResponses(
             value = {
                     @ApiResponse(code = 200, message = "OK"),
                     @ApiResponse(code = 500, message = "Error occurred in getting user profiles", response = Error.class)
             })
-    public ResponseEntity<Profile> getProfile(@RequestParam(required=true) UUID pid) {
-
-        /* replace code with implementation here */
-
-        Profile profile = new Profile();
+    public ResponseEntity<Profile> getProfile(@RequestParam String pid) {
+        Profile profile = profileCol.get(pid).contentAs(Profile.class);
+        profile.setPid(pid);
         return ResponseEntity.status(HttpStatus.OK).body(profile);
     }
 
+    @CrossOrigin(value="*")
     @PutMapping(path = "/{id}")
     @ApiOperation(value = "Modify a Users Profile", response = Profile.class)
     @ApiResponses({
@@ -84,15 +98,17 @@ public class ProfileController {
             @ApiResponse(code = 404, message = "Not Found", response = Error.class),
             @ApiResponse(code = 500, message = "Internal Server Error", response = Error.class)
     })
-    public ResponseEntity<Profile> update(
-            @PathVariable("id") UUID id,
-            @RequestBody Profile profile) {
+    public ResponseEntity<Profile> update( @PathVariable("id") String id, @RequestBody Profile profile) {
 
-        /* replace code with implementation here */
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(profile);
+        try {
+            profileCol.upsert(id, profile);
+            return ResponseEntity.status(HttpStatus.CREATED).body(new ProfileResult(profile, ""));
+        } catch (Exception e){
+            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(new ProfileResult(new Profile(), String.format("Error: %s",e.getMessage())));
+        }
     }
 
+    @CrossOrigin(value="*")
     @DeleteMapping(path = "/{id}")
     @ApiOperation(value = "Delete a Users Profile")
     @ApiResponses({
@@ -103,18 +119,12 @@ public class ProfileController {
     })
     public ResponseEntity delete(@PathVariable UUID id){
 
-        /* replace code with implementation here */
-
-        return ResponseEntity.status(HttpStatus.OK).body(null);
+        try {
+            profileCol.remove(id.toString());
+            return ResponseEntity.status(HttpStatus.OK).body(null);
+        } catch (Exception e){
+            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(new ProfileResult(new Profile(), String.format("Error: %s",e.getMessage())));
+        }
     }
 
-    private Collection getDbCollection(){
-        ConfigDb config = ConfigDb.getInstance();
-
-        Cluster cluster = Cluster.connect(config.getHostName(), config.getUsername(), config.getPassword());
-        Bucket bucket = cluster.bucket(config.getBucketName());
-        Scope scope = bucket.scope(config.getScope());
-        Collection collection = scope.collection(config.getCollection());
-        return collection;
-    }
 }

@@ -5,11 +5,11 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import java.util.UUID;
 
 public class Profile {
-    private UUID pid;
+    private String pid;
     private String firstName, lastName, email, password;
 
-    public UUID getPid() { return pid; }
-    public void setPid(UUID pid) { this.pid = pid; }
+    public String getPid() { return pid; }
+    public void setPid(String pid) { this.pid = pid; }
 
     public String getFirstName() { return firstName; }
     public void setFirstName(String firstName) { this.firstName =  firstName; }
@@ -27,7 +27,7 @@ public class Profile {
 
     public Profile() { }
 
-    public Profile(UUID pid, String firstName, String lastName, String email, String password){
+    public Profile(String pid, String firstName, String lastName, String email, String password){
         this.pid = pid;
         this.firstName = firstName;
         this.lastName = lastName;
