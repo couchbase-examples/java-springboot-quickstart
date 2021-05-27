@@ -8,6 +8,12 @@ jobs:
     - name: Setup couchbase
       run: |
         wget -O - http://localhost:8091/
+        curl  -u Administrator:password -v -X POST \
+          http://10.142.181.103:8091/nodes/self/controller/settings \
+          -d 'path=%2Fopt%2Fcouchbase%2Fvar%2Flib%2Fcouchbase%2Fdata&' \
+          -d 'index_path=%2Fopt%2Fcouchbase%2Fvar%2Flib%2Fcouchbase%2Fidata&' \
+          -d 'cbas_path=%2Fopt%2Fcouchbase%2Fvar%2Flib%2Fcouchbase%2Fadata&' \
+          -d 'eventing_path=%2Fopt%2Fcouchbase%2Fvar%2Flib%2Fcouchbase%2Fedata&'
         curl  -v -X POST http://localhost:8091/node/controller/setupServices -d 'services=kv%2Cn1ql%2Cindex' || echo "FAILED TO SETUP SERVICES"
         curl  -v -X POST http://localhost:8091/pools/default -d 'memoryQuota=256' -d 'indexMemoryQuota=256' || echo "FAILED TO SETUP QUOTAS"
         curl  -u Administrator:password -v -X POST http://localhost:8091/settings/web -d 'password=password&username=Administrator&port=SAME' || echo "FAILED TO SETUP LOGIN"
