@@ -3,7 +3,7 @@ on:
   workflow_dispatch
 jobs:
   tests:
-    runs-on: ubuntu
+    runs-on: ubuntu-latest
     container: java:9-jdk
     steps:
     - uses: actions/checkout@v2
