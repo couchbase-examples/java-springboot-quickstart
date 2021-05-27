@@ -19,6 +19,7 @@ import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.rules.ExpectedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
@@ -55,38 +56,6 @@ public class UserProfileTest {
 
 
     @Before
-    public void init() {
-                try {
-            cluster.queryIndexes().createPrimaryIndex(prop.getBucketName());
-        } catch (Exception e) {
-            System.out.println("Primary index already exists on bucket "+prop.getBucketName());
-        }
-
-        CollectionManager collectionManager = bucket.collections();
-        try {
-            CollectionSpec spec = CollectionSpec.create(CollectionNames.PROFILE, bucket.defaultScope().name());
-            collectionManager.createCollection(spec);
-        } catch (CollectionExistsException e){
-            System.out.println(String.format("Collection <%s> already exists", CollectionNames.PROFILE));
-        } catch (Exception e) {
-            System.out.println(String.format("Generic error <%s>",e.getMessage()));
-        }
-
-        try {
-            final QueryResult result = cluster.query("CREATE PRIMARY INDEX default_profile_index ON "+prop.getBucketName()+"._default."+ CollectionNames.PROFILE);
-            for (JsonObject row : result.rowsAsObject()){
-                System.out.println(String.format("Index Creation Status %s",row.getObject("meta").getString("status")));
-            }
-        } catch (IndexExistsException e){
-            System.out.println(String.format("Collection's primary index already exists"));
-        } catch (Exception e){
-            System.out.println(String.format("General error <%s> when trying to create index ",e.getMessage()));
-        }
-
-        cluster.query("DELETE FROM "+prop.getBucketName()+"._default.profile ");
-    }
-    
-    @AfterEach
     public void cleanDB() {
         cluster.query("DELETE FROM "+prop.getBucketName()+"._default.profile ");
     }

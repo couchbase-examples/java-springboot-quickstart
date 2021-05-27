@@ -30,6 +30,12 @@ public class DBSetupRunner implements CommandLineRunner {
     @Override
     public void run(String... args) {
 
+        System.out.println("||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+        System.out.println("||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+        System.out.println("||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+        System.out.println("||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+        System.out.println("||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+        System.out.println("||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
         try {
             cluster.queryIndexes().createPrimaryIndex(props.getBucketName());
         } catch (Exception e) {
@@ -40,6 +46,7 @@ public class DBSetupRunner implements CommandLineRunner {
         try {
             CollectionSpec spec = CollectionSpec.create(CollectionNames.PROFILE, bucket.defaultScope().name());
             collectionManager.createCollection(spec);
+            Thread.sleep(10000);
         } catch (CollectionExistsException e){
             System.out.println(String.format("Collection <%s> already exists", CollectionNames.PROFILE));
         } catch (Exception e) {
@@ -58,4 +65,8 @@ public class DBSetupRunner implements CommandLineRunner {
         }
 
     }
+//
+//    private QueryResult createCollectionIndex() throws Exception {
+//        return cluster.query("CREATE PRIMARY INDEX default_profile_index ON "+props.getBucketName()+"._default."+ CollectionNames.PROFILE);
+//    }
 }
