@@ -10,7 +10,7 @@ jobs:
         printf "Waiting for CB startup..."
         wget -O /dev/null  http://localhost:8091/ && echo "DONE" || (echo "FAIL" && panic)
         curl  -u Administrator:password -v -X POST \
-          http://10.142.181.103:8091/nodes/self/controller/settings \
+          http://localhost:8091/nodes/self/controller/settings \
           -d 'path=%2Fopt%2Fcouchbase%2Fvar%2Flib%2Fcouchbase%2Fdata&' \
           -d 'index_path=%2Fopt%2Fcouchbase%2Fvar%2Flib%2Fcouchbase%2Fidata&' \
           -d 'cbas_path=%2Fopt%2Fcouchbase%2Fvar%2Flib%2Fcouchbase%2Fadata&' \
