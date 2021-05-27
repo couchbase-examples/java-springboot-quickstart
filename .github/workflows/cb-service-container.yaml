@@ -22,4 +22,6 @@ jobs:
       run: mvn -B package --file pom.xml
     services:
       couchbase:
-        image: couchbase:7.0.0-beta
+        image: couchbase:community-7.0.0-beta
+        ports:
+          - 8091:8091
