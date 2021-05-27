@@ -19,8 +19,6 @@ on:
 jobs:
   kind:
     runs-on: ubuntu-latest
-    env:
-      connectionString: localhost:8091
     strategy:
       matrix:
         node-version: [14.x]
@@ -52,10 +50,11 @@ jobs:
           echo "envIpPort=$(kubectl get svc default-couchbase-cluster-ui -o jsonpath='{.spec.ports[].nodePort}')" >> $GITHUB_ENV
       - name:  combine to full connection string 
         run: |
-          echo "connectionString = $(echo "${envIpAddress}:${envIpPort}?network=external" | sed -e 's/[]$.*[\^]/\\&/g' )" | xargs >> $GITHUB_ENV 
+          echo "connectionString=$(echo "${envIpAddress}:${envIpPort}?network=external" | sed -e 's/[]$.*[\^]/\\&/g' )" | xargs >> $GITHUB_ENV 
       - name: fix connection string
-        run: |   
-          sed -i'' -e "s|localhost|$connectionString|" src/main/resources/application.properties
+        run: |
+          echo "${{ env.connectionString }}"
+          sed -i'' -e "s|localhost|${{ env.connectionString }}|" src/main/resources/application.properties
           cat src/main/resources/application.properties
       - name: Build with Maven
         run: mvn -B package --file pom.xml
