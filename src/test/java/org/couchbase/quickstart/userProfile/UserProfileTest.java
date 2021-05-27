@@ -49,7 +49,8 @@ public class UserProfileTest {
     @Rule
     public ExpectedException exceptionRule = ExpectedException.none();
 
-    @Before
+
+    @AfterEach
     public void cleanDB() {
         cluster.query("DELETE FROM "+prop.getBucketName()+"._default.profile ");
     }
