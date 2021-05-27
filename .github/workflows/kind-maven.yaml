@@ -50,7 +50,7 @@ jobs:
           echo "envIpPort=$(kubectl get svc default-couchbase-cluster-ui -o jsonpath='{.spec.ports[].nodePort}')" >> $GITHUB_ENV
       - name:  combine to full connection string 
         run: |
-          echo "connectionString=$(echo "${envIpAddress}:${envIpPort}?network=external" | sed -e 's/[]$.*[\^]/\\&/g' )" | xargs >> $GITHUB_ENV 
+          echo "connectionString=$(echo "http://${envIpAddress}:${envIpPort}?network=external" | sed -e 's/[]$.*[\^]/\\&/g' )" | xargs >> $GITHUB_ENV 
       - name: fix connection string
         run: |
           echo "${{ env.connectionString }}"
