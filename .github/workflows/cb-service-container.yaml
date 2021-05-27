@@ -1,0 +1,14 @@
+name: Run maven tests using couchbase service container
+on:
+  workflow_dispatch
+jobs:
+  tests:
+    runs-on: ubuntu
+    container: java:9-jdk
+    steps:
+    - uses: actions/checkout@v2
+    - name: Build with Maven
+      run: mvn -B package --file pom.xml
+    services:
+      couchbase:
+        image: couchbase:7.0.0-beta
