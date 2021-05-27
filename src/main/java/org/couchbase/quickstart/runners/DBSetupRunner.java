@@ -33,6 +33,7 @@ public class DBSetupRunner implements CommandLineRunner {
             cluster.queryIndexes().createPrimaryIndex(props.getBucketName());
         } catch (Exception e) {
             System.out.println("Primary index already exists on bucket "+props.getBucketName());
+            e.printStackTrace();
         }
 
         CollectionManager collectionManager = bucket.collections();
