@@ -6,8 +6,9 @@ tasks:
   command:  cd /opt/couchbase/ && ./start-cb.sh
 - name: Start app
   init: ./mvnw package -DskipTests
-  command: while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' -u Administrator:password localhost:8091/pools/default/buckets/user_profile)" != "200" ]]; do sleep 5; done && java -jar target/*.jar
-
+  command: java -jar target/*.jar
+- name: Log use
+  command: curl -s 'https://da-demo-images.s3.amazonaws.com/runItNow_outline.png?couchbase-example=java-springboot-quickstart-repo&source=gitpod' > /dev/null
 # exposed ports
 ports:
 - port: 8080
