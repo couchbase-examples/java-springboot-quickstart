@@ -31,3 +31,9 @@ hs_err_pid*
 *.swp
 
 target/surefire-reports/
+
+# eclipse
+.classpath
+.factorypath
+.project
+.settings
