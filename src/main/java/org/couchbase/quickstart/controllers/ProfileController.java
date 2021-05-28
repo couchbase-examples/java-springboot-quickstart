@@ -34,6 +34,7 @@ public class ProfileController {
     private DBProperties dbProperties;
 
     public ProfileController(Cluster cluster, Bucket bucket, DBProperties dbProperties) {
+      System.out.println("Initializing profile controller, cluster: " + cluster + "; bucket: " + bucket);
         this.cluster = cluster;
         this.profileCol = bucket.collection(PROFILE);
         this.dbProperties = dbProperties;
