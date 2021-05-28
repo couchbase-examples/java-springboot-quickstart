@@ -31,6 +31,7 @@ public class DBSetupRunner implements CommandLineRunner {
     public void run(String... args) {
         try {
             cluster.queryIndexes().createPrimaryIndex(props.getBucketName());
+            System.out.println("Created primary index" + props.getBucketName());
         } catch (Exception e) {
             System.out.println("Primary index already exists on bucket "+props.getBucketName());
             e.printStackTrace();
@@ -40,7 +41,8 @@ public class DBSetupRunner implements CommandLineRunner {
         try {
             CollectionSpec spec = CollectionSpec.create(CollectionNames.PROFILE, bucket.defaultScope().name());
             collectionManager.createCollection(spec);
-            Thread.sleep(15000);
+            Thread.sleep(10000);
+            System.out.println("Created collection" + CollectionNames.PROFILE);
         } catch (CollectionExistsException e){
             System.out.println(String.format("Collection <%s> already exists", CollectionNames.PROFILE));
         } catch (Exception e) {
@@ -52,7 +54,7 @@ public class DBSetupRunner implements CommandLineRunner {
             for (JsonObject row : result.rowsAsObject()){
                 System.out.println(String.format("Index Creation Status %s",row.getObject("meta").getString("status")));
             }
-            Thread.sleep(10000);
+            System.out.println("Created primary index on collection " + CollectionNames.PROFILE);
         } catch (IndexExistsException e){
             System.out.println(String.format("Collection's primary index already exists"));
         } catch (Exception e){
