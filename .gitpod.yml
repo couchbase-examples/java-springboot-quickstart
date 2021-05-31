@@ -9,6 +9,7 @@ tasks:
 - name: Start app
   init: ./mvnw package -DskipTests
   command: java -jar target/*.jar
+
 # exposed ports
 ports:
 - port: 8080
