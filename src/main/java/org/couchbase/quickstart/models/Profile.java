@@ -1,9 +1,5 @@
 package org.couchbase.quickstart.models;
 
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-
-import java.util.UUID;
-
 public class Profile {
     private String pid;
     private String firstName, lastName, email, password;
@@ -22,7 +18,7 @@ public class Profile {
 
     public String getPassword() { return password; }
     public void setPassword(String password) {
-        this.password = getEncryptedPassword(password);
+        this.password = password;
     }
 
     public Profile() { }
@@ -43,13 +39,4 @@ public class Profile {
         this.password = profile.getPassword();
     }
 
-    //simple encoding to encrypt the password using BCrypt
-    //for a more robust way to encrypt passwords, see documentation:
-    //https://docs.couchbase.com/java-sdk/current/concept-docs/encryption.html
-    private String getEncryptedPassword(String decryptedPassword){
-        //note to see if the password matches the encrypted password you can use the
-        //encoder.matches method
-        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-        return encoder.encode(decryptedPassword);
-    }
 }

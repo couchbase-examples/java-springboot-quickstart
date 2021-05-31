@@ -1,7 +1,12 @@
-META-INF/spring-configuration-metadata.json
+org/couchbase/quickstart/controllers/ProfileController.class
+org/couchbase/quickstart/runners/DBSetupRunner.class
+org/couchbase/quickstart/models/ProfileList.class
+org/couchbase/quickstart/Application.class
+org/couchbase/quickstart/controllers/IndexController.class
 org/couchbase/quickstart/controllers/HealthCheckController.class
 org/couchbase/quickstart/models/Profile.class
 org/couchbase/quickstart/configs/Swagger.class
-org/couchbase/quickstart/controllers/UserProfileController.class
-org/couchbase/quickstart/Application.class
-org/couchbase/quickstart/configs/ConfigProperties.class
+org/couchbase/quickstart/configs/DBProperties.class
+org/couchbase/quickstart/configs/CollectionNames.class
+org/couchbase/quickstart/configs/CouchbaseConfig.class
+org/couchbase/quickstart/models/ProfileResult.class

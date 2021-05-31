@@ -1,14 +1,9 @@
 package org.couchbase.quickstart.userProfile;
 
-import com.couchbase.client.core.error.CollectionExistsException;
 import com.couchbase.client.core.error.DocumentNotFoundException;
-import com.couchbase.client.core.error.IndexExistsException;
 import com.couchbase.client.java.Bucket;
 import com.couchbase.client.java.Cluster;
 import com.couchbase.client.java.json.JsonObject;
-import com.couchbase.client.java.manager.collection.CollectionManager;
-import com.couchbase.client.java.manager.collection.CollectionSpec;
-import com.couchbase.client.java.query.QueryResult;
 import org.couchbase.quickstart.configs.CollectionNames;
 import org.couchbase.quickstart.configs.DBProperties;
 import org.couchbase.quickstart.models.Profile;
@@ -18,8 +13,6 @@ import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Rule;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.rules.ExpectedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
