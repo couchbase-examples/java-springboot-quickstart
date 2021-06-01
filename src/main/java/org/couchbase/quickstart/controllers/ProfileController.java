@@ -10,6 +10,7 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import static org.couchbase.quickstart.configs.CollectionNames.PROFILE;
 import org.couchbase.quickstart.models.Profile;
+import org.couchbase.quickstart.models.ProfileRequest;
 import org.couchbase.quickstart.models.ProfileResult;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -42,11 +43,11 @@ public class ProfileController {
             @ApiResponse(code = 201, message = "Created", response = Profile.class),
             @ApiResponse(code = 500, message = "Internal Server Error", response = Error.class)
     })
-    public ResponseEntity<Profile> save(@RequestBody final Profile userProfile) {
+    public ResponseEntity<Profile> save(@RequestBody final ProfileRequest userProfile) {
         //generates an id and save the user
-        userProfile.setPid(UUID.randomUUID().toString());
-        profileCol.insert(userProfile.getPid(), userProfile);
-        return ResponseEntity.status(HttpStatus.CREATED).body(userProfile);
+        Profile profile = userProfile.getProfile();
+        profileCol.insert(profile.getPid(), profile);
+        return ResponseEntity.status(HttpStatus.CREATED).body(profile);
     }
 
 
