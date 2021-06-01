@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/v1/profiles")
+@RequestMapping("/api/v1/profile")
 public class ProfileController {
 
     private Cluster cluster;
@@ -37,11 +37,9 @@ public class ProfileController {
 
     @CrossOrigin(value="*")
     @PostMapping(path = "/", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "Post User Profile")
+    @ApiOperation(value = "Create a user profile from the request")
     @ApiResponses({
             @ApiResponse(code = 201, message = "Created", response = Profile.class),
-            @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
-            @ApiResponse(code = 404, message = "Not Found", response = Error.class),
             @ApiResponse(code = 500, message = "Internal Server Error", response = Error.class)
     })
     public ResponseEntity<Profile> save(@RequestBody final Profile userProfile) {
@@ -53,21 +51,21 @@ public class ProfileController {
 
 
     @CrossOrigin(value="*")
-    @GetMapping(path = "/", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "Search for User Profiles", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(path = "/profiles/", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Search for user profiles", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiResponses(
             value = {
-                    @ApiResponse(code = 200, message = "OK"),
+                    @ApiResponse(code = 200, message = "Returns the list of user profiles"),
                     @ApiResponse(code = 500, message = "Error occurred in getting user profiles", response = Error.class)
             })
     public ResponseEntity<List<Profile>> getProfiles(
             @RequestParam(required=false, defaultValue = "5") int limit,
             @RequestParam(required=false, defaultValue = "0") int skip,
-            @RequestParam String searchFirstName) {
+            @RequestParam String search) {
 
-        final List<Profile> profiles = cluster.query("SELECT p.* FROM user_profile._default.profile p WHERE lower(p.firstName) LIKE $firstName LIMIT $limit OFFSET $skip",
+        final List<Profile> profiles = cluster.query("SELECT p.* FROM user_profile._default.profile p WHERE lower(p.firstName) LIKE $search OR lower(p.lastName) LIKE $search LIMIT $limit OFFSET $skip",
                     queryOptions().parameters(JsonObject.create()
-                            .put("firstName", "%"+searchFirstName.toLowerCase()+"%")
+                            .put("search", "%"+ search.toLowerCase()+"%")
                             .put("limit", limit)
                             .put("skip", skip))
                             .scanConsistency(QueryScanConsistency.REQUEST_PLUS))
@@ -77,7 +75,7 @@ public class ProfileController {
 
     @CrossOrigin(value="*")
     @GetMapping(path = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "Get a User Profile", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Get a user profile by Id", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiResponses(
             value = {
                     @ApiResponse(code = 200, message = "OK"),
@@ -91,12 +89,11 @@ public class ProfileController {
 
     @CrossOrigin(value="*")
     @PutMapping(path = "/{id}")
-    @ApiOperation(value = "Modify a Users Profile", response = Profile.class)
+    @ApiOperation(value = "Update a user profile", response = Profile.class)
     @ApiResponses({
-            @ApiResponse(code = 200, message = "OK", response = Profile.class),
-            @ApiResponse(code = 401, message = "Unauthorized", response = Error.class),
-            @ApiResponse(code = 404, message = "Not Found", response = Error.class),
-            @ApiResponse(code = 500, message = "Internal Server Error", response = Error.class)
+            @ApiResponse(code = 200, message = "Updated the user profile", response = Profile.class),
+            @ApiResponse(code = 404, message = "user profile not found", response = Error.class),
+            @ApiResponse(code = 500, message = "returns internal server error", response = Error.class)
     })
     public ResponseEntity<Profile> update( @PathVariable("id") String id, @RequestBody Profile profile) {
 
