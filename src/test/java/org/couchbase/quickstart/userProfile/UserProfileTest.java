@@ -7,7 +7,7 @@ import com.couchbase.client.java.json.JsonObject;
 import org.couchbase.quickstart.configs.CollectionNames;
 import org.couchbase.quickstart.configs.DBProperties;
 import org.couchbase.quickstart.models.Profile;
-import org.couchbase.quickstart.models.ProfileResult;
+import org.couchbase.quickstart.models.ProfileRequest;
 
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
@@ -56,7 +56,7 @@ public class UserProfileTest {
     public void testUserProfileNotFound() {
 
         this.webTestClient.get()
-                .uri("/api/v1/profiles?limit=5&skip=0&searchFirstName=Bob")
+                .uri("/api/v1/profile?limit=5&skip=0&searchFirstName=Bob")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().is4xxClientError()
@@ -66,28 +66,28 @@ public class UserProfileTest {
     @Test
     public void testCreateUserProfile(){
         //test data
-        Profile testProfile = getTestProfile();
-        String json = getCreatedUserJson(testProfile);
+        ProfileRequest createTestProfile = getCreateTestProfile();
+        String json = getCreatedUserJson(createTestProfile);
 
         //run the post test
-        EntityExchangeResult<ProfileResult> profileResult = this.webTestClient.post()
-                .uri("/api/v1/profiles/")
+        EntityExchangeResult<Profile> profileResult = this.webTestClient.post()
+                .uri("/api/v1/profile/")
                 .bodyValue(json)
                 .accept(MediaType.APPLICATION_JSON)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .exchange()
                 .expectStatus().isCreated()
-                .expectBody(ProfileResult.class)
+                .expectBody(Profile.class)
                 .returnResult();
 
         Profile result = bucket.collection(CollectionNames.PROFILE)
                 .get(profileResult.getResponseBody().getPid())
                 .contentAs(Profile.class);
 
-        assertEquals(result.getFirstName(), testProfile.getFirstName());
-        assertEquals(result.getLastName(), testProfile.getLastName());
-        assertEquals(result.getEmail(), testProfile.getEmail());
-        assertEquals(result.getPassword(), testProfile.getPassword());
+        assertEquals(result.getFirstName(), createTestProfile.getFirstName());
+        assertEquals(result.getLastName(), createTestProfile.getLastName());
+        assertEquals(result.getEmail(), createTestProfile.getEmail());
+        assertNotEquals(result.getPassword(), createTestProfile.getPassword());
         assertNotNull(result.getPid());
     }
 
@@ -100,7 +100,7 @@ public class UserProfileTest {
         bucket.collection(CollectionNames.PROFILE).insert(testProfile.getPid(), testProfile);
 
         EntityExchangeResult<List<Profile>> profileListResult = this.webTestClient.get()
-            .uri("/api/v1/profiles/?limit=5&skip=0&searchFirstName=Jam")
+            .uri("/api/v1/profile/?limit=5&skip=0&searchFirstName=Jam")
             .accept(MediaType.APPLICATION_JSON)
             .exchange()
             .expectStatus().isOk()
@@ -127,7 +127,7 @@ public class UserProfileTest {
         bucket.collection(CollectionNames.PROFILE).insert(testProfile.getPid(), testProfile);
 
         EntityExchangeResult<List<Profile>> profileListResult = this.webTestClient.get()
-            .uri("/api/v1/profiles/?limit=5&skip=0&searchFirstName=Jack")
+            .uri("/api/v1/profile/?limit=5&skip=0&searchFirstName=Jack")
             .accept(MediaType.APPLICATION_JSON)
             .exchange()
             .expectStatus().isOk()
@@ -150,7 +150,7 @@ public class UserProfileTest {
 
         //delete the user
         this.webTestClient.delete()
-                .uri(String.format("/api/v1/profiles/%s", testProfile.getPid()))
+                .uri(String.format("/api/v1/profile/%s", testProfile.getPid()))
                 .accept(MediaType.APPLICATION_JSON)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .exchange()
@@ -159,13 +159,21 @@ public class UserProfileTest {
         bucket.collection(CollectionNames.PROFILE).get(testProfile.getPid());
     }
 
-    private String getCreatedUserJson(Profile profile) {
+    private String getCreatedUserJson(ProfileRequest profile) {
         //create json to post to integration test
         return JsonObject.create()
                 .put("firstName", profile.getFirstName())
                 .put("lastName", profile.getLastName())
                 .put("password", profile.getPassword())
                 .put("email", profile.getEmail()).toString();
+    }
+
+    private ProfileRequest getCreateTestProfile() {
+        return new ProfileRequest(
+                "James",
+                "Gosling",
+                "password",
+                "james.gosling@sun.com");
     }
 
     private Profile getTestProfile() {
