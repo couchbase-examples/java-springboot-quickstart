@@ -28,7 +28,7 @@ public class CouchbaseConfig {
         if( !cluster.buckets().getAllBuckets().containsKey(dbProp.getBucketName())) {
             cluster.buckets().createBucket(BucketSettings.create(dbProp.getBucketName())
                     .bucketType(BucketType.COUCHBASE)
-                    .ramQuotaMB(256));
+                    .ramQuotaMB(128));
         }
         return cluster.bucket(dbProp.getBucketName());
     }

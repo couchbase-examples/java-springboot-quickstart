@@ -1,28 +1,58 @@
 name: Run maven tests using couchbase service container
 on:
-  workflow_dispatch
+  push:
+  schedule:
+  - cron: "0 11 * * 0"
 jobs:
   tests:
     runs-on: ubuntu-latest
-    container: java:9-jdk
     steps:
-    - name: Setup couchbase
+    - name: Update repositories
       run: |
-        printf "Waiting for CB startup..."
-        wget -O /dev/null  http://couchbase:8091/ && echo "DONE" || (echo "FAIL" && panic)
-        curl  -v -X POST http://couchbase:8091/node/controller/setupServices -d 'services=kv%2Cn1ql%2Cindex'
-        curl  -v -X POST http://couchbase:8091/pools/default -d 'memoryQuota=256' -d 'indexMemoryQuota=256'
-        curl  -u Administrator:password -v -X POST http://couchbase:8091/settings/web -d 'password=password&username=Administrator&port=SAME'
-        curl  -u Administrator:password -v -X POST http://couchbase:8091/settings/indexes -d 'storageMode=memory_optimized'
-        curl  -u Administrator:password -v -X GET http://couchbase:8091/pools/default | jq '.' | grep hostname
-    - name: Set up JDK 8
+        apt update || echo "apt-update failed" # && apt -y upgrade 
+    - name: Set up JDK 11
       uses: actions/setup-java@v2
       with:
-        java-version: '8'
+        java-version: '11'
         distribution: 'adopt'
+    - name: Setup couchbase
+      run: |
+        apt install -y iputils-ping || echo "apt-install failed"
+        ping -c 1 couchbase && (
+          apt install -y socat
+          socat TCP-LISTEN:8091,fork TCP:couchbase:8091 &
+          socat TCP-LISTEN:8092,fork TCP:couchbase:8092 &
+          socat TCP-LISTEN:8093,fork TCP:couchbase:8093 &
+          socat TCP-LISTEN:8094,fork TCP:couchbase:8094 &
+          socat TCP-LISTEN:8095,fork TCP:couchbase:8095 &
+          socat TCP-LISTEN:8096,fork TCP:couchbase:8096 &
+          socat TCP-LISTEN:9140,fork TCP:couchbase:9140 &
+          socat TCP-LISTEN:11210,fork TCP:couchbase:11210 &
+          socat TCP-LISTEN:11211,fork TCP:couchbase:11211 &
+          socat TCP-LISTEN:11207,fork TCP:couchbase:11207 &
+          socat TCP-LISTEN:18091,fork TCP:couchbase:18091 &
+          socat TCP-LISTEN:18092,fork TCP:couchbase:18092 &
+          socat TCP-LISTEN:18093,fork TCP:couchbase:18093 &
+          socat TCP-LISTEN:18094,fork TCP:couchbase:18094 &
+          socat TCP-LISTEN:18095,fork TCP:couchbase:18095 &
+          socat TCP-LISTEN:18096,fork TCP:couchbase:18096 &
+        ) && echo "Initialized couchbase port forwarding" || echo "ping couchbase failed, not forwarding ports"
+        printf "Waiting for CB startup..."
+        wget -O /dev/null  http://localhost:8091/ && echo "DONE" || (echo "FAIL" && panic)
+        curl  -v -X POST http://localhost:8091/node/controller/setupServices -d 'services=kv%2Cn1ql%2Cindex'
+        curl  -v -X POST http://localhost:8091/pools/default -d 'memoryQuota=256' -d 'indexMemoryQuota=256'
+        curl  -u Administrator:password -v -X POST http://localhost:8091/settings/web -d 'password=password&username=Administrator&port=SAME'
+         curl -v -X POST http://localhost:8091/pools/default/buckets \
+          -u Administrator:password \
+          -d name=user_profile \
+          -d bucketType=couchbase\
+          -d ramQuotaMB=1024 \
+          -d durabilityMinLevel=majorityAndPersistActive
+        curl  -u Administrator:password -v -X POST http://localhost:8091/settings/indexes -d 'storageMode=memory_optimized'
+        curl  -u Administrator:password -v -X GET http://localhost:8091/pools/default | jq '.' | grep hostname
     - uses: actions/checkout@v2
     - name: Build with Maven
-      run: mvn -B package --file pom.xml
+      run: mvn --batch-mode --update-snapshots -B package --file pom.xml verify
     services:
       couchbase:
         image: couchbase:enterprise-7.0.0-beta
