@@ -47,7 +47,6 @@ public class UserProfileTest {
     @Rule
     public ExpectedException exceptionRule = ExpectedException.none();
 
-
     @Before
     public void cleanDB() {
         cluster.query("DELETE FROM "+prop.getBucketName()+"._default.profile ");
@@ -88,7 +87,7 @@ public class UserProfileTest {
         assertEquals(result.getFirstName(), testProfile.getFirstName());
         assertEquals(result.getLastName(), testProfile.getLastName());
         assertEquals(result.getEmail(), testProfile.getEmail());
-        assertNotEquals(result.getPassword(), testProfile.getPassword());
+        assertEquals(result.getPassword(), testProfile.getPassword());
         assertNotNull(result.getPid());
     }
 
@@ -115,7 +114,7 @@ public class UserProfileTest {
         assertEquals(result.getFirstName(), testProfile.getFirstName());
         assertEquals(result.getLastName(), testProfile.getLastName());
         assertEquals(result.getEmail(), testProfile.getEmail());
-        assertNotEquals(result.getPassword(), testProfile.getPassword());
+        assertEquals(result.getPassword(), testProfile.getPassword());
         assertNotNull(result.getPid());
     }
 
@@ -174,7 +173,7 @@ public class UserProfileTest {
                 UUID.randomUUID().toString(),
                 "James",
                 "Gosling",
-                "password",
-                "james.gosling@sun.com");
+                "james.gosling@sun.com",
+                "password");
     }
 }

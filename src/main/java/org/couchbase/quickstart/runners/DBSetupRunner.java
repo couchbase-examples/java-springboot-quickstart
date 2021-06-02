@@ -51,6 +51,7 @@ public class DBSetupRunner implements CommandLineRunner {
             for (JsonObject row : result.rowsAsObject()){
                 System.out.println(String.format("Index Creation Status %s",row.getObject("meta").getString("status")));
             }
+            Thread.sleep(10000);
         } catch (IndexExistsException e){
             System.out.println(String.format("Collection's primary index already exists"));
         } catch (Exception e){
