@@ -39,3 +39,6 @@ target/surefire-reports/
 .factorypath
 .project
 .settings
+
+# tags
+tags
