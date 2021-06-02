@@ -8,7 +8,6 @@ import org.couchbase.quickstart.configs.CollectionNames;
 import org.couchbase.quickstart.configs.DBProperties;
 import org.couchbase.quickstart.models.Profile;
 import org.couchbase.quickstart.models.ProfileRequest;
-import org.couchbase.quickstart.models.ProfileResult;
 
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
@@ -72,14 +71,14 @@ public class UserProfileTest {
         String json = getCreatedUserJson(createTestProfile);
 
         //run the post test
-        EntityExchangeResult<ProfileResult> profileResult = this.webTestClient.post()
+        EntityExchangeResult<Profile> profileResult = this.webTestClient.post()
                 .uri("/api/v1/profile/")
                 .bodyValue(json)
                 .accept(MediaType.APPLICATION_JSON)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .exchange()
                 .expectStatus().isCreated()
-                .expectBody(ProfileResult.class)
+                .expectBody(Profile.class)
                 .returnResult();
 
         Profile result = bucket.collection(CollectionNames.PROFILE)

@@ -9,9 +9,11 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import static org.couchbase.quickstart.configs.CollectionNames.PROFILE;
+
+import org.couchbase.quickstart.configs.CollectionNames;
+import org.couchbase.quickstart.configs.DBProperties;
 import org.couchbase.quickstart.models.Profile;
 import org.couchbase.quickstart.models.ProfileRequest;
-import org.couchbase.quickstart.models.ProfileResult;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -29,10 +31,12 @@ public class ProfileController {
 
     private Cluster cluster;
     private Collection profileCol;
+    private DBProperties dbProperties;
 
-    public ProfileController(Cluster cluster, Bucket bucket) {
+    public ProfileController(Cluster cluster, Bucket bucket, DBProperties dbProperties) {
         this.cluster = cluster;
         this.profileCol = bucket.collection(PROFILE);
+        this.dbProperties = dbProperties;
     }
 
 
@@ -48,30 +52,6 @@ public class ProfileController {
         Profile profile = userProfile.getProfile();
         profileCol.insert(profile.getPid(), profile);
         return ResponseEntity.status(HttpStatus.CREATED).body(profile);
-    }
-
-
-    @CrossOrigin(value="*")
-    @GetMapping(path = "/profiles/", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "Search for user profiles", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ApiResponses(
-            value = {
-                    @ApiResponse(code = 200, message = "Returns the list of user profiles"),
-                    @ApiResponse(code = 500, message = "Error occurred in getting user profiles", response = Error.class)
-            })
-    public ResponseEntity<List<Profile>> getProfiles(
-            @RequestParam(required=false, defaultValue = "5") int limit,
-            @RequestParam(required=false, defaultValue = "0") int skip,
-            @RequestParam String search) {
-
-        final List<Profile> profiles = cluster.query("SELECT p.* FROM user_profile._default.profile p WHERE lower(p.firstName) LIKE $search OR lower(p.lastName) LIKE $search LIMIT $limit OFFSET $skip",
-                    queryOptions().parameters(JsonObject.create()
-                            .put("search", "%"+ search.toLowerCase()+"%")
-                            .put("limit", limit)
-                            .put("skip", skip))
-                            .scanConsistency(QueryScanConsistency.REQUEST_PLUS))
-                            .rowsAs(Profile.class);
-        return ResponseEntity.status(HttpStatus.OK).body(profiles);
     }
 
     @CrossOrigin(value="*")
@@ -99,9 +79,9 @@ public class ProfileController {
 
         try {
             profileCol.upsert(id, profile);
-            return ResponseEntity.status(HttpStatus.CREATED).body(new ProfileResult(profile, ""));
+            return ResponseEntity.status(HttpStatus.CREATED).body(profile);
         } catch (Exception e){
-            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(new ProfileResult(new Profile(), String.format("Error: %s",e.getMessage())));
+            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(null);
         }
     }
 
@@ -120,8 +100,32 @@ public class ProfileController {
             profileCol.remove(id.toString());
             return ResponseEntity.status(HttpStatus.OK).body(null);
         } catch (Exception e){
-            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(new ProfileResult(new Profile(), String.format("Error: %s",e.getMessage())));
+            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(null);
         }
     }
 
+    @CrossOrigin(value="*")
+    @GetMapping(path = "/profiles/", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Search for user profiles", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiResponses(
+            value = {
+                    @ApiResponse(code = 200, message = "Returns the list of user profiles"),
+                    @ApiResponse(code = 500, message = "Error occurred in getting user profiles", response = Error.class)
+            })
+    public ResponseEntity<List<Profile>> getProfiles(
+            @RequestParam(required=false, defaultValue = "5") int limit,
+            @RequestParam(required=false, defaultValue = "0") int skip,
+            @RequestParam String search) {
+
+        final List<Profile> profiles = cluster.query("SELECT p.* FROM $bucketName._default.$collectionName p WHERE lower(p.firstName) LIKE $search OR lower(p.lastName) LIKE $search LIMIT $limit OFFSET $skip",
+                queryOptions().parameters(JsonObject.create()
+                        .put("bucketName", dbProperties.getBucketName())
+                        .put("collectionName", CollectionNames.PROFILE)
+                        .put("search", "%"+ search.toLowerCase()+"%")
+                        .put("limit", limit)
+                        .put("skip", skip))
+                        .scanConsistency(QueryScanConsistency.REQUEST_PLUS))
+                .rowsAs(Profile.class);
+        return ResponseEntity.status(HttpStatus.OK).body(profiles);
+    }
 }
