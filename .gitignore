@@ -29,3 +29,5 @@ hs_err_pid*
 .idea
 
 *.swp
+
+target/surefire-reports/

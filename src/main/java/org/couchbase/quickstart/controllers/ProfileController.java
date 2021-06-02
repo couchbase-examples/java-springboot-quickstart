@@ -84,7 +84,6 @@ public class ProfileController {
             })
     public ResponseEntity<Profile> getProfile(@RequestParam String pid) {
         Profile profile = profileCol.get(pid).contentAs(Profile.class);
-        profile.setPid(pid);
         return ResponseEntity.status(HttpStatus.OK).body(profile);
     }
 
