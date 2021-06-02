@@ -37,7 +37,7 @@ At this point the application is ready and you can run it via your IDE or from t
 mvn spring-boot:run -e -X
 ```
 
-You can launch your browser and go to the [Swagger start page](https://localhost:5001/swagger/index.html).
+You can launch your browser and go to the [Swagger start page](https://localhost:8080/swagger-ui/index.html).
 
 ## Running The Tests
 
@@ -51,10 +51,10 @@ mvn test
 
 ## Project Setup Notes
 
-This project was based on the standard link:https://spring.io/guides/gs/rest-service/[Spring Boot project].  The HealthCheckController is provided as a santity check and is used in unit tests.  
+This project was based on the standard [Spring Boot project](https://spring.io/guides/gs/rest-service/).  The HealthCheckController is provided as a santity check and is used in unit tests.  
 
 A fully list of packages are referenced in the pom.xml file
 
 ## Conclusion
 
-Setting up a basic REST API in Spring Boot with Couchbase is fairly simple.  This project when run with Couchbase Server 7 installed creates a bucket in Couchbase, an index for our parameterized link:https://docs.couchbase.com/java-sdk/current/howtos/n1ql-queries-with-sdk.html[N1QL query], and showcases basic CRUD operations needed in most applications.
+Setting up a basic REST API in Spring Boot with Couchbase is fairly simple.  This project when run with Couchbase Server 7 installed creates a bucket in Couchbase, an index for our parameterized [N1QL query](https://docs.couchbase.com/java-sdk/current/howtos/n1ql-queries-with-sdk.html), and showcases basic CRUD operations needed in most applications.
