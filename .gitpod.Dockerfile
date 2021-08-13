@@ -1,13 +1,11 @@
 FROM couchbase:latest
 
-RUN addgroup --gid 33333 gitpod && \
+RUN rm -rf /opt/couchbase/var/lib && \
+     chmod -R 777 /opt/couchbase && \
+     addgroup --gid 33333 gitpod && \
      useradd --no-log-init --create-home --home-dir /home/gitpod --shell /bin/bash --uid 33333 --gid 33333 gitpod && \
      usermod -a -G gitpod,couchbase gitpod && \
-     rm -rf /opt/couchbase/var/lib && \
-     chmod -R g+rwx /opt/couchbase && \
-     mkdir /opt/couchbase/gitpod && \
-     chown gitpod:gitpod /opt/couchbase/gitpod && \
-     sed -i 's/var/gitpod/g' /opt/couchbase/bin/couchbase-server
+     chown -R gitpod:gitpod /opt/couchbase/var
 
 RUN echo "* soft nproc 20000\n"\
 "* hard nproc 20000\n"\
@@ -17,3 +15,5 @@ RUN echo "* soft nproc 20000\n"\
 #Simple example on how to extend the image to install Java and maven
 RUN apt-get -qq update && \
      apt-get install -yq maven default-jdk
+
+USER gitpod
