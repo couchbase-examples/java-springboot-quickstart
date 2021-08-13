@@ -3,7 +3,7 @@ image:
 
 tasks:
 - name: Start Couchbase
-  command:  cd /opt/couchbase/ && ./start-cb.sh
+  command:  /opt/couchbase/bin/couchbase-server --start
 - name: Start app
   init: ./mvnw package -DskipTests
   command: java -jar target/*.jar
