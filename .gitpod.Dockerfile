@@ -3,6 +3,7 @@ FROM couchbase:latest
 RUN addgroup --gid 33333 gitpod && \
      useradd --no-log-init --create-home --home-dir /home/gitpod --shell /bin/bash --uid 33333 --gid 33333 gitpod && \
      usermod -a -G gitpod,couchbase gitpod && \
+     rm -rf /opt/couchbase/var/lib && \
      chmod -R g+rwx /opt/couchbase
 
 RUN echo "* soft nproc 20000\n"\
