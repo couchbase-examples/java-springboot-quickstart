@@ -5,7 +5,9 @@ RUN addgroup --gid 33333 gitpod && \
      usermod -a -G gitpod,couchbase gitpod && \
      rm -rf /opt/couchbase/var/lib && \
      chmod -R g+rwx /opt/couchbase && \
-     sed -i 's/var/gipod/g' /opt/couchbase/bin/couchbase-server
+     mkdir /opt/couchbase/gitpod && \
+     chown gitpod:gitpod /opt/couchbase/gitpod && \
+     sed -i 's/var/gitpod/g' /opt/couchbase/bin/couchbase-server
 
 RUN echo "* soft nproc 20000\n"\
 "* hard nproc 20000\n"\
