@@ -17,3 +17,5 @@ RUN apt-get -qq update && \
      apt-get install -yq maven default-jdk
 
 USER gitpod
+RUN /opt/couchbase/bin/couchbase-server --start && sleep 10 && /opt/couchbase/bin/couchbase-server --stop && sleep 5
+
