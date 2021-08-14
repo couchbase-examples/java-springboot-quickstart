@@ -3,6 +3,7 @@ image:
 
 tasks:
 - name: Start Couchbase
+  init: sudo chown -R gitpod:gitpod /opt/couchbase/var
   command:  /opt/couchbase/bin/couchbase-server --start
 - name: Start app
   init: ./mvnw package -DskipTests
