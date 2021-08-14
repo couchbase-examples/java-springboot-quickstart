@@ -7,7 +7,7 @@ RUN echo "* soft nproc 20000\n"\
 
 #Simple example on how to extend the image to install Java and maven
 RUN apt-get -qq update && \
-     apt-get install -yq maven default-jdk acl sudo
+     apt-get install -yq maven default-jdk sudo
 
 RUN chmod -R g+rwX /opt/couchbase && \
      addgroup --gid 33333 gitpod && \
@@ -15,6 +15,6 @@ RUN chmod -R g+rwX /opt/couchbase && \
      usermod -a -G gitpod,couchbase,sudo gitpod && \
      echo 'gitpod ALL=(ALL) NOPASSWD:ALL'>> /etc/sudoers
 
+COPY startcb.sh /opt/couchbase/bin/startcb.sh
 USER gitpod
-RUN sudo chown -R gitpod:gitpod /opt/couchbase/var
      
