@@ -9,7 +9,8 @@ RUN echo "* soft nproc 20000\n"\
 RUN apt-get -qq update && \
      apt-get install -yq maven default-jdk
 
-RUN rm -rf /opt/couchbase/var && \
+RUN /opt/couchbase/bin/couchbase-server --stop || \
+     rm -rf /opt/couchbase/var && \
      chmod -R 777 /opt/couchbase && \
      addgroup --gid 33333 gitpod && \
      useradd --no-log-init --create-home --home-dir /home/gitpod --shell /bin/bash --uid 33333 --gid 33333 gitpod && \
