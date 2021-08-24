@@ -41,4 +41,9 @@ public class Profile {
         this.password = profile.getPassword();
     }
 
+    public String toString() {
+        return "Profile: { pid="+this.pid+",firstName="+this.firstName+",lastName="+this.lastName+",email="+this.email+",password="+this.password;
+    }
+
+
 }

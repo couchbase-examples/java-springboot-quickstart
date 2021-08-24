@@ -117,14 +117,14 @@ public class ProfileController {
             @RequestParam(required=false, defaultValue = "0") int skip,
             @RequestParam String search) {
 
-        final List<Profile> profiles = cluster.query("SELECT p.* FROM $bucketName._default.$collectionName p WHERE lower(p.firstName) LIKE $search OR lower(p.lastName) LIKE $search LIMIT $limit OFFSET $skip",
-                queryOptions().parameters(JsonObject.create()
-                        .put("bucketName", dbProperties.getBucketName())
-                        .put("collectionName", CollectionNames.PROFILE)
-                        .put("search", "%"+ search.toLowerCase()+"%")
-                        .put("limit", limit)
-                        .put("skip", skip))
-                        .scanConsistency(QueryScanConsistency.REQUEST_PLUS))
+        String qryString = "SELECT p.* FROM `"+dbProperties.getBucketName()+"`.`_default`.`"+PROFILE +"` p "+
+                            "WHERE lower(p.firstName) LIKE '%"+search.toLowerCase()
+                            +"%' OR lower(p.lastName) LIKE '%"+search.toLowerCase()+"%'  LIMIT "+limit+" OFFSET "+skip;
+        System.out.println("Query="+qryString);
+        //TBD with params: final List<Profile> profiles = cluster.query("SELECT p.* FROM `$bucketName`.`_default`.`$collectionName` p WHERE lower(p.firstName) LIKE '$search' OR lower(p.lastName) LIKE '$search' LIMIT $limit OFFSET $skip",
+        final List<Profile> profiles = 
+                cluster.query(qryString,
+                    queryOptions().scanConsistency(QueryScanConsistency.REQUEST_PLUS))
                 .rowsAs(Profile.class);
         return ResponseEntity.status(HttpStatus.OK).body(profiles);
     }
