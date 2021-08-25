@@ -3,12 +3,12 @@ image:
 
 tasks:
 - name: Start Couchbase
-  command:  cd /opt/couchbase/ && ./start-cb.sh
+  command:  ./startcb.sh
+- name: Log use
+  command: curl -s 'https://da-demo-images.s3.amazonaws.com/runItNow_outline.png?couchbase-example=java-springboot-quickstart-repo&source=gitpod' > /dev/null
 - name: Start app
   init: ./mvnw package -DskipTests
   command: java -jar target/*.jar
-- name: Log use
-  command: curl -s 'https://da-demo-images.s3.amazonaws.com/runItNow_outline.png?couchbase-example=java-springboot-quickstart-repo&source=gitpod' > /dev/null
 # exposed ports
 ports:
 - port: 8080

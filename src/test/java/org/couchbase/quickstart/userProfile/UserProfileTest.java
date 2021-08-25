@@ -29,6 +29,8 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.junit.Assert.*;
+import org.mindrot.jbcrypt.*;
+
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -100,7 +102,7 @@ public class UserProfileTest {
         bucket.collection(CollectionNames.PROFILE).insert(testProfile.getPid(), testProfile);
 
         EntityExchangeResult<List<Profile>> profileListResult = this.webTestClient.get()
-            .uri("/api/v1/profile/?limit=5&skip=0&searchFirstName=Jam")
+            .uri("/api/v1/profile/profiles/?limit=5&skip=0&search=Jam")
             .accept(MediaType.APPLICATION_JSON)
             .exchange()
             .expectStatus().isOk()
@@ -110,11 +112,12 @@ public class UserProfileTest {
 
         MatcherAssert.assertThat(profileListResult.getResponseBody(), Matchers.hasSize(1));
         Profile result = profileListResult.getResponseBody().get(0);
-
+        System.out.println(result);
         assertEquals(result.getFirstName(), testProfile.getFirstName());
         assertEquals(result.getLastName(), testProfile.getLastName());
         assertEquals(result.getEmail(), testProfile.getEmail());
-        assertEquals(result.getPassword(), testProfile.getPassword());
+        //TBD: encrypted password verify
+        //assertTrue(BCrypt.checkpw(testProfile.getPassword(),result.getPassword()));
         assertNotNull(result.getPid());
     }
 
@@ -127,7 +130,7 @@ public class UserProfileTest {
         bucket.collection(CollectionNames.PROFILE).insert(testProfile.getPid(), testProfile);
 
         EntityExchangeResult<List<Profile>> profileListResult = this.webTestClient.get()
-            .uri("/api/v1/profile/?limit=5&skip=0&searchFirstName=Jack")
+            .uri("/api/v1/profile/profiles/?limit=5&skip=0&search=Jack")
             .accept(MediaType.APPLICATION_JSON)
             .exchange()
             .expectStatus().isOk()
@@ -164,16 +167,17 @@ public class UserProfileTest {
         return JsonObject.create()
                 .put("firstName", profile.getFirstName())
                 .put("lastName", profile.getLastName())
+                .put("email", profile.getEmail())
                 .put("password", profile.getPassword())
-                .put("email", profile.getEmail()).toString();
+                .toString();
     }
 
     private ProfileRequest getCreateTestProfile() {
         return new ProfileRequest(
                 "James",
                 "Gosling",
-                "password",
-                "james.gosling@sun.com");
+                "james.gosling@sun.com",
+                "password");
     }
 
     private Profile getTestProfile() {
