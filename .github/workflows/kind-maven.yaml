@@ -41,16 +41,16 @@ jobs:
           helm repo add couchbase https://couchbase-partners.github.io/helm-charts/
           helm repo update
           helm install default --values deployment/operator-values.yaml couchbase/couchbase-operator
-      - name: wait for cluster to come up 
+      - name: wait for cluster to come up
         run: |
-          sleep 180 
+          sleep 180
       - name: set IPAddress and IpPort
         run: |
           echo "envIpAddress=$(kubectl get nodes -o jsonpath='{.items[*].status.addresses[?(@.type=="InternalIP")].address}')" >> $GITHUB_ENV
           echo "envIpPort=$(kubectl get svc default-couchbase-cluster-ui -o jsonpath='{.spec.ports[].nodePort}')" >> $GITHUB_ENV
-      - name:  combine to full connection string 
+      - name:  combine to full connection string
         run: |
-          echo "connectionString=$(echo "http://${envIpAddress}:${envIpPort}?network=external" | sed -e 's/[]$.*[\^]/\\&/g' )" | xargs >> $GITHUB_ENV 
+          echo "connectionString=$(echo "http://${envIpAddress}:${envIpPort}?network=external" | sed -e 's/[]$.*[\^]/\\&/g' )" | xargs >> $GITHUB_ENV
       - name: fix connection string
         run: |
           echo "${{ env.connectionString }}"
@@ -68,3 +68,15 @@ jobs:
 
       - name: Run tests with Maven
         run: mvn -B test --file pom.xml
+      - name: Report Status
+        if: always()
+        uses: ravsamhq/notify-slack-action@v1
+        with:
+          status: ${{ job.status }}
+          notify_when: 'failure,warnings'
+          notification_title: '{workflow} on *{repo}*'
+          message_format: '{emoji}    *{status_message}* in <{repo_url}|{repo}@{branch}> on <{commit_url}|{commit_sha}>'
+          footer: '<{run_url}|View Full Run on GitHub>'
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.ACTION_MONITORING_SLACK }}
+
