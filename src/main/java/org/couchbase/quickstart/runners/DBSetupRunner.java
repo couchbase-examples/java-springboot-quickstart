@@ -59,7 +59,12 @@ public class DBSetupRunner implements CommandLineRunner {
         } catch (Exception e){
             System.out.println(String.format("General error <%s> when trying to create index ",e.getMessage()));
         }
-
+        
+        try {
+          final QueryResult result = cluster.query("CREATE INDEX default_profile_firstName_index ON " + props.getBucketName() + "._default." + CollectionNames.PROFILE + "(firstName)");
+        } catch (Exception e) {
+          System.out.println(String.format("Failed to create secondary index on profile.firstName: %s", e.getMessage()));
+        }
     }
 //
 //    private QueryResult createCollectionIndex() throws Exception {
