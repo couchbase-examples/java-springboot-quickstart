@@ -1,6 +1,7 @@
 package org.couchbase.quickstart.configs;
 
 import com.couchbase.client.core.error.BucketExistsException;
+import com.couchbase.client.core.msg.kv.DurabilityLevel;
 import com.couchbase.client.java.Bucket;
 import com.couchbase.client.java.Cluster;
 import com.couchbase.client.java.manager.bucket.BucketSettings;
@@ -26,9 +27,11 @@ public class CouchbaseConfig {
 
         //Creates the cluster if it does not exist yet
         if( !cluster.buckets().getAllBuckets().containsKey(dbProp.getBucketName())) {
-            cluster.buckets().createBucket(BucketSettings.create(dbProp.getBucketName())
+            cluster.buckets().createBucket(
+                BucketSettings.create(dbProp.getBucketName())
                     .bucketType(BucketType.COUCHBASE)
-                    .ramQuotaMB(256));
+                    .minimumDurabilityLevel(DurabilityLevel.NONE)
+                    .ramQuotaMB(128));
         }
         return cluster.bucket(dbProp.getBucketName());
     }

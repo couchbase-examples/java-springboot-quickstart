@@ -8,12 +8,14 @@ import org.couchbase.quickstart.configs.CollectionNames;
 import org.couchbase.quickstart.configs.DBProperties;
 import org.couchbase.quickstart.models.Profile;
 import org.couchbase.quickstart.models.ProfileRequest;
-
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
-import org.junit.Before;
+import org.junit.After;
 import org.junit.Rule;
+import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.rules.ExpectedException;
+import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -22,14 +24,10 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.reactive.server.EntityExchangeResult;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
-
 import java.util.List;
 import java.util.UUID;
 
 import static org.junit.Assert.*;
-import org.mindrot.jbcrypt.*;
 
 
 @RunWith(SpringRunner.class)
@@ -49,7 +47,8 @@ public class UserProfileTest {
     @Rule
     public ExpectedException exceptionRule = ExpectedException.none();
 
-    @Before
+
+    @After
     public void cleanDB() {
         cluster.query("DELETE FROM "+prop.getBucketName()+"._default.profile ");
     }
