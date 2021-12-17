@@ -42,6 +42,7 @@ public class DBSetupRunner implements CommandLineRunner {
             CollectionSpec spec = CollectionSpec.create(CollectionNames.PROFILE, bucket.defaultScope().name());
             collectionManager.createCollection(spec);
             System.out.println("Created collection '" + spec.name() + "' in scope '" + spec.scopeName() + "' of bucket '" + bucket.name() + "'");
+            Thread.sleep(1000);
         } catch (CollectionExistsException e){
             System.out.println(String.format("Collection <%s> already exists", CollectionNames.PROFILE));
         } catch (Exception e) {
@@ -49,11 +50,14 @@ public class DBSetupRunner implements CommandLineRunner {
         }
 
         try {
-            final QueryResult result = cluster.query("CREATE PRIMARY INDEX default_profile_index ON "+props.getBucketName()+"._default."+ CollectionNames.PROFILE);
+            final String query = "CREATE PRIMARY INDEX default_profile_index ON "+props.getBucketName()+"._default."+ CollectionNames.PROFILE;
+            System.out.println(String.format("Creating default_profile_index: <%s>", query));
+            final QueryResult result = cluster.query(query);
             for (JsonObject row : result.rowsAsObject()){
                 System.out.println(String.format("Index Creation Status %s",row.getObject("meta").getString("status")));
             }
             System.out.println("Created primary index on collection " + CollectionNames.PROFILE);
+            Thread.sleep(1000);
         } catch (IndexExistsException e){
             System.out.println(String.format("Collection's primary index already exists"));
         } catch (Exception e){
@@ -62,6 +66,7 @@ public class DBSetupRunner implements CommandLineRunner {
         
         try {
           final QueryResult result = cluster.query("CREATE INDEX default_profile_firstName_index ON " + props.getBucketName() + "._default." + CollectionNames.PROFILE + "(firstName)");
+          Thread.sleep(1000);
         } catch (Exception e) {
           System.out.println(String.format("Failed to create secondary index on profile.firstName: %s", e.getMessage()));
         }

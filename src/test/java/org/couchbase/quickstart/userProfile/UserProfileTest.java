@@ -10,6 +10,7 @@ import org.couchbase.quickstart.models.Profile;
 import org.couchbase.quickstart.models.ProfileRequest;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
+import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.jupiter.api.AfterEach;
@@ -47,7 +48,7 @@ public class UserProfileTest {
     public ExpectedException exceptionRule = ExpectedException.none();
 
 
-    @AfterEach
+    @After
     public void cleanDB() {
         cluster.query("DELETE FROM "+prop.getBucketName()+"._default.profile ");
     }

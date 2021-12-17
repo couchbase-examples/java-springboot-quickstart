@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        java-version: ['8', '11' ]
+        java-version: ['8', '11', '17']
     steps:
     - name: Update repositories
       run: |
@@ -55,10 +55,10 @@ jobs:
         curl  -u Administrator:password -v -X GET http://localhost:8091/pools/default | jq '.' | grep hostname
     - uses: actions/checkout@v2
     - name: Build with Maven
-      run: mvn --batch-mode --update-snapshots -B package --file pom.xml verify
+      run: mvn --batch-mode --update-snapshots -B package --file pom.xml verify -Dspring.couchbase.bootstrap-host=couchbase
     services:
       couchbase:
-        image: couchbase:enterprise-7.0.0-beta
+        image: couchbase:enterprise-7.0.3
         ports:
           - 8091:8091
           - 8092:8092
