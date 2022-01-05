@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 
 
 /**
- * This class run after the application startup. It automatically setup all indexes needed
+ * This class run after the application startup. It automatically sets up all needed indexes
  */
 @Component
 public class DBSetupRunner implements CommandLineRunner {
@@ -34,7 +34,6 @@ public class DBSetupRunner implements CommandLineRunner {
             System.out.println("Created primary index" + props.getBucketName());
         } catch (Exception e) {
             System.out.println("Primary index already exists on bucket "+props.getBucketName());
-            e.printStackTrace();
         }
 
         CollectionManager collectionManager = bucket.collections();
@@ -71,8 +70,4 @@ public class DBSetupRunner implements CommandLineRunner {
           System.out.println(String.format("Failed to create secondary index on profile.firstName: %s", e.getMessage()));
         }
     }
-//
-//    private QueryResult createCollectionIndex() throws Exception {
-//        return cluster.query("CREATE PRIMARY INDEX default_profile_index ON "+props.getBucketName()+"._default."+ CollectionNames.PROFILE);
-//    }
 }
