@@ -12,7 +12,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureWebTestClient
-public class HealthCheckApplicationTest {
+public class HealthCheckIntegrationTest {
 
     @Autowired
     private WebTestClient webTestClient;

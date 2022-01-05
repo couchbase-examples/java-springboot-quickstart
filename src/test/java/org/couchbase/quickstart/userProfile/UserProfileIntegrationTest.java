@@ -33,7 +33,7 @@ import static org.junit.Assert.*;
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureWebTestClient
-public class UserProfileTest {
+public class UserProfileIntegrationTest {
 
     @Autowired
     private WebTestClient webTestClient;
