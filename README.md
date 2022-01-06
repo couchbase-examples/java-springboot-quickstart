@@ -9,9 +9,10 @@ Full documentation can be found on the [Couchbase Developer Portal](https://deve
 ## Prerequisites
 To run this prebuilt project, you will need:
 
-- Couchbase 7 Installed (version 7.0.0-5247 or higher)
+- Couchbase Server 7 Installed (version 7.0.0-5247 or higher)
 - Java SDK v1.8 or higher installed 
 - Code Editor installed (IntelliJ IDEA, Eclipse, or Visual Studio Code)
+- Maven command line
 
 ## Install Dependencies 
 
@@ -23,7 +24,7 @@ mvn package
 
 ### Database Server Configuration
 
-All configuration for communication with the database is stored in the `/src/main/java/resources/application.properties` file.  This includes the connection string, username, and password.  The default username is assumed to be `Administrator` and the default password is assumed to be `password`.  If these are different in your environment you will need to change them before running the application.
+All configuration for communication with the database is stored in the `/src/main/resources/application.properties` file.  This includes the connection string, username, and password.  The default username is assumed to be `Administrator` and the default password is assumed to be `password`.  If these are different in your environment you will need to change them before running the application.
 
 ### Dependency Injection via DBSetupRunner class 
 
@@ -41,19 +42,17 @@ You can launch your browser and go to the [Swagger start page](https://localhost
 
 ## Running The Tests
 
-To run the standard integration tests, use the following commands:
-
-To run the standard integration tests, use the following commands:
+To run the standard integration tests (which requires a running Couchbase Server), use the following command:
 
 ```sh
-mvn test
+mvn verify
 ```
 
 ## Project Setup Notes
 
-This project was based on the standard [Spring Boot project](https://spring.io/guides/gs/rest-service/).  The HealthCheckController is provided as a santity check and is used in unit tests.  
+This project was based on the standard [Spring Boot project](https://spring.io/guides/gs/rest-service/).  The HealthCheckController is provided as a sanity check and is used in integration tests.  
 
-A fully list of packages are referenced in the pom.xml file
+A full list of packages are referenced in the pom.xml file
 
 ## Conclusion
 
