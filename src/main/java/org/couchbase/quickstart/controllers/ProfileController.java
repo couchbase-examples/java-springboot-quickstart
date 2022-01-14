@@ -82,6 +82,8 @@ public class ProfileController {
         try {
             profileCol.upsert(id.toString(), profile);
             return ResponseEntity.status(HttpStatus.CREATED).body(profile);
+        } catch (DocumentNotFoundException dnfe) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         } catch (Exception e){
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
