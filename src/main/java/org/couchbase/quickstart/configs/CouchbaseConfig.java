@@ -9,7 +9,6 @@ import com.couchbase.client.java.manager.bucket.BucketType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.stereotype.Component;
 
 @Configuration
 public class CouchbaseConfig {
@@ -25,8 +24,8 @@ public class CouchbaseConfig {
     @Bean
     public Bucket getCouchbaseBucket(Cluster cluster){
 
-        //Creates the cluster if it does not exist yet
-        if( !cluster.buckets().getAllBuckets().containsKey(dbProp.getBucketName())) {
+        // Creates the cluster if it does not exist yet
+        if (!cluster.buckets().getAllBuckets().containsKey(dbProp.getBucketName())) {
             cluster.buckets().createBucket(
                 BucketSettings.create(dbProp.getBucketName())
                     .bucketType(BucketType.COUCHBASE)
