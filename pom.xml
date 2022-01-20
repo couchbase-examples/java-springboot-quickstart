@@ -23,7 +23,7 @@
         <swagger.version>3.0.0</swagger.version>
         <springweb.version>3.0.0</springweb.version>
         <couchbase.version>3.2.4</couchbase.version>
-        <junit.version>4.13.1</junit.version>
+        <junit.version>4.13.2</junit.version>
         <mavensurefire.version>3.0.0-M5</mavensurefire.version>
     </properties>
 
