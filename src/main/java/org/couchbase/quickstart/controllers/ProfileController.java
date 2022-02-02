@@ -76,15 +76,12 @@ public class ProfileController {
     @ApiOperation(value = "Update a user profile", response = Profile.class)
     @ApiResponses({
             @ApiResponse(code = 201, message = "Updated the user profile", response = Profile.class),
-            @ApiResponse(code = 404, message = "User profile not found", response = Error.class),
             @ApiResponse(code = 500, message = "Internal Server Error", response = Error.class)
     })
     public ResponseEntity<Profile> update(@PathVariable("id") UUID id, @RequestBody Profile profile) {
         try {
-            profileCol.replace(id.toString(), profile);
+            profileCol.upsert(id.toString(), profile);
             return ResponseEntity.status(HttpStatus.CREATED).body(profile);
-        } catch (DocumentNotFoundException dnfe) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         } catch (Exception e){
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
