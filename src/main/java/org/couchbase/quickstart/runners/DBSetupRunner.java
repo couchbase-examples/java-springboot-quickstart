@@ -69,5 +69,7 @@ public class DBSetupRunner implements CommandLineRunner {
         } catch (Exception e) {
           System.out.println(String.format("Failed to create secondary index on profile.firstName: %s", e.getMessage()));
         }
+
+        System.out.println("Application is ready.");
     }
 }
