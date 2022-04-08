@@ -1,0 +1,97 @@
+[
+  {
+    "pid": "1",
+    "firstName": "user1",
+    "lastName": "user1last",
+    "email": "user1@couchbase.com",
+    "password": "secret",
+    "myCollectionName": "profile"
+  },
+
+  {
+    "pid": "2",
+    "firstName": "user2",
+    "lastName": "user2last",
+    "email": "user2@couchbase.com",
+    "password": "secret",
+    "myCollectionName": "profile"
+  },
+
+  {
+    "pid": "3",
+    "firstName": "user3",
+    "lastName": "user3last",
+    "email": "user3@couchbase.com",
+    "password": "secret",
+    "myCollectionName": "profile"
+  },
+
+  {
+    "pid": "4",
+    "firstName": "user4",
+    "lastName": "user4last",
+    "email": "user4@couchbase.com",
+    "password": "secret",
+    "myCollectionName": "profile"
+  },
+
+  {
+    "pid": "5",
+    "firstName": "user5",
+    "lastName": "user5last",
+    "email": "user5@couchbase.com",
+    "password": "secret",
+    "myCollectionName": "profile"
+  },
+
+  {
+    "pid": "6",
+    "firstName": "user6",
+    "lastName": "user6last",
+    "email": "user6@couchbase.com",
+    "password": "secret",
+    "myCollectionName": "profile"
+  },
+
+  {
+    "pid": "7",
+    "firstName": "user7",
+    "lastName": "user7last",
+    "email": "user7@couchbase.com",
+    "password": "secret",
+    "myCollectionName": "profile"
+  },
+
+  {
+    "pid": "8",
+    "firstName": "user8",
+    "lastName": "user8last",
+    "email": "user8@couchbase.com",
+    "password": "secret",
+    "myCollectionName": "profile"
+  },
+
+  {
+    "pid": "9",
+    "firstName": "user9",
+    "lastName": "user9last",
+    "email": "user9@couchbase.com",
+    "password": "secret",
+    "myCollectionName": "profile"
+  },
+
+  {
+    "pid": "10",
+    "firstName": "user10",
+    "lastName": "user10last",
+    "email": "user10@couchbase.com",
+    "password": "secret",
+    "myCollectionName": "profile"
+  },
+
+  {
+    "pid": "10",
+    "name": "Imported Product",
+    "myCollectionName": "product"
+  }
+]
