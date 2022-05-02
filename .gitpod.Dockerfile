@@ -1,4 +1,4 @@
-FROM public.ecr.aws/z2f7n8a1/playground-couchbase-server:latest
+FROM couchbase:latest
 
 RUN echo "* soft nproc 20000\n"\
 "* hard nproc 20000\n"\
