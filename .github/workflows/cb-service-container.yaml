@@ -58,7 +58,12 @@ jobs:
       run: mvn --batch-mode --update-snapshots -B package --file pom.xml verify -Dspring.couchbase.bootstrap-host=couchbase
     services:
       couchbase:
-        image: couchbase:enterprise-7.0.3
+        image: public.ecr.aws/z2f7n8a1/couchbase-da-containers:couchbase-neo 
+        options: >-
+          --health-cmd "wget -q -O - localhost:8091"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
         ports:
           - 8091:8091
           - 8092:8092
