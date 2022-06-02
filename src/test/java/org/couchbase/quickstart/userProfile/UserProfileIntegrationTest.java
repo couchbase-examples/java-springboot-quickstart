@@ -1,9 +1,17 @@
 package org.couchbase.quickstart.userProfile;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
+
+import java.util.List;
+import java.util.UUID;
+
 import com.couchbase.client.core.error.DocumentNotFoundException;
 import com.couchbase.client.java.Bucket;
 import com.couchbase.client.java.Cluster;
 import com.couchbase.client.java.json.JsonObject;
+
 import org.couchbase.quickstart.configs.CollectionNames;
 import org.couchbase.quickstart.configs.DBProperties;
 import org.couchbase.quickstart.models.Profile;
@@ -13,7 +21,6 @@ import org.hamcrest.Matchers;
 import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,11 +30,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.reactive.server.EntityExchangeResult;
 import org.springframework.test.web.reactive.server.WebTestClient;
-
-import java.util.List;
-import java.util.UUID;
-
-import static org.junit.Assert.*;
+import org.springframework.test.web.reactive.server.WebTestClient.ResponseSpec;
+import org.springframework.web.reactive.function.BodyInserters;
 
 
 @RunWith(SpringRunner.class)
@@ -161,6 +165,45 @@ public class UserProfileIntegrationTest {
         bucket.collection(CollectionNames.PROFILE).get(testProfile.getPid());
     }
 
+    @Test
+    public void testTransferCredits() {
+      Profile sourceProfile = getTestProfile(),
+              targetProfile = getTestProfile();
+      
+      bucket.collection(CollectionNames.PROFILE).insert(sourceProfile.getPid(), sourceProfile);
+      bucket.collection(CollectionNames.PROFILE).insert(targetProfile.getPid(), targetProfile);
+
+      // transfer credits 
+      callTransferCredits(sourceProfile, targetProfile, 100)
+        .expectStatus().isOk();
+
+      // attempt to transfer credits again -- should fail
+      callTransferCredits(sourceProfile, targetProfile, 100)
+        .expectStatus().is5xxServerError();
+
+      sourceProfile = bucket.collection(CollectionNames.PROFILE).get(sourceProfile.getPid()).contentAs(Profile.class);
+      targetProfile = bucket.collection(CollectionNames.PROFILE).get(targetProfile.getPid()).contentAs(Profile.class);
+
+      assertNotNull(sourceProfile);
+      assertNotNull(targetProfile);
+
+      assertEquals((Integer)0, sourceProfile.getBalance());
+      assertEquals((Integer)200, targetProfile.getBalance());
+    }
+
+    private ResponseSpec callTransferCredits(Profile sourceProfile, Profile targetProfile, Integer amount) {
+      return webTestClient.post()
+        .uri("/api/v1/profile/transfer")
+//        .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+        .body(BodyInserters
+          .fromFormData("source", sourceProfile.getPid())
+          .with("target", targetProfile.getPid())
+          .with("amount", amount.toString())
+        )
+        //.header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+        .exchange();
+    }
+
     private String getCreatedUserJson(ProfileRequest profile) {
         //create json to post to integration test
         return JsonObject.create()
@@ -168,6 +211,7 @@ public class UserProfileIntegrationTest {
                 .put("lastName", profile.getLastName())
                 .put("email", profile.getEmail())
                 .put("password", profile.getPassword())
+                .put("balance", profile.getBalance())
                 .toString();
     }
 
@@ -176,7 +220,8 @@ public class UserProfileIntegrationTest {
                 "James",
                 "Gosling",
                 "james.gosling@sun.com",
-                "password");
+                "password",
+                100);
     }
 
     private Profile getTestProfile() {
@@ -185,6 +230,7 @@ public class UserProfileIntegrationTest {
                 "James",
                 "Gosling",
                 "james.gosling@sun.com",
-                "password");
+                "password",
+                100);
     }
 }

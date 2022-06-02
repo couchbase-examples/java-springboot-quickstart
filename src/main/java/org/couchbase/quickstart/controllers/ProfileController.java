@@ -1,26 +1,42 @@
 package org.couchbase.quickstart.controllers;
 
+import static org.couchbase.quickstart.configs.CollectionNames.PROFILE;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.UUID;
+
 import com.couchbase.client.core.error.DocumentNotFoundException;
+import com.couchbase.client.core.msg.kv.DurabilityLevel;
 import com.couchbase.client.java.Bucket;
 import com.couchbase.client.java.Cluster;
 import com.couchbase.client.java.Collection;
+import com.couchbase.client.java.json.JsonObject;
+import com.couchbase.client.java.query.QueryOptions;
 import com.couchbase.client.java.query.QueryScanConsistency;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import com.couchbase.client.java.transactions.TransactionQueryOptions;
+import com.couchbase.client.java.transactions.config.TransactionOptions;
+
 import org.couchbase.quickstart.configs.DBProperties;
 import org.couchbase.quickstart.models.Profile;
 import org.couchbase.quickstart.models.ProfileRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-import java.util.UUID;
-
-import static com.couchbase.client.java.query.QueryOptions.queryOptions;
-import static org.couchbase.quickstart.configs.CollectionNames.PROFILE;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 
 @RestController
 @RequestMapping("/api/v1/profile")
@@ -29,10 +45,12 @@ public class ProfileController {
     private Cluster cluster;
     private Collection profileCol;
     private DBProperties dbProperties;
+    private Bucket bucket;
 
     public ProfileController(Cluster cluster, Bucket bucket, DBProperties dbProperties) {
       System.out.println("Initializing profile controller, cluster: " + cluster + "; bucket: " + bucket);
         this.cluster = cluster;
+        this.bucket = bucket;
         this.profileCol = bucket.collection(PROFILE);
         this.dbProperties = dbProperties;
     }
@@ -82,6 +100,8 @@ public class ProfileController {
         try {
             profileCol.upsert(id.toString(), profile);
             return ResponseEntity.status(HttpStatus.CREATED).body(profile);
+        } catch (DocumentNotFoundException dnfe) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         } catch (Exception e){
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
@@ -127,8 +147,69 @@ public class ProfileController {
         //TBD with params: final List<Profile> profiles = cluster.query("SELECT p.* FROM `$bucketName`.`_default`.`$collectionName` p WHERE lower(p.firstName) LIKE '$search' OR lower(p.lastName) LIKE '$search' LIMIT $limit OFFSET $skip",
         final List<Profile> profiles = 
                 cluster.query(qryString,
-                    queryOptions().scanConsistency(QueryScanConsistency.REQUEST_PLUS))
+                    QueryOptions.queryOptions().scanConsistency(QueryScanConsistency.REQUEST_PLUS))
                 .rowsAs(Profile.class);
         return ResponseEntity.status(HttpStatus.OK).body(profiles);
     }
+
+    @CrossOrigin(value="*")
+    @PostMapping(path = "/transfer", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Transfer credits between 2 profiles", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiResponses(
+            value = {
+                    @ApiResponse(code = 200, message = "Returns the list of changed user profiles"),
+                    @ApiResponse(code = 500, message = "Error occurred while transfer operation", response = Error.class)
+            })
+    public ResponseEntity transferCredits(
+          @RequestParam(name="source", required=true) String sourceProfileId,
+          @RequestParam(name="target", required=true) String targetProfileId,
+          @RequestParam(name="amount", required=true) Integer amount
+        ) {
+
+        Profile sourceProfile = profileCol.get(sourceProfileId).contentAs(Profile.class),
+          targetProfile = profileCol.get(targetProfileId).contentAs(Profile.class);
+
+        if (sourceProfile == null) {
+          return ResponseEntity.status(500).body("Source profile not found");
+        }
+        if (targetProfile == null) {
+          return ResponseEntity.status(500).body("Target profile not found");
+        }
+        
+        if (sourceProfile.getBalance() < amount) {
+          return ResponseEntity.status(500).body("Insufficient balance");
+        }
+
+        TransactionOptions to = TransactionOptions.transactionOptions();
+        TransactionQueryOptions args = TransactionQueryOptions.queryOptions().parameters(
+            JsonObject.create()
+              .put("source", sourceProfileId)
+              .put("amount", amount)
+              .put("target", targetProfileId)
+          );
+
+        while(true) {
+          try {
+            cluster.transactions().run(ctx -> {
+
+              ctx.query("UPDATE `"+dbProperties.getBucketName()+"`.`_default`.`"+PROFILE+"` SET balance = balance - $amount WHERE pid = $source", args);
+              ctx.query("UPDATE `"+dbProperties.getBucketName()+"`.`_default`.`"+PROFILE+"` SET balance = balance + $amount WHERE pid = $target", args);
+            }, to);
+
+            break;
+          } catch (Exception e) {
+            if (e.getMessage().contains("DurabilityImpossible")) {
+              // Sets DurabilityLevel.NONE to make it work with local clusters
+              to.durabilityLevel(DurabilityLevel.NONE);
+            } else {
+              throw e;
+            }
+          }
+        }
+
+
+
+        return ResponseEntity.ok(Arrays.asList(sourceProfile, targetProfile));
+    }
+
 }

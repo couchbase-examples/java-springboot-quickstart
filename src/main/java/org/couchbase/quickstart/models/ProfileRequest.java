@@ -5,6 +5,7 @@ import java.util.UUID;
 public class ProfileRequest {
 
     private String firstName, lastName, email, password;
+    private Integer balance;
 
     public String getFirstName() { return firstName; }
     public void setFirstName(String firstName) { this.firstName =  firstName; }
@@ -20,17 +21,22 @@ public class ProfileRequest {
         this.password = password;
     }
 
+    public Integer getBalance() { return balance; }
+    public void setBalance(Integer balance) {
+      this.balance = balance;
+    }
+
     public ProfileRequest() { }
 
-    public ProfileRequest(String firstName, String lastName, String email, String password){
-
+    public ProfileRequest(String firstName, String lastName, String email, String password, Integer balance){
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
         this.password = password;
+        this.balance = balance;
     }
 
     public Profile getProfile() {
-        return new Profile(UUID.randomUUID().toString(), firstName, lastName, email, password);
+        return new Profile(UUID.randomUUID().toString(), firstName, lastName, email, password, balance);
     }
 }
