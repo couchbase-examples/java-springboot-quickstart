@@ -176,10 +176,6 @@ public class ProfileController {
           return ResponseEntity.status(500).body("Target profile not found");
         }
         
-        if (sourceProfile.getBalance() < amount) {
-          return ResponseEntity.status(500).body("Insufficient balance");
-        }
-
         TransactionOptions to = TransactionOptions.transactionOptions();
         TransactionQueryOptions args = TransactionQueryOptions.queryOptions().parameters(
             JsonObject.create()
@@ -191,9 +187,12 @@ public class ProfileController {
         while(true) {
           try {
             cluster.transactions().run(ctx -> {
-
               ctx.query("UPDATE `"+dbProperties.getBucketName()+"`.`_default`.`"+PROFILE+"` SET balance = balance - $amount WHERE pid = $source", args);
               ctx.query("UPDATE `"+dbProperties.getBucketName()+"`.`_default`.`"+PROFILE+"` SET balance = balance + $amount WHERE pid = $target", args);
+              if (sourceProfile.getBalance() < amount) {
+                throw new RuntimeException("Insufficient balance");
+              }
+
             }, to);
 
             break;
