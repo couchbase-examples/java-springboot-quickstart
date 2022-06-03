@@ -165,34 +165,33 @@ public class ProfileController {
           @RequestParam(name="target", required=true) String targetProfileId,
           @RequestParam(name="amount", required=true) Integer amount
         ) {
-
-        Profile sourceProfile = profileCol.get(sourceProfileId).contentAs(Profile.class),
-          targetProfile = profileCol.get(targetProfileId).contentAs(Profile.class);
-
-        if (sourceProfile == null) {
-          return ResponseEntity.status(500).body("Source profile not found");
-        }
-        if (targetProfile == null) {
-          return ResponseEntity.status(500).body("Target profile not found");
-        }
-        
-        TransactionOptions to = TransactionOptions.transactionOptions();
-        TransactionQueryOptions args = TransactionQueryOptions.queryOptions().parameters(
-            JsonObject.create()
-              .put("source", sourceProfileId)
-              .put("amount", amount)
-              .put("target", targetProfileId)
+          TransactionOptions to = TransactionOptions.transactionOptions();
+          TransactionQueryOptions args = TransactionQueryOptions.queryOptions().parameters(
+              JsonObject.create()
+                .put("source", sourceProfileId)
+                .put("amount", amount)
+                .put("target", targetProfileId)
           );
 
         while(true) {
           try {
             cluster.transactions().run(ctx -> {
+              Profile sourceProfile = profileCol.get(sourceProfileId).contentAs(Profile.class),
+                targetProfile = profileCol.get(targetProfileId).contentAs(Profile.class);
+
+              if (sourceProfile == null) {
+                throw new RuntimeException("Source profile not found");
+              }
+              if (targetProfile == null) {
+                throw new RuntimeException("Target profile not found");
+              }
+
               ctx.query("UPDATE `"+dbProperties.getBucketName()+"`.`_default`.`"+PROFILE+"` SET balance = balance - $amount WHERE pid = $source", args);
               ctx.query("UPDATE `"+dbProperties.getBucketName()+"`.`_default`.`"+PROFILE+"` SET balance = balance + $amount WHERE pid = $target", args);
+
               if (sourceProfile.getBalance() < amount) {
                 throw new RuntimeException("Insufficient balance");
               }
-
             }, to);
 
             break;
@@ -206,8 +205,8 @@ public class ProfileController {
           }
         }
 
-
-
+        Profile sourceProfile = profileCol.get(sourceProfileId).contentAs(Profile.class),
+          targetProfile = profileCol.get(targetProfileId).contentAs(Profile.class);
         return ResponseEntity.ok(Arrays.asList(sourceProfile, targetProfile));
     }
 
