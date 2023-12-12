@@ -16,7 +16,7 @@ import com.couchbase.client.java.transactions.TransactionQueryOptions;
 import com.couchbase.client.java.transactions.config.TransactionOptions;
 
 import org.couchbase.quickstart.springboot.configs.DBProperties;
-import org.couchbase.quickstart.springboot.models.Airport;
+import org.couchbase.quickstart.springboot.models.Route;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -35,55 +35,54 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 
-@RestController
-@RequestMapping("/api/v1/airport")
-public class AirportController {
+public class RouteController {
 
     private Cluster cluster;
-    private Collection airportCol;
+    private Collection routeCol;
     private DBProperties dbProperties;
     private Bucket bucket;
 
-    public AirportController(Cluster cluster, Bucket bucket, DBProperties dbProperties) {
-        System.out.println("Initializing airport controller, cluster: " + cluster + "; bucket: " + bucket);
+    public RouteController(Cluster cluster, Bucket bucket, DBProperties dbProperties) {
+        System.out.println("Initializing route controller, cluster: " + cluster + "; bucket: " + bucket);
         this.cluster = cluster;
         this.bucket = bucket;
-        this.airportCol = bucket.scope("inventory").collection("airport");
+        this.routeCol = bucket.scope("inventory").collection("route");
         this.dbProperties = dbProperties;
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Airport> getAirport(@PathVariable String id) {
-        Airport createdAirport = airportCol.get(id).contentAs(Airport.class);
-        return new ResponseEntity<>(createdAirport, HttpStatus.CREATED);
+    public ResponseEntity<Route> getRoute(@PathVariable String id) {
+        Route createdRoute = routeCol.get(id).contentAs(Route.class);
+        return new ResponseEntity<>(createdRoute, HttpStatus.CREATED);
     }
 
     @PostMapping("/{id}")
-    public ResponseEntity<Airport> createAirport(@PathVariable String id, @RequestBody Airport airport) {
-        airportCol.insert(id, airport);
-        Airport createdAirport = airportCol.get(id).contentAs(Airport.class);
-        return new ResponseEntity<>(createdAirport, HttpStatus.CREATED);
+    public ResponseEntity<Route> createRoute(@PathVariable String id, @RequestBody Route route) {
+        routeCol.insert(id, route);
+        Route createdRoute = routeCol.get(id).contentAs(Route.class);
+        return new ResponseEntity<>(createdRoute, HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Airport> updateAirport(@PathVariable String id, @RequestBody Airport airport) {
-        airportCol.replace(id, airport);
-        Airport updatedAirport = airportCol.get(id).contentAs(Airport.class);
-        return new ResponseEntity<>(updatedAirport, HttpStatus.OK);
+    public ResponseEntity<Route> updateRoute(@PathVariable String id, @RequestBody Route route) {
+        routeCol.replace(id, route);
+        Route updatedRoute = routeCol.get(id).contentAs(Route.class);
+        return new ResponseEntity<>(updatedRoute, HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteAirport(@PathVariable String id) {
-        airportCol.remove(id);
+    public ResponseEntity<Void> deleteRoute(@PathVariable String id) {
+        routeCol.remove(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @GetMapping("/list")
-    public ResponseEntity<List<Airport>> listAirports() {
-        String statement = "SELECT airport.* FROM `" + dbProperties.getBucketName() + "`.`inventory`.`airport`";
-        List<Airport> airports = cluster
+    public ResponseEntity<List<Route>> listRoutes() {
+        String statement = "SELECT airport.* FROM `" + dbProperties.getBucketName() + "`.`inventory`.`route`";
+        List<Route> routes = cluster
                 .query(statement, QueryOptions.queryOptions().scanConsistency(QueryScanConsistency.REQUEST_PLUS))
-                .rowsAs(Airport.class);
-        return new ResponseEntity<>(airports, HttpStatus.OK);
+                .rowsAs(Route.class);
+        return new ResponseEntity<>(routes, HttpStatus.OK);
     }
+
 }
