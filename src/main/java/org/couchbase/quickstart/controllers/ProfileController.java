@@ -145,7 +145,7 @@ public class ProfileController {
                             +"%' OR lower(p.lastName) LIKE '%"+search.toLowerCase()+"%'  LIMIT "+limit+" OFFSET "+skip;
         System.out.println("Query="+qryString);
         //TBD with params: final List<Profile> profiles = cluster.query("SELECT p.* FROM `$bucketName`.`_default`.`$collectionName` p WHERE lower(p.firstName) LIKE '$search' OR lower(p.lastName) LIKE '$search' LIMIT $limit OFFSET $skip",
-        final List<Profile> profiles = 
+        final List<Profile> profiles =
                 cluster.query(qryString,
                     QueryOptions.queryOptions().scanConsistency(QueryScanConsistency.REQUEST_PLUS))
                 .rowsAs(Profile.class);

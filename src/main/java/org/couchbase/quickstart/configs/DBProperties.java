@@ -3,7 +3,10 @@ package org.couchbase.quickstart.configs;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 
+import lombok.Getter;
+
 @Configuration
+@Getter
 public class DBProperties {
 
     @Value("${spring.couchbase.bootstrap-hosts}")
@@ -14,19 +17,8 @@ public class DBProperties {
     private String password;
     @Value("${spring.couchbase.bucket.name}")
     private String bucketName;
-
-    public String getHostName() {
-        return hostName;
-    }
-    public String getUsername() {
-        return username;
-    }
-    public String getPassword() {
-        return password;
-    }
-    public String getBucketName() {
-        return bucketName;
-    }
+    @Value("${spring.couchbase.bucket.scope}")
+    private String scopeName;
 
 
 }
