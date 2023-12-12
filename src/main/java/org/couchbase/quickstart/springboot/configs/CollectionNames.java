@@ -1,4 +1,4 @@
-package org.couchbase.quickstart.configs;
+package org.couchbase.quickstart.springboot.configs;
 
 public class CollectionNames {
 

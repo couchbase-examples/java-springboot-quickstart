@@ -1,4 +1,4 @@
-package org.couchbase.quickstart.models;
+package org.couchbase.quickstart.springboot.models;
 
 import java.util.UUID;
 

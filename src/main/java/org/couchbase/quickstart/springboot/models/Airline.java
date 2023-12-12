@@ -1,5 +1,4 @@
-package org.couchbase.quickstart.models;
-
+package org.couchbase.quickstart.springboot.models;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

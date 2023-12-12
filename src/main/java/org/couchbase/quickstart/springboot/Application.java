@@ -1,4 +1,4 @@
-package org.couchbase.quickstart;
+package org.couchbase.quickstart.springboot;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;

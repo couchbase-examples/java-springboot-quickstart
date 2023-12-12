@@ -1,10 +1,13 @@
-package org.couchbase.quickstart.models;
+package org.couchbase.quickstart.springboot.models;
 
 import org.mindrot.jbcrypt.*;
 
 public class Profile {
     private String pid;
-    private String firstName, lastName, email, password;
+    private String firstName;
+    private String lastName;
+    private String email;
+    private String password;
     private Integer balance;
 
     public String getPid() { return pid; }

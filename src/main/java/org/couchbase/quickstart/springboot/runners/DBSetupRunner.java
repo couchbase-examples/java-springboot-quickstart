@@ -7,8 +7,9 @@ import com.couchbase.client.java.json.JsonObject;
 import com.couchbase.client.java.manager.collection.CollectionManager;
 import com.couchbase.client.java.manager.collection.CollectionSpec;
 import com.couchbase.client.java.query.QueryResult;
-import org.couchbase.quickstart.configs.CollectionNames;
-import org.couchbase.quickstart.configs.DBProperties;
+
+import org.couchbase.quickstart.springboot.configs.CollectionNames;
+import org.couchbase.quickstart.springboot.configs.DBProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;

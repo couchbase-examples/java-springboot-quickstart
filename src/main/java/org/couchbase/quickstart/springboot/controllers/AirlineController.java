@@ -1,4 +1,4 @@
-package org.couchbase.quickstart.controllers;
+package org.couchbase.quickstart.springboot.controllers;
 
 import java.util.Arrays;
 import java.util.List;
@@ -15,8 +15,8 @@ import com.couchbase.client.java.query.QueryScanConsistency;
 import com.couchbase.client.java.transactions.TransactionQueryOptions;
 import com.couchbase.client.java.transactions.config.TransactionOptions;
 
-import org.couchbase.quickstart.configs.DBProperties;
-import org.couchbase.quickstart.models.Airline;
+import org.couchbase.quickstart.springboot.configs.DBProperties;
+import org.couchbase.quickstart.springboot.models.Airline;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;

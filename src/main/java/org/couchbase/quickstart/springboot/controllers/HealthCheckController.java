@@ -1,4 +1,4 @@
-package org.couchbase.quickstart.controllers;
+package org.couchbase.quickstart.springboot.controllers;
 
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
