@@ -18,13 +18,12 @@ public class HealthCheckIntegrationTest {
     private WebTestClient webTestClient;
 
     @Test
-    public void testHealthCheck()
-    {
+    public void testHealthCheck() {
         this.webTestClient.get()
-                    .uri("/api/v1/health")
-                    .accept(MediaType.APPLICATION_JSON)
-                    .exchange()
-                    .expectStatus().isOk()
-                    .expectHeader().contentType(MediaType.APPLICATION_JSON);
+                .uri("/api/v1/health")
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectHeader().contentType(MediaType.APPLICATION_JSON);
     }
 }

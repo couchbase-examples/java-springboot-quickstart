@@ -1,4 +1,4 @@
-package org.couchbase.quickstart.runners;
+package org.couchbase.quickstart.springboot.runners;
 
 import com.couchbase.client.core.error.*;
 import com.couchbase.client.java.Bucket;

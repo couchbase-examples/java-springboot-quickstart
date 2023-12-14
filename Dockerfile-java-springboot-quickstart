@@ -1,0 +1,21 @@
+# # Dockerfile for Spring boot application
+# FROM openjdk:11
+# EXPOSE 8080
+# ADD target/java-springboot-quickstart.jar java-springboot-quickstart.jar
+# ENTRYPOINT ["java","-jar","/java-springboot-quickstart.jar"]
+
+FROM eclipse-temurin:17-jdk-jammy AS build
+ENV HOME=/usr/app
+RUN mkdir -p "$HOME"
+WORKDIR "$HOME"
+COPY . "$HOME"
+RUN --mount=type=cache,target=/root/.m2 ./mvnw -f "$HOME"/pom.xml clean package -DskipTests=true
+
+#
+# Package stage
+#
+FROM eclipse-temurin:17-jre-jammy 
+ARG JAR_FILE=/usr/app/target/*.jar
+COPY --from=build $JAR_FILE /app/runner.jar
+EXPOSE 8080
+ENTRYPOINT java -jar /app/runner.jar

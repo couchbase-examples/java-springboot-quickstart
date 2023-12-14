@@ -1,3 +1,7 @@
+*.iml
+.docker/
+.vscode/
+
 # maven target directory
 target/
 # Compiled class file

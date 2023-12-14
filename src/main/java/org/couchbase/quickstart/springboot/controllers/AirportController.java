@@ -86,4 +86,18 @@ public class AirportController {
                 .rowsAs(Airport.class);
         return new ResponseEntity<>(airports, HttpStatus.OK);
     }
+
+    @GetMapping("/direct-connections")
+    public ResponseEntity<List<Airport>> listDirectConnections(@RequestParam String airportCode) {
+        String statement = "SELECT airport.* FROM `" + dbProperties.getBucketName()
+                + "`.`inventory`.`airport` as airport JOIN `" + dbProperties.getBucketName()
+                + "`.`inventory`.`route` as route on route.sourceairport = airport.faa WHERE airport.faa = \""
+                + airportCode + "\" and route.stops = 0";
+        List<Airport> airports = cluster
+                .query(statement, QueryOptions.queryOptions().scanConsistency(QueryScanConsistency.REQUEST_PLUS))
+                .rowsAs(Airport.class);
+
+        return new ResponseEntity<>(airports, HttpStatus.OK);
+    }
+
 }
