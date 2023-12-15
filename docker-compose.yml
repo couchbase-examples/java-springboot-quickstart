@@ -7,8 +7,17 @@ services:
       dockerfile: Dockerfile-couchbase-server
     container_name: couchbase
     ports:
-      - 9091-9094:8091-8094
-      - 21210:11210
+      - "9091-9094:8091-8094"
+      - "21210:11210"
+    environment:
+      CLUSTER_USERNAME: Administrator
+      CLUSTER_PASSWORD: password
+      CLUSTER_NAME: default
+      SERVICES: data,index,query,fts
+      CLUSTER_RAMSIZE: 500
+      BUCKET: travel-sample
+      BUCKET_RAMSIZE: 300
+      NODE_INIT_INDEX_PATH: /opt/couchbase/var/lib/couchbase/indexes
     volumes:
       - .docker/couchbase:/opt/couchbase/var
 
@@ -20,7 +29,7 @@ services:
       dockerfile: Dockerfile-java-springboot-quickstart
     container_name: java-springboot-quickstart
     ports:
-      - 8080:8080
+      - 9090:8080
     depends_on:
       - couchbase
     networks:

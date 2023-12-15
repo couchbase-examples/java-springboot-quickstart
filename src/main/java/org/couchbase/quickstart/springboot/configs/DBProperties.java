@@ -20,5 +20,4 @@ public class DBProperties {
     @Value("${spring.couchbase.bucket.scope}")
     private String scopeName;
 
-
 }

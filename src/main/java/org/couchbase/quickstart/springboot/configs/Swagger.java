@@ -1,6 +1,5 @@
 package org.couchbase.quickstart.springboot.configs;
 
-import org.couchbase.quickstart.springboot.controllers.ProfileController;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -15,7 +14,8 @@ public class Swagger {
     public Docket api() {
         return new Docket(DocumentationType.SWAGGER_2)
                 .select()
-                .apis(RequestHandlerSelectors.basePackage(ProfileController.class.getPackage().getName()))
+                .apis(RequestHandlerSelectors.basePackage(
+                        "org.couchbase.quickstart.springboot.controllers"))
                 .paths(PathSelectors.any())
                 .build();
     }
