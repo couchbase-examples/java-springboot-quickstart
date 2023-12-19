@@ -83,15 +83,13 @@ class AirlineControllerTest {
 
     @Test
     void testDeleteAirline() {
-        ResponseEntity<Airline> response = restTemplate
-                .getForEntity("http://localhost:" + port + "/api/v1/airline/airline_11", Airline.class);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        Airline airline = response.getBody();
-        assertThat(airline).isNotNull();
+        Airline airline = new Airline("airline_11", "airline", "Test Airline", "TA", "TST", "TEST", "United States");
+        restTemplate.postForEntity("http://localhost:" + port + "/api/v1/airline/" + airline.getId(), airline,
+                Airline.class);
         restTemplate.delete("http://localhost:" + port + "/api/v1/airline/" + airline.getId());
-        ResponseEntity<Airline> response2 = restTemplate
-                .getForEntity("http://localhost:" + port + "/api/v1/airline/airline_11", Airline.class);
-        assertThat(response2.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+        ResponseEntity<Airline> response = restTemplate
+                .getForEntity("http://localhost:" + port + "/api/v1/airline/" + airline.getId(), Airline.class);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
     }
 
     @Test

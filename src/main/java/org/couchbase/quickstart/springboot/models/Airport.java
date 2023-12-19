@@ -35,10 +35,10 @@ public class Airport {
     @NoArgsConstructor
     public static class Geo {
 
-        private float alt;
+        private double alt;
 
-        private float lat;
+        private double lat;
 
-        private float lon;
+        private double lon;
     }
 }
