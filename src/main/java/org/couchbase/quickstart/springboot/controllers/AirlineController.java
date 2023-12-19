@@ -1,24 +1,12 @@
 package org.couchbase.quickstart.springboot.controllers;
 
-import java.util.Arrays;
+import java.net.URI;
 import java.util.List;
-import java.util.UUID;
-
-import com.couchbase.client.core.error.DocumentNotFoundException;
-import com.couchbase.client.core.msg.kv.DurabilityLevel;
-import com.couchbase.client.java.Bucket;
-import com.couchbase.client.java.Cluster;
-import com.couchbase.client.java.Collection;
-import com.couchbase.client.java.json.JsonObject;
-import com.couchbase.client.java.query.QueryOptions;
-import com.couchbase.client.java.query.QueryScanConsistency;
-import com.couchbase.client.java.transactions.TransactionQueryOptions;
-import com.couchbase.client.java.transactions.config.TransactionOptions;
 
 import org.couchbase.quickstart.springboot.configs.DBProperties;
 import org.couchbase.quickstart.springboot.models.Airline;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -28,14 +16,18 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import com.couchbase.client.core.error.DocumentNotFoundException;
+import com.couchbase.client.java.Bucket;
+import com.couchbase.client.java.Cluster;
+import com.couchbase.client.java.Collection;
+import com.couchbase.client.java.json.JsonObject;
+import com.couchbase.client.java.query.QueryOptions;
+import com.couchbase.client.java.query.QueryScanConsistency;
 
 @RestController
+@CrossOrigin
 @RequestMapping("/api/v1/airline")
 public class AirlineController {
 
@@ -54,15 +46,21 @@ public class AirlineController {
 
     @GetMapping("/{id}")
     public ResponseEntity<Airline> getAirline(@PathVariable String id) {
-        Airline createdAirline = airlineCol.get(id).contentAs(Airline.class);
-        return new ResponseEntity<>(createdAirline, HttpStatus.CREATED);
+        try {
+            Airline airline = airlineCol.get(id).contentAs(Airline.class);
+            return new ResponseEntity<>(airline, HttpStatus.OK);
+        } catch (DocumentNotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 
     @PostMapping("/{id}")
     public ResponseEntity<Airline> createAirline(@PathVariable String id, @RequestBody Airline airline) {
         airlineCol.insert(id, airline);
         Airline createdAirline = airlineCol.get(id).contentAs(Airline.class);
-        return new ResponseEntity<>(createdAirline, HttpStatus.CREATED);
+
+        return ResponseEntity.created(URI.create("/api/v1/airline/" + id)).body(createdAirline);
+
     }
 
     @PutMapping("/{id}")
