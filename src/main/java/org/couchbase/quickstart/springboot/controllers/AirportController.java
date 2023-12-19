@@ -1,5 +1,6 @@
 package org.couchbase.quickstart.springboot.controllers;
 
+import java.net.URI;
 import java.util.List;
 
 import org.couchbase.quickstart.springboot.configs.DBProperties;
@@ -21,6 +22,7 @@ import com.couchbase.client.java.Cluster;
 import com.couchbase.client.java.Collection;
 import com.couchbase.client.java.query.QueryOptions;
 import com.couchbase.client.java.query.QueryScanConsistency;
+
 
 @RestController
 @RequestMapping("/api/v1/airport")
@@ -54,7 +56,7 @@ public class AirportController {
         try {
             airportCol.insert(id, airport);
             Airport createdAirport = airportCol.get(id).contentAs(Airport.class);
-            return new ResponseEntity<>(createdAirport, HttpStatus.CREATED);
+            return ResponseEntity.created(new URI("/api/v1/airport/" + id)).body(createdAirport);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.CONFLICT);
         }

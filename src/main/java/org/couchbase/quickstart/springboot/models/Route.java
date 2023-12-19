@@ -31,7 +31,7 @@ public class Route {
 
     private List<Schedule> schedule;
 
-    private float distance;
+    private double distance;
 
     @Getter
     @Setter
