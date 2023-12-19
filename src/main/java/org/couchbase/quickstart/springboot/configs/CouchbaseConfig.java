@@ -1,5 +1,6 @@
 package org.couchbase.quickstart.springboot.configs;
 
+import com.couchbase.client.core.error.CouchbaseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -30,9 +31,10 @@ public class CouchbaseConfig {
      */
     @Bean(destroyMethod = "disconnect")
     public Cluster getCouchbaseCluster() {
-        return Cluster.connect(dbProp.getHostName(), dbProp.getUsername(), dbProp.getPassword());
+        try {
+            return Cluster.connect(dbProp.getHostName(), dbProp.getUsername(), dbProp.getPassword());
 
-        // Here is an alternative version that enables TLS by configuring the cluster environment.
+            // Here is an alternative version that enables TLS by configuring the cluster environment.
 /*      return Cluster.connect(
             dbProp.getHostName(),
             ClusterOptions.clusterOptions(dbProp.getUsername(), dbProp.getPassword())
@@ -46,7 +48,17 @@ public class CouchbaseConfig {
                     );
                 })
         );
+
  */
+        } catch (CouchbaseException e) {
+            System.err.println("Could not connect to Couchbase cluster at " + dbProp.getHostName());
+            System.err.println("Please check the username (" + dbProp.getUsername() + ") and password (" + dbProp.getPassword() + ")");
+            throw e;
+        } catch (Exception e) {
+            System.err.println("Could not connect to Couchbase cluster at " + dbProp.getHostName());
+            throw e;
+        }
+
     }
 
     @Bean
