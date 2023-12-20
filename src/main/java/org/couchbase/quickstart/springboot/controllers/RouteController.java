@@ -3,6 +3,8 @@ package org.couchbase.quickstart.springboot.controllers;
 import java.net.URI;
 import java.util.List;
 
+import javax.validation.Valid;
+
 import org.couchbase.quickstart.springboot.configs.DBProperties;
 import org.couchbase.quickstart.springboot.models.Route;
 import org.springframework.http.HttpStatus;
@@ -52,7 +54,7 @@ public class RouteController {
     }
 
     @PostMapping("/{id}")
-    public ResponseEntity<Route> createRoute(@PathVariable String id, @RequestBody Route route) {
+    public ResponseEntity<Route> createRoute(@PathVariable String id,@Valid @RequestBody Route route) {
         try {
             routeCol.insert(id, route);
             Route createdRoute = routeCol.get(id).contentAs(Route.class);
@@ -63,7 +65,7 @@ public class RouteController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Route> updateRoute(@PathVariable String id, @RequestBody Route route) {
+    public ResponseEntity<Route> updateRoute(@PathVariable String id,@Valid @RequestBody Route route) {
         try {
             routeCol.replace(id, route);
             Route updatedRoute = routeCol.get(id).contentAs(Route.class);
@@ -86,7 +88,7 @@ public class RouteController {
     @GetMapping("/list")
     public ResponseEntity<List<Route>> listRoutes() {
         try {
-            String statement = "SELECT airport.* FROM `" + dbProperties.getBucketName() + "`.`inventory`.`route`";
+            String statement = "SELECT route.* FROM `" + dbProperties.getBucketName() + "`.`inventory`.`route`";
             List<Route> routes = cluster
                     .query(statement, QueryOptions.queryOptions().scanConsistency(QueryScanConsistency.REQUEST_PLUS))
                     .rowsAs(Route.class);

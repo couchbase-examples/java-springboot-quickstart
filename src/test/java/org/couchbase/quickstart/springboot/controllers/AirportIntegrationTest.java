@@ -17,7 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
- class AirportControllerTest {
+ class AirportIntegrationTest {
     // {"id":1254,"type":"airport","airportname":"Calais Dunkerque","city":"Calais","country":"France","faa":"CQF","icao":"LFAC","tz":"Europe/Paris","geo":{"lat":50.962097,"lon":1.954764,"alt":12.0}}
 
     @Value("${local.server.port}")
@@ -47,7 +47,7 @@ import org.springframework.http.ResponseEntity;
 
     @Test
      void testCreateAirport() throws Exception {
-        Airport airport = new Airport("airport_1255", "airport", "Test Airport", "Test City", "Test Country", "TST", "TST", "Test Timezone", new Geo(1.0, 2.0, 3.0));
+        Airport airport = new Airport("airport_1255", "airport", "Test Airport", "Test City", "Test Country", "TST", "TEST", "Test Timezone", new Geo(1.0, 2.0, 3.0));
         ResponseEntity<Airport> response = restTemplate.postForEntity("http://localhost:" + port + "/api/v1/airport/" + airport.getId(), airport, Airport.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
         Airport createdAirport = response.getBody();
@@ -58,7 +58,7 @@ import org.springframework.http.ResponseEntity;
         assertThat(createdAirport.getCity()).isEqualTo("Test City");
         assertThat(createdAirport.getCountry()).isEqualTo("Test Country");
         assertThat(createdAirport.getFaa()).isEqualTo("TST");
-        assertThat(createdAirport.getIcao()).isEqualTo("TST");
+        assertThat(createdAirport.getIcao()).isEqualTo("TEST");
         assertThat(createdAirport.getTz()).isEqualTo("Test Timezone");
         assertThat(createdAirport.getGeo().getAlt()).isEqualTo(1.0);
         assertThat(createdAirport.getGeo().getLat()).isEqualTo(2.0);
@@ -67,7 +67,7 @@ import org.springframework.http.ResponseEntity;
 
     @Test
      void testUpdateAirport() throws Exception {
-        Airport airport = new Airport("airport_1255", "airport", "Updated Test Airport", "Updated Test City", "Updated Test Country", "TST", "TST", "Updated Test Timezone", new Geo(1.0, 2.0, 3.0));
+        Airport airport = new Airport("airport_1255", "airport", "Updated Test Airport", "Updated Test City", "Updated Test Country", "TST", "TEST", "Updated Test Timezone", new Geo(1.0, 2.0, 3.0));
         restTemplate.put("http://localhost:" + port + "/api/v1/airport/" + airport.getId(), airport);
         ResponseEntity<Airport> response = restTemplate.getForEntity("http://localhost:" + port + "/api/v1/airport/" + airport.getId(), Airport.class);
 
@@ -80,7 +80,7 @@ import org.springframework.http.ResponseEntity;
         assertThat(updatedAirport.getCity()).isEqualTo("Updated Test City");
         assertThat(updatedAirport.getCountry()).isEqualTo("Updated Test Country");
         assertThat(updatedAirport.getFaa()).isEqualTo("TST");
-        assertThat(updatedAirport.getIcao()).isEqualTo("TST");
+        assertThat(updatedAirport.getIcao()).isEqualTo("TEST");
         assertThat(updatedAirport.getTz()).isEqualTo("Updated Test Timezone");
         assertThat(updatedAirport.getGeo().getAlt()).isEqualTo(1.0);
         assertThat(updatedAirport.getGeo().getLat()).isEqualTo(2.0);
@@ -89,7 +89,7 @@ import org.springframework.http.ResponseEntity;
 
     @Test
      void testDeleteAirport() throws Exception {
-        Airport airport = new Airport("airport_1255", "airport", "Test Airport", "Test City", "Test Country", "TST", "TST", "Test Timezone", new Geo(1.0, 2.0, 3.0));
+        Airport airport = new Airport("airport_1255", "airport", "Test Airport", "Test City", "Test Country", "TST", "TEST", "Test Timezone", new Geo(1.0, 2.0, 3.0));
         restTemplate.postForEntity("http://localhost:" + port + "/api/v1/airport/" + airport.getId(), airport, Airport.class);
         restTemplate.delete("http://localhost:" + port + "/api/v1/airport/" + airport.getId());
         ResponseEntity<Airport> response = restTemplate.getForEntity("http://localhost:" + port + "/api/v1/airport/" + airport.getId(), Airport.class);

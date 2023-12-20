@@ -18,7 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-class RouteControllerTest {
+class RouteIntegrationTest {
 
     @Value("${local.server.port}")
     private int port;
@@ -36,9 +36,9 @@ class RouteControllerTest {
         assertThat(route.getId()).isEqualTo("10000");
         assertThat(route.getType()).isEqualTo("route");
         assertThat(route.getAirline()).isEqualTo("AF");
-        assertThat(route.getAirlineId()).isEqualTo("airline_137");
-        assertThat(route.getSourceAirport()).isEqualTo("TLV");
-        assertThat(route.getDestinationAirport()).isEqualTo("MRS");
+        assertThat(route.getAirlineid()).isEqualTo("airline_137");
+        assertThat(route.getSourceairport()).isEqualTo("TLV");
+        assertThat(route.getDestinationairport()).isEqualTo("MRS");
         assertThat(route.getStops()).isEqualTo(0);
         assertThat(route.getEquipment()).isEqualTo("320");
         assertThat(route.getSchedule().size()).isEqualTo(23);
@@ -58,15 +58,15 @@ class RouteControllerTest {
         assertThat(route.getId()).isEqualTo("route_10001");
         assertThat(route.getType()).isEqualTo("route");
         assertThat(route.getAirline()).isEqualTo("AF");
-        assertThat(route.getAirlineId()).isEqualTo("airline_137");
-        assertThat(route.getSourceAirport()).isEqualTo("TLV");
-        assertThat(route.getDestinationAirport()).isEqualTo("MRS");
+        assertThat(route.getAirlineid()).isEqualTo("airline_137");
+        assertThat(route.getSourceairport()).isEqualTo("TLV");
+        assertThat(route.getDestinationairport()).isEqualTo("MRS");
         assertThat(route.getStops()).isZero();
         assertThat(route.getEquipment()).isEqualTo("320");
         assertThat(route.getSchedule()).hasSize(1);
         assertThat(route.getSchedule().get(0).getDay()).isZero();
-        assertThat(route.getSchedule().get(0).getUtc()).isEqualTo("10:13:00");
-        assertThat(route.getSchedule().get(0).getFlight()).isEqualTo("AF198");
+        assertThat(route.getSchedule().get(0).getUtc()).isEqualTo("AF198");
+        assertThat(route.getSchedule().get(0).getFlight()).isEqualTo("10:13:00");
         assertThat(route.getDistance()).isEqualTo(2881.617376098415);
     }
 
@@ -84,7 +84,7 @@ class RouteControllerTest {
                 new Route.Schedule(17, "AF967", "11:33:00"), new Route.Schedule(18, "AF730", "19:42:00"),
                 new Route.Schedule(19, "AF882", "17:07:00"), new Route.Schedule(20, "AF485", "17:03:00"),
                 new Route.Schedule(21, "AF898", "10:01:00"), new Route.Schedule(22, "AF496", "07:00:00"));
-        Route route = new Route("route_10001", "route", "AF", "airline_137", "TLV", "MRS", 0, "320", null, 2881.617376098415);
+        Route route = new Route("route_10001", "route", "AF", "airline_137", "TLV", "MRS", 0, "320", schedule, 2881.617376098415);
         restTemplate.put("http://localhost:" + port + "/api/v1/route/" + route.getId(), route);
         ResponseEntity<Route> response = restTemplate
                 .getForEntity("http://localhost:" + port + "/api/v1/route/" + route.getId(), Route.class);
@@ -95,9 +95,9 @@ class RouteControllerTest {
         assertThat(updatedRoute.getId()).isEqualTo("route_10001");
         assertThat(updatedRoute.getType()).isEqualTo("route");
         assertThat(updatedRoute.getAirline()).isEqualTo("AF");
-        assertThat(updatedRoute.getAirlineId()).isEqualTo("airline_137");
-        assertThat(updatedRoute.getSourceAirport()).isEqualTo("TLV");
-        assertThat(updatedRoute.getDestinationAirport()).isEqualTo("MRS");
+        assertThat(updatedRoute.getAirlineid()).isEqualTo("airline_137");
+        assertThat(updatedRoute.getSourceairport()).isEqualTo("TLV");
+        assertThat(updatedRoute.getDestinationairport()).isEqualTo("MRS");
         assertThat(updatedRoute.getStops()).isZero();
         assertThat(updatedRoute.getEquipment()).isEqualTo("320");
         assertThat(updatedRoute.getDistance()).isEqualTo(2881.617376098415);

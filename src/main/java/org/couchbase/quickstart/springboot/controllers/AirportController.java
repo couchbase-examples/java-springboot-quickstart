@@ -3,6 +3,8 @@ package org.couchbase.quickstart.springboot.controllers;
 import java.net.URI;
 import java.util.List;
 
+import javax.validation.Valid;
+
 import org.couchbase.quickstart.springboot.configs.DBProperties;
 import org.couchbase.quickstart.springboot.models.Airport;
 import org.springframework.http.HttpStatus;
@@ -52,7 +54,7 @@ public class AirportController {
     }
 
     @PostMapping("/{id}")
-    public ResponseEntity<Airport> createAirport(@PathVariable String id, @RequestBody Airport airport) {
+    public ResponseEntity<Airport> createAirport(@PathVariable String id,@Valid @RequestBody Airport airport) {
         try {
             airportCol.insert(id, airport);
             Airport createdAirport = airportCol.get(id).contentAs(Airport.class);
@@ -63,7 +65,7 @@ public class AirportController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Airport> updateAirport(@PathVariable String id, @RequestBody Airport airport) {
+    public ResponseEntity<Airport> updateAirport(@PathVariable String id,@Valid @RequestBody Airport airport) {
         try {
             airportCol.replace(id, airport);
             Airport updatedAirport = airportCol.get(id).contentAs(Airport.class);
