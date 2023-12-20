@@ -39,9 +39,9 @@ class RouteIntegrationTest {
         assertThat(route.getAirlineid()).isEqualTo("airline_137");
         assertThat(route.getSourceairport()).isEqualTo("TLV");
         assertThat(route.getDestinationairport()).isEqualTo("MRS");
-        assertThat(route.getStops()).isEqualTo(0);
+        assertThat(route.getStops()).isZero();
         assertThat(route.getEquipment()).isEqualTo("320");
-        assertThat(route.getSchedule().size()).isEqualTo(23);
+        assertThat(route.getSchedule()).hasSize(23);
         assertThat(route.getDistance()).isEqualTo(2881.617376098415);
     }
 
@@ -72,18 +72,31 @@ class RouteIntegrationTest {
 
     @Test
     void testUpdateRoute() {
-        List<Route.Schedule> schedule = Arrays.asList(new Route.Schedule(0, "AF198", "10:13:00"),
-                new Route.Schedule(1, "AF547", "19:14:00"), new Route.Schedule(2, "AF943", "01:31:00"),
-                new Route.Schedule(3, "AF356", "12:40:00"), new Route.Schedule(4, "AF480", "08:58:00"),
-                new Route.Schedule(5, "AF250", "12:59:00"), new Route.Schedule(6, "AF130", "04:45:00"),
-                new Route.Schedule(7, "AF997", "00:31:00"), new Route.Schedule(8, "AF223", "19:41:00"),
-                new Route.Schedule(9, "AF890", "15:14:00"), new Route.Schedule(10, "AF399", "00:30:00"),
-                new Route.Schedule(11, "AF328", "16:18:00"), new Route.Schedule(12, "AF074", "23:50:00"),
-                new Route.Schedule(13, "AF556", "11:33:00"), new Route.Schedule(14, "AF064", "13:23:00"),
-                new Route.Schedule(15, "AF596", "12:09:00"), new Route.Schedule(16, "AF818", "08:02:00"),
-                new Route.Schedule(17, "AF967", "11:33:00"), new Route.Schedule(18, "AF730", "19:42:00"),
-                new Route.Schedule(19, "AF882", "17:07:00"), new Route.Schedule(20, "AF485", "17:03:00"),
-                new Route.Schedule(21, "AF898", "10:01:00"), new Route.Schedule(22, "AF496", "07:00:00"));
+        List<Route.Schedule> schedule = Arrays.asList(
+            new Route.Schedule(0, "10:13:00", "AF198"),
+            new Route.Schedule(1, "19:14:00", "AF547"),
+            new Route.Schedule(2, "01:31:00", "AF943"),
+            new Route.Schedule(3, "12:40:00", "AF356"),
+            new Route.Schedule(4, "08:58:00", "AF480"),
+            new Route.Schedule(5, "12:59:00", "AF250"),
+            new Route.Schedule(6, "04:45:00", "AF130"),
+            new Route.Schedule(7, "00:31:00", "AF997"),
+            new Route.Schedule(8, "19:41:00", "AF223"),
+            new Route.Schedule(9, "15:14:00", "AF890"),
+            new Route.Schedule(10, "00:30:00", "AF399"),
+            new Route.Schedule(11, "16:18:00", "AF328"),
+            new Route.Schedule(12, "23:50:00", "AF074"),
+            new Route.Schedule(13, "11:33:00", "AF556"),
+            new Route.Schedule(14, "13:23:00", "AF064"),
+            new Route.Schedule(15, "12:09:00", "AF596"),
+            new Route.Schedule(16, "08:02:00", "AF818"),
+            new Route.Schedule(17, "11:33:00", "AF967"),
+            new Route.Schedule(18, "19:42:00", "AF730"),
+            new Route.Schedule(19, "17:07:00", "AF882"),
+            new Route.Schedule(20, "17:03:00", "AF485"),
+            new Route.Schedule(21, "10:01:00", "AF898"),
+            new Route.Schedule(22, "07:00:00", "AF496")
+        );
         Route route = new Route("route_10001", "route", "AF", "airline_137", "TLV", "MRS", 0, "320", schedule, 2881.617376098415);
         restTemplate.put("http://localhost:" + port + "/api/v1/route/" + route.getId(), route);
         ResponseEntity<Route> response = restTemplate
