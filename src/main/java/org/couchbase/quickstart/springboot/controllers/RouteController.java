@@ -1,12 +1,11 @@
 package org.couchbase.quickstart.springboot.controllers;
 
-import java.net.URI;
 import java.util.List;
 
 import javax.validation.Valid;
 
-import org.couchbase.quickstart.springboot.configs.DBProperties;
 import org.couchbase.quickstart.springboot.models.Route;
+import org.couchbase.quickstart.springboot.services.RouteService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -19,82 +18,84 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.couchbase.client.java.Bucket;
-import com.couchbase.client.java.Cluster;
-import com.couchbase.client.java.Collection;
-import com.couchbase.client.java.query.QueryOptions;
-import com.couchbase.client.java.query.QueryScanConsistency;
+import com.couchbase.client.core.error.DocumentExistsException;
+import com.couchbase.client.core.error.DocumentNotFoundException;
 
 @RestController
 @CrossOrigin
 @RequestMapping("/api/v1/route")
 public class RouteController {
 
-    private Cluster cluster;
-    private Collection routeCol;
-    private DBProperties dbProperties;
-    private Bucket bucket;
+    private final RouteService routeService;
 
-    public RouteController(Cluster cluster, Bucket bucket, DBProperties dbProperties) {
-        System.out.println("Initializing route controller, cluster: " + cluster + "; bucket: " + bucket);
-        this.cluster = cluster;
-        this.bucket = bucket;
-        this.routeCol = bucket.scope("inventory").collection("route");
-        this.dbProperties = dbProperties;
+    public RouteController(RouteService routeService) {
+        this.routeService = routeService;
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Route> getRoute(@PathVariable String id) {
         try {
-            Route route = routeCol.get(id).contentAs(Route.class);
-            return new ResponseEntity<>(route, HttpStatus.OK);
-        } catch (Exception e) {
+            Route route = routeService.getRouteById(id);
+            if (route != null) {
+                return new ResponseEntity<>(route, HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+        } catch (DocumentNotFoundException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @PostMapping("/{id}")
-    public ResponseEntity<Route> createRoute(@PathVariable String id,@Valid @RequestBody Route route) {
+    public ResponseEntity<Route> createRoute(@PathVariable String id, @Valid @RequestBody Route route) {
         try {
-            routeCol.insert(id, route);
-            Route createdRoute = routeCol.get(id).contentAs(Route.class);
-            return ResponseEntity.created(new URI("/api/v1/route/" + id)).body(createdRoute);
-        } catch (Exception e) {
+            Route newRoute = routeService.createRoute(route);
+            return new ResponseEntity<>(newRoute, HttpStatus.CREATED);
+        } catch (DocumentExistsException e) {
             return new ResponseEntity<>(HttpStatus.CONFLICT);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
+
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Route> updateRoute(@PathVariable String id,@Valid @RequestBody Route route) {
+    public ResponseEntity<Route> updateRoute(@PathVariable String id, @Valid @RequestBody Route route) {
         try {
-            routeCol.replace(id, route);
-            Route updatedRoute = routeCol.get(id).contentAs(Route.class);
-            return new ResponseEntity<>(updatedRoute, HttpStatus.OK);
-        } catch (Exception e) {
+            Route updatedRoute = routeService.updateRoute(id, route);
+            if (updatedRoute != null) {
+                return new ResponseEntity<>(updatedRoute, HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+        } catch (DocumentNotFoundException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteRoute(@PathVariable String id) {
         try {
-            routeCol.remove(id);
+            routeService.deleteRoute(id);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        } catch (Exception e) {
+        } catch (DocumentNotFoundException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @GetMapping("/list")
     public ResponseEntity<List<Route>> listRoutes() {
         try {
-            String statement = "SELECT route.* FROM `" + dbProperties.getBucketName() + "`.`inventory`.`route`";
-            List<Route> routes = cluster
-                    .query(statement, QueryOptions.queryOptions().scanConsistency(QueryScanConsistency.REQUEST_PLUS))
-                    .rowsAs(Route.class);
+            List<Route> routes = routeService.listRoutes();
             return new ResponseEntity<>(routes, HttpStatus.OK);
         } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

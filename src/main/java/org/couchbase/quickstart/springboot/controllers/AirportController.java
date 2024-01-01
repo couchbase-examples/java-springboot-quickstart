@@ -1,12 +1,11 @@
 package org.couchbase.quickstart.springboot.controllers;
 
-import java.net.URI;
 import java.util.List;
 
 import javax.validation.Valid;
 
-import org.couchbase.quickstart.springboot.configs.DBProperties;
 import org.couchbase.quickstart.springboot.models.Airport;
+import org.couchbase.quickstart.springboot.services.AirportService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -19,99 +18,93 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.couchbase.client.java.Bucket;
-import com.couchbase.client.java.Cluster;
-import com.couchbase.client.java.Collection;
-import com.couchbase.client.java.query.QueryOptions;
-import com.couchbase.client.java.query.QueryScanConsistency;
-
+import com.couchbase.client.core.error.DocumentExistsException;
+import com.couchbase.client.core.error.DocumentNotFoundException;
 
 @RestController
 @RequestMapping("/api/v1/airport")
 public class AirportController {
 
-    private Cluster cluster;
-    private Collection airportCol;
-    private DBProperties dbProperties;
-    private Bucket bucket;
+    private final AirportService airportService;
 
-    public AirportController(Cluster cluster, Bucket bucket, DBProperties dbProperties) {
-        System.out.println("Initializing airport controller, cluster: " + cluster + "; bucket: " + bucket);
-        this.cluster = cluster;
-        this.bucket = bucket;
-        this.airportCol = bucket.scope("inventory").collection("airport");
-        this.dbProperties = dbProperties;
+    public AirportController(AirportService airportService) {
+        this.airportService = airportService;
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Airport> getAirport(@PathVariable String id) {
         try {
-            Airport airport = airportCol.get(id).contentAs(Airport.class);
-            return new ResponseEntity<>(airport, HttpStatus.OK);
-        } catch (Exception e) {
+            Airport airport = airportService.getAirportById(id);
+            if (airport != null) {
+                return new ResponseEntity<>(airport, HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+        } catch (DocumentNotFoundException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @PostMapping("/{id}")
-    public ResponseEntity<Airport> createAirport(@PathVariable String id,@Valid @RequestBody Airport airport) {
+    public ResponseEntity<Airport> createAirport(@PathVariable String id, @Valid @RequestBody Airport airport) {
         try {
-            airportCol.insert(id, airport);
-            Airport createdAirport = airportCol.get(id).contentAs(Airport.class);
-            return ResponseEntity.created(new URI("/api/v1/airport/" + id)).body(createdAirport);
-        } catch (Exception e) {
+            Airport newAirport = airportService.createAirport(airport);
+            return new ResponseEntity<>(newAirport, HttpStatus.CREATED);
+        } catch (DocumentExistsException e) {
             return new ResponseEntity<>(HttpStatus.CONFLICT);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
+
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Airport> updateAirport(@PathVariable String id,@Valid @RequestBody Airport airport) {
+    public ResponseEntity<Airport> updateAirport(@PathVariable String id, @Valid @RequestBody Airport airport) {
         try {
-            airportCol.replace(id, airport);
-            Airport updatedAirport = airportCol.get(id).contentAs(Airport.class);
-            return new ResponseEntity<>(updatedAirport, HttpStatus.OK);
-        } catch (Exception e) {
+            Airport updatedAirport = airportService.updateAirport(id, airport);
+            if (updatedAirport != null) {
+                return new ResponseEntity<>(updatedAirport, HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+        } catch (DocumentNotFoundException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteAirport(@PathVariable String id) {
         try {
-            airportCol.remove(id);
+            airportService.deleteAirport(id);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        } catch (Exception e) {
+        } catch (DocumentNotFoundException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @GetMapping("/list")
     public ResponseEntity<List<Airport>> listAirports() {
         try {
-            String statement = "SELECT airport.* FROM `" + dbProperties.getBucketName() + "`.`inventory`.`airport`";
-            List<Airport> airports = cluster
-                    .query(statement, QueryOptions.queryOptions().scanConsistency(QueryScanConsistency.REQUEST_PLUS))
-                    .rowsAs(Airport.class);
+            List<Airport> airports = airportService.listAirports();
             return new ResponseEntity<>(airports, HttpStatus.OK);
         } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @GetMapping("/direct-connections")
     public ResponseEntity<List<Airport>> listDirectConnections(@RequestParam String airportCode) {
         try {
-            String statement = "SELECT airport.* FROM `" + dbProperties.getBucketName()
-                    + "`.`inventory`.`airport` as airport JOIN `" + dbProperties.getBucketName()
-                    + "`.`inventory`.`route` as route on route.sourceairport = airport.faa WHERE airport.faa = \""
-                    + airportCode + "\" and route.stops = 0";
-            List<Airport> airports = cluster
-                    .query(statement, QueryOptions.queryOptions().scanConsistency(QueryScanConsistency.REQUEST_PLUS))
-                    .rowsAs(Airport.class);
-
+            List<Airport> airports = airportService.listDirectConnections(airportCode);
             return new ResponseEntity<>(airports, HttpStatus.OK);
         } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

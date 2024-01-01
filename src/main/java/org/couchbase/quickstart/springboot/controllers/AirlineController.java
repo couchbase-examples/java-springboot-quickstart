@@ -1,12 +1,11 @@
 package org.couchbase.quickstart.springboot.controllers;
 
-import java.net.URI;
 import java.util.List;
 
 import javax.validation.Valid;
 
-import org.couchbase.quickstart.springboot.configs.DBProperties;
 import org.couchbase.quickstart.springboot.models.Airline;
+import org.couchbase.quickstart.springboot.services.AirlineService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -19,121 +18,94 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.couchbase.client.core.error.DocumentExistsException;
 import com.couchbase.client.core.error.DocumentNotFoundException;
-import com.couchbase.client.java.Bucket;
-import com.couchbase.client.java.Cluster;
-import com.couchbase.client.java.Collection;
-import com.couchbase.client.java.json.JsonObject;
-import com.couchbase.client.java.query.QueryOptions;
-import com.couchbase.client.java.query.QueryScanConsistency;
 
 @RestController
 @CrossOrigin
 @RequestMapping("/api/v1/airline")
 public class AirlineController {
 
-    private Cluster cluster;
-    private Collection airlineCol;
-    private DBProperties dbProperties;
-    private Bucket bucket;
+    private final AirlineService airlineService;
 
-    public AirlineController(Cluster cluster, Bucket bucket, DBProperties dbProperties) {
-        System.out.println("Initializing airline controller, cluster: " + cluster + "; bucket: " + bucket);
-        this.cluster = cluster;
-        this.bucket = bucket;
-        this.airlineCol = bucket.scope("inventory").collection("airline");
-        this.dbProperties = dbProperties;
+    public AirlineController(AirlineService airlineService) {
+        this.airlineService = airlineService;
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Airline> getAirline(@PathVariable String id) {
         try {
-            Airline airline = airlineCol.get(id).contentAs(Airline.class);
-            return new ResponseEntity<>(airline, HttpStatus.OK);
+            Airline airline = airlineService.getAirlineById(id);
+            if (airline != null) {
+                return new ResponseEntity<>(airline, HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
         } catch (DocumentNotFoundException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @PostMapping("/{id}")
-    public ResponseEntity<Airline> createAirline(@PathVariable String id,@Valid @RequestBody Airline airline) {
+    public ResponseEntity<Airline> createAirline(@PathVariable String id, @Valid @RequestBody Airline airline) {
         try {
-            airlineCol.insert(id, airline);
-            Airline createdAirline = airlineCol.get(id).contentAs(Airline.class);
-            return ResponseEntity.created(new URI("/api/v1/airline/" + id)).body(createdAirline);
-        } catch (Exception e) {
+            Airline newAirline = airlineService.createAirline(airline);
+            return new ResponseEntity<>(newAirline, HttpStatus.CREATED);
+        } catch (DocumentExistsException e) {
             return new ResponseEntity<>(HttpStatus.CONFLICT);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Airline> updateAirline(@PathVariable String id,@Valid @RequestBody Airline airline) {
+    public ResponseEntity<Airline> updateAirline(@PathVariable String id, @Valid @RequestBody Airline airline) {
         try {
-            airlineCol.replace(id, airline);
-            Airline updatedAirline = airlineCol.get(id).contentAs(Airline.class);
-            return new ResponseEntity<>(updatedAirline, HttpStatus.OK);
-        } catch (Exception e) {
+            Airline updatedAirline = airlineService.updateAirline(id, airline);
+            if (updatedAirline != null) {
+                return new ResponseEntity<>(updatedAirline, HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+        } catch (DocumentNotFoundException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteAirline(@PathVariable String id) {
         try {
-            airlineCol.remove(id);
+            airlineService.deleteAirline(id);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        } catch (Exception e) {
+        } catch (DocumentNotFoundException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @GetMapping("/list")
     public ResponseEntity<List<Airline>> listAirlines() {
         try {
-            String statement = "SELECT airline.id, airline.type, airline.name, airline.iata, airline.icao, airline.callsign, airline.country FROM `"
-                    + dbProperties.getBucketName() + "`.`inventory`.`airline`";
-            List<Airline> airlines = cluster
-                    .query(statement, QueryOptions.queryOptions().scanConsistency(QueryScanConsistency.REQUEST_PLUS))
-                    .rowsAs(Airline.class);
+            List<Airline> airlines = airlineService.listAirlines();
             return new ResponseEntity<>(airlines, HttpStatus.OK);
         } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @GetMapping("/country/{country}")
     public ResponseEntity<List<Airline>> listAirlinesByCountry(@PathVariable String country) {
         try {
-            String statement = "SELECT airline.id, airline.type, airline.name, airline.iata, airline.icao, airline.callsign, airline.country FROM `"
-                    + dbProperties.getBucketName() + "`.`inventory`.`airline` WHERE country = '" + country + "'";
-            List<Airline> airlines = cluster
-                    .query(statement, QueryOptions.queryOptions().scanConsistency(QueryScanConsistency.REQUEST_PLUS)
-                            .parameters(JsonObject.create().put("country", country)))
-                    .rowsAs(Airline.class);
+            List<Airline> airlines = airlineService.listAirlinesByCountry(country);
             return new ResponseEntity<>(airlines, HttpStatus.OK);
         } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
-    @GetMapping("/destination/{destinationAirport}")
-    public ResponseEntity<List<Airline>> listAirlinesByDestinationAirport(@PathVariable String destinationAirport) {
-        try {
-            String statement = "SELECT air.callsign, air.country, air.iata, air.icao, air.id, air.name, air.type FROM (SELECT DISTINCT META(airline).id AS airlineId FROM `"
-                    + dbProperties.getBucketName() + "`.`inventory`.`route` JOIN `" + dbProperties.getBucketName()
-                    + "`.`inventory`.`airline` ON route.airlineid = META(airline).id WHERE route.destinationairport = "
-                    + destinationAirport + ") AS subquery JOIN `" + dbProperties.getBucketName()
-                    + "`.`inventory`.`airline` AS air ON META(air).id = subquery.airlineId";
-            List<Airline> airlines = cluster
-                    .query(statement,
-                            QueryOptions.queryOptions().scanConsistency(QueryScanConsistency.REQUEST_PLUS)
-                                    .parameters(JsonObject.create().put("destinationAirport", destinationAirport)))
-                    .rowsAs(Airline.class);
-            return new ResponseEntity<>(airlines, HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-    }
-
 }

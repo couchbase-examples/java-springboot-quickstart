@@ -53,6 +53,7 @@ public class Route {
     @Setter
     @AllArgsConstructor
     @NoArgsConstructor
+    @Data
     public static class Schedule {
 
         @NotNull(message = "Day is mandatory")
