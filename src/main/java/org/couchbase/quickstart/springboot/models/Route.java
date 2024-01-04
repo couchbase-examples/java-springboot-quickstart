@@ -62,11 +62,11 @@ public class Route {
         @NotNull(message = "Day is mandatory")
         private int day;
 
+        @NotBlank(message = "Flight is mandatory")
+        private String flight;
+
         @NotBlank(message = "UTC is mandatory")
         private String utc;
 
-        @NotBlank(message = "Flight is mandatory")
-        private String flight;
-        
     }
 }
