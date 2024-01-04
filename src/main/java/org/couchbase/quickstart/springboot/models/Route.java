@@ -7,6 +7,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,6 +18,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
+@Builder
 public class Route {
 
     @NotBlank(message = "ID is mandatory")
@@ -54,6 +56,7 @@ public class Route {
     @AllArgsConstructor
     @NoArgsConstructor
     @Data
+    @Builder
     public static class Schedule {
 
         @NotNull(message = "Day is mandatory")

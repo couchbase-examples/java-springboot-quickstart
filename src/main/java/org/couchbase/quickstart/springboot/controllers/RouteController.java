@@ -21,6 +21,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.couchbase.client.core.error.DocumentExistsException;
 import com.couchbase.client.core.error.DocumentNotFoundException;
 
+import io.swagger.v3.oas.annotations.Operation;
+
 @RestController
 @CrossOrigin
 @RequestMapping("/api/v1/route")
@@ -32,6 +34,7 @@ public class RouteController {
         this.routeService = routeService;
     }
 
+    @Operation(summary = "Get a route by ID")
     @GetMapping("/{id}")
     public ResponseEntity<Route> getRoute(@PathVariable String id) {
         try {
@@ -48,6 +51,7 @@ public class RouteController {
         }
     }
 
+    @Operation(summary = "Create a route")
     @PostMapping("/{id}")
     public ResponseEntity<Route> createRoute(@PathVariable String id, @Valid @RequestBody Route route) {
         try {
@@ -61,6 +65,7 @@ public class RouteController {
 
     }
 
+    @Operation(summary = "Update a route")
     @PutMapping("/{id}")
     public ResponseEntity<Route> updateRoute(@PathVariable String id, @Valid @RequestBody Route route) {
         try {
@@ -77,6 +82,7 @@ public class RouteController {
         }
     }
 
+    @Operation(summary = "Delete a route")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteRoute(@PathVariable String id) {
         try {
@@ -89,6 +95,7 @@ public class RouteController {
         }
     }
 
+    @Operation(summary = "List all routes")
     @GetMapping("/list")
     public ResponseEntity<List<Route>> listRoutes() {
         try {

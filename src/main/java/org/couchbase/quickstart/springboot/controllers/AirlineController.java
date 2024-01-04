@@ -21,6 +21,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.couchbase.client.core.error.DocumentExistsException;
 import com.couchbase.client.core.error.DocumentNotFoundException;
 
+import io.swagger.v3.oas.annotations.Operation;
+
 @RestController
 @CrossOrigin
 @RequestMapping("/api/v1/airline")
@@ -32,6 +34,7 @@ public class AirlineController {
         this.airlineService = airlineService;
     }
 
+    @Operation(summary = "Get an airline by ID")
     @GetMapping("/{id}")
     public ResponseEntity<Airline> getAirline(@PathVariable String id) {
         try {
@@ -48,6 +51,7 @@ public class AirlineController {
         }
     }
 
+    @Operation(summary = "Create an airline")
     @PostMapping("/{id}")
     public ResponseEntity<Airline> createAirline(@PathVariable String id, @Valid @RequestBody Airline airline) {
         try {
@@ -61,6 +65,7 @@ public class AirlineController {
 
     }
 
+    @Operation(summary = "Update an airline")
     @PutMapping("/{id}")
     public ResponseEntity<Airline> updateAirline(@PathVariable String id, @Valid @RequestBody Airline airline) {
         try {
@@ -77,6 +82,7 @@ public class AirlineController {
         }
     }
 
+    @Operation(summary = "Delete an airline")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteAirline(@PathVariable String id) {
         try {
@@ -89,6 +95,7 @@ public class AirlineController {
         }
     }
 
+    @Operation(summary = "List all airlines")
     @GetMapping("/list")
     public ResponseEntity<List<Airline>> listAirlines() {
         try {
@@ -99,6 +106,7 @@ public class AirlineController {
         }
     }
 
+    @Operation(summary = "List all airlines by country")
     @GetMapping("/country/{country}")
     public ResponseEntity<List<Airline>> listAirlinesByCountry(@PathVariable String country) {
         try {

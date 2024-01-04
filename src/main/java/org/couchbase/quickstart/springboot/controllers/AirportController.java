@@ -21,6 +21,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.couchbase.client.core.error.DocumentExistsException;
 import com.couchbase.client.core.error.DocumentNotFoundException;
 
+import io.swagger.v3.oas.annotations.Operation;
+
 @RestController
 @RequestMapping("/api/v1/airport")
 public class AirportController {
@@ -31,6 +33,7 @@ public class AirportController {
         this.airportService = airportService;
     }
 
+    @Operation(summary = "Get an airport by ID")
     @GetMapping("/{id}")
     public ResponseEntity<Airport> getAirport(@PathVariable String id) {
         try {
@@ -47,6 +50,7 @@ public class AirportController {
         }
     }
 
+    @Operation(summary = "Create an airport")
     @PostMapping("/{id}")
     public ResponseEntity<Airport> createAirport(@PathVariable String id, @Valid @RequestBody Airport airport) {
         try {
@@ -60,6 +64,7 @@ public class AirportController {
 
     }
 
+    @Operation(summary = "Update an airport")
     @PutMapping("/{id}")
     public ResponseEntity<Airport> updateAirport(@PathVariable String id, @Valid @RequestBody Airport airport) {
         try {
@@ -76,6 +81,7 @@ public class AirportController {
         }
     }
 
+    @Operation(summary = "Delete an airport")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteAirport(@PathVariable String id) {
         try {
@@ -88,6 +94,7 @@ public class AirportController {
         }
     }
 
+    @Operation(summary = "List all airports")
     @GetMapping("/list")
     public ResponseEntity<List<Airport>> listAirports() {
         try {
@@ -98,6 +105,7 @@ public class AirportController {
         }
     }
 
+    @Operation(summary = "List all direct connections from an airport")
     @GetMapping("/direct-connections")
     public ResponseEntity<List<Airport>> listDirectConnections(@RequestParam String airportCode) {
         try {

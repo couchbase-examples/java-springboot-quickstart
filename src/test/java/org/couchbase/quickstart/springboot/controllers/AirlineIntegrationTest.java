@@ -26,10 +26,6 @@ class AirlineIntegrationTest {
         @Autowired
         private TestRestTemplate restTemplate;
 
-        // {"id":10,"type":"airline","name":"40-Mile
-        // Air","iata":"Q5","icao":"MLA","callsign":"MILE-AIR","country":"United
-        // States"}
-
         @BeforeEach
         void setUp() {
                 restTemplate.delete("http://localhost:" + port + "/api/v1/airline/airline_create");
@@ -57,22 +53,36 @@ class AirlineIntegrationTest {
 
         @Test
         void testCreateAirline() {
-                Airline airline = new Airline("airline_create", "airline", "Test Airline", "TA", "TST", "TEST",
-                                "United States");
+                Airline airline = Airline.builder()
+                                .id("airline_create")
+                                .type("airline")
+                                .name("Test Airline")
+                                .iata("TA")
+                                .icao("TST")
+                                .callsign("TEST")
+                                .country("United States")
+                                .build();
                 ResponseEntity<Airline> response = restTemplate.postForEntity(
                                 "http://localhost:" + port + "/api/v1/airline/" + airline.getId(), airline,
                                 Airline.class);
                 assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
                 Airline createdAirline = response.getBody();
-                
+
                 assert createdAirline != null;
                 assertThat(createdAirline).isEqualTo(airline);
         }
 
         @Test
         void testUpdateAirline() {
-                Airline airline = new Airline("airline_update", "airline", "Updated Test Airline", "TA", "TST", "TEST",
-                                "United States");
+                Airline airline = Airline.builder()
+                                .id("airline_update")
+                                .type("airline")
+                                .name("Updated Test Airline")
+                                .iata("TA")
+                                .icao("TST")
+                                .callsign("TEST")
+                                .country("United States")
+                                .build();
                 restTemplate.postForEntity("http://localhost:" + port + "/api/v1/airline/" + airline.getId(), airline,
                                 Airline.class);
                 restTemplate.put("http://localhost:" + port + "/api/v1/airline/" + airline.getId(), airline);
@@ -90,8 +100,15 @@ class AirlineIntegrationTest {
         @Test
         void testDeleteAirline() {
                 String airlineIdToDelete = "airline_delete";
-                Airline airline = new Airline(airlineIdToDelete, "airline", "Test Airline", "TA", "TST", "TEST",
-                                "United States");
+                Airline airline = Airline.builder()
+                                .id(airlineIdToDelete)
+                                .type("airline")
+                                .name("Test Airline")
+                                .iata("TA")
+                                .icao("TST")
+                                .callsign("TEST")
+                                .country("United States")
+                                .build();
                 restTemplate.postForEntity("http://localhost:" + port + "/api/v1/airline/" + airline.getId(), airline,
                                 Airline.class);
                 restTemplate.delete("http://localhost:" + port + "/api/v1/airline/" + airlineIdToDelete);
@@ -112,13 +129,20 @@ class AirlineIntegrationTest {
                 List<Airline> airlines = response.getBody();
                 assert airlines != null;
                 assertThat(airlines).hasSize(187);
-                assertThat(airlines.get(0)).isEqualTo(
-                                new Airline("10", "airline", "40-Mile Air", "Q5", "MLA", "MILE-AIR", "United States"));
+                Airline expectedAirline = Airline.builder()
+                                .id("10")
+                                .type("airline")
+                                .name("40-Mile Air")
+                                .iata("Q5")
+                                .icao("MLA")
+                                .callsign("MILE-AIR")
+                                .country("United States")
+                                .build();
+                assertThat(airlines.get(0)).isEqualTo(expectedAirline);
         }
 
         @Test
         void testListAirlinesByCountry() {
-                // using equals method
                 String country = "United States";
                 ResponseEntity<List<Airline>> response = restTemplate.exchange(
                                 "http://localhost:" + port + "/api/v1/airline/country/" + country,
@@ -129,10 +153,17 @@ class AirlineIntegrationTest {
                 assertThat(airlines).hasSize(127);
 
                 Airline airline = airlines.get(0);
-                assertThat(airline).isEqualTo(
-                                new Airline("10", "airline", "40-Mile Air", "Q5", "MLA", "MILE-AIR", "United States"));
+                Airline expectedAirline = Airline.builder()
+                                .id("10")
+                                .type("airline")
+                                .name("40-Mile Air")
+                                .iata("Q5")
+                                .icao("MLA")
+                                .callsign("MILE-AIR")
+                                .country("United States")
+                                .build();
+                assertThat(airline).isEqualTo(expectedAirline);
 
-                // using contains method
                 country = "France";
                 ResponseEntity<List<Airline>> response2 = restTemplate.exchange(
                                 "http://localhost:" + port + "/api/v1/airline/country/" + country,
@@ -143,8 +174,16 @@ class AirlineIntegrationTest {
                 assertThat(airlines2).hasSize(21);
 
                 Airline airline2 = airlines2.get(0);
-                assertThat(airline2).isEqualTo(
-                                new Airline("1191", "airline", "Air Austral", "UU", "REU", "REUNION", "France"));
+                Airline expectedAirline2 = Airline.builder()
+                                .id("1191")
+                                .type("airline")
+                                .name("Air Austral")
+                                .iata("UU")
+                                .icao("REU")
+                                .callsign("REUNION")
+                                .country("France")
+                                .build();
+                assertThat(airline2).isEqualTo(expectedAirline2);
 
         }
 

@@ -5,6 +5,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,6 +16,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
+@Builder
 public class Airport {
 
     @NotBlank(message = "ID is mandatory")
@@ -51,6 +53,7 @@ public class Airport {
     @AllArgsConstructor
     @NoArgsConstructor
     @Data
+    @Builder
     public static class Geo {
 
         // @NotBlank(message = "Altitude is mandatory")

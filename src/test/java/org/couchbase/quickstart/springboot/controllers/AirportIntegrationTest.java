@@ -49,16 +49,17 @@ class AirportIntegrationTest {
                 assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
                 Airport airport = response.getBody();
                 assert airport != null;
-                assertThat(airport)
-                                .isEqualTo(new Airport("1254", "airport", "Calais Dunkerque", "Calais", "France", "CQF",
-                                                "LFAC", "Europe/Paris", new Geo(12.0, 50.962097, 1.954764)));
+                Airport expectedAirport = Airport.builder().id("1254").type("airport").airportname("Calais Dunkerque")
+                                .city("Calais").country("France").faa("CQF").icao("LFAC").tz("Europe/Paris")
+                                .geo(new Geo(12.0, 50.962097, 1.954764)).build();
+                assertThat(airport).isEqualTo(expectedAirport);
         }
 
         @Test
         void testCreateAirport() {
-                Airport airport = new Airport("airport_create", "airport", "Test Airport", "Test City", "Test Country",
-                                "TST",
-                                "TEST", "Test Timezone", new Geo(1.0, 2.0, 3.0));
+                Airport airport = Airport.builder().id("airport_create").type("airport").airportname("Test Airport")
+                                .city("Test City").country("Test Country").faa("TST").icao("TEST")
+                                .tz("Test Timezone").geo(new Geo(1.0, 2.0, 3.0)).build();
                 ResponseEntity<Airport> response = restTemplate.postForEntity(
                                 "http://localhost:" + port + "/api/v1/airport/" + airport.getId(), airport,
                                 Airport.class);
@@ -70,8 +71,10 @@ class AirportIntegrationTest {
 
         @Test
         void testUpdateAirport() {
-                Airport airport = new Airport("airport_update", "airport", "Updated Test Airport", "Updated Test City",
-                                "Updated Test Country", "TST", "TEST", "Updated Test Timezone", new Geo(1.0, 2.0, 3.0));
+                Airport airport = Airport.builder().id("airport_update").type("airport")
+                                .airportname("Updated Test Airport").city("Updated Test City")
+                                .country("Updated Test Country").faa("TST").icao("TEST")
+                                .tz("Updated Test Timezone").geo(new Geo(1.0, 2.0, 3.0)).build();
                 restTemplate.postForEntity("http://localhost:" + port + "/api/v1/airport/" + airport.getId(), airport,
                                 Airport.class);
                 restTemplate.put("http://localhost:" + port + "/api/v1/airport/" + airport.getId(), airport);
@@ -87,9 +90,9 @@ class AirportIntegrationTest {
 
         @Test
         void testDeleteAirport() {
-                Airport airport = new Airport("airport_delete", "airport", "Test Airport", "Test City", "Test Country",
-                                "TST",
-                                "TEST", "Test Timezone", new Geo(1.0, 2.0, 3.0));
+                Airport airport = Airport.builder().id("airport_delete").type("airport").airportname("Test Airport")
+                                .city("Test City").country("Test Country").faa("TST").icao("TEST")
+                                .tz("Test Timezone").geo(new Geo(1.0, 2.0, 3.0)).build();
                 restTemplate.postForEntity("http://localhost:" + port + "/api/v1/airport/" + airport.getId(), airport,
                                 Airport.class);
                 restTemplate.delete("http://localhost:" + port + "/api/v1/airport/" + airport.getId());
@@ -110,8 +113,9 @@ class AirportIntegrationTest {
                 List<Airport> airports = response.getBody();
                 assert airports != null;
 
-                Airport airport = new Airport("1254", "airport", "Calais Dunkerque", "Calais", "France", "CQF", "LFAC",
-                                "Europe/Paris", new Geo(12.0, 50.962097, 1.954764));
+                Airport airport = Airport.builder().id("1254").type("airport").airportname("Calais Dunkerque")
+                                .city("Calais").country("France").faa("CQF").icao("LFAC").tz("Europe/Paris")
+                                .geo(new Geo(12.0, 50.962097, 1.954764)).build();
                 assertThat(airports.get(0)).isEqualTo(airport);
 
                 assertThat(airports).hasSize(1967);
