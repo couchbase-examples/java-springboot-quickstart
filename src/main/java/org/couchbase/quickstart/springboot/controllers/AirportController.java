@@ -22,9 +22,11 @@ import com.couchbase.client.core.error.DocumentExistsException;
 import com.couchbase.client.core.error.DocumentNotFoundException;
 
 import io.swagger.v3.oas.annotations.Operation;
+import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @RequestMapping("/api/v1/airport")
+@Slf4j
 public class AirportController {
 
     private final AirportService airportService;
@@ -32,6 +34,11 @@ public class AirportController {
     public AirportController(AirportService airportService) {
         this.airportService = airportService;
     }
+
+    // All errors
+    private static final String INTERNAL_SERVER_ERROR = "Internal Server Error";
+    private static final String DOCUMENT_NOT_FOUND = "Document Not Found";
+    private static final String DOCUMENT_EXISTS = "Document Exists";
 
     @Operation(summary = "Get an airport by ID")
     @GetMapping("/{id}")
@@ -41,11 +48,14 @@ public class AirportController {
             if (airport != null) {
                 return new ResponseEntity<>(airport, HttpStatus.OK);
             } else {
+                log.error(DOCUMENT_NOT_FOUND + ": " + id);
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
         } catch (DocumentNotFoundException e) {
+            log.error(DOCUMENT_NOT_FOUND + ": " + id);
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } catch (Exception e) {
+            log.error(INTERNAL_SERVER_ERROR + ": " + e.getMessage());
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -57,8 +67,10 @@ public class AirportController {
             Airport newAirport = airportService.createAirport(airport);
             return new ResponseEntity<>(newAirport, HttpStatus.CREATED);
         } catch (DocumentExistsException e) {
+            log.error(DOCUMENT_EXISTS + ": " + id);
             return new ResponseEntity<>(HttpStatus.CONFLICT);
         } catch (Exception e) {
+            log.error(INTERNAL_SERVER_ERROR + ": " + e.getMessage());
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
@@ -75,8 +87,10 @@ public class AirportController {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
         } catch (DocumentNotFoundException e) {
+            log.error("Document not found: " + id);
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } catch (Exception e) {
+            log.error(INTERNAL_SERVER_ERROR + ": " + e.getMessage());
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -88,8 +102,10 @@ public class AirportController {
             airportService.deleteAirport(id);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         } catch (DocumentNotFoundException e) {
+            log.error("Document not found: " + id);
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } catch (Exception e) {
+            log.error(INTERNAL_SERVER_ERROR + ": " + e.getMessage());
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -101,6 +117,7 @@ public class AirportController {
             List<Airport> airports = airportService.listAirports();
             return new ResponseEntity<>(airports, HttpStatus.OK);
         } catch (Exception e) {
+            log.error(INTERNAL_SERVER_ERROR + ": " + e.getMessage());
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -112,6 +129,7 @@ public class AirportController {
             List<Airport> airports = airportService.listDirectConnections(airportCode);
             return new ResponseEntity<>(airports, HttpStatus.OK);
         } catch (Exception e) {
+            log.error(INTERNAL_SERVER_ERROR + ": " + e.getMessage());
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

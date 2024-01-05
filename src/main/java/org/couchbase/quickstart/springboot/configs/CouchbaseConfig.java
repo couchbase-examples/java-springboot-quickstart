@@ -1,21 +1,27 @@
 package org.couchbase.quickstart.springboot.configs;
 
-import com.couchbase.client.core.error.CouchbaseException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import com.couchbase.client.core.error.CouchbaseException;
 import com.couchbase.client.core.msg.kv.DurabilityLevel;
 import com.couchbase.client.java.Bucket;
 import com.couchbase.client.java.Cluster;
 import com.couchbase.client.java.manager.bucket.BucketSettings;
 import com.couchbase.client.java.manager.bucket.BucketType;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Configuration
+@Slf4j
 public class CouchbaseConfig {
 
-    @Autowired
-    private DBProperties dbProp;
+    private final DBProperties dbProp;
+
+    public CouchbaseConfig(DBProperties dbProp) {
+        this.dbProp = dbProp;
+    }
+
 
     /**
      * NOTE: If connecting to Couchbase Capella, you must enable TLS.
@@ -32,6 +38,7 @@ public class CouchbaseConfig {
     @Bean(destroyMethod = "disconnect")
     public Cluster getCouchbaseCluster() {
         try {
+            log.debug("Connecting to Couchbase cluster at " + dbProp.getHostName());
             return Cluster.connect(dbProp.getHostName(), dbProp.getUsername(), dbProp.getPassword());
 
             // Here is an alternative version that enables TLS by configuring the cluster environment.
@@ -50,12 +57,13 @@ public class CouchbaseConfig {
         );
 
  */
+
         } catch (CouchbaseException e) {
-            System.err.println("Could not connect to Couchbase cluster at " + dbProp.getHostName());
-            System.err.println("Please check the username (" + dbProp.getUsername() + ") and password (" + dbProp.getPassword() + ")");
+            log.error("Could not connect to Couchbase cluster at " + dbProp.getHostName());
+            log.error("Please check the username (" + dbProp.getUsername() + ") and password (" + dbProp.getPassword() + ")");
             throw e;
         } catch (Exception e) {
-            System.err.println("Could not connect to Couchbase cluster at " + dbProp.getHostName());
+            log.error("Could not connect to Couchbase cluster at " + dbProp.getHostName());
             throw e;
         }
 
@@ -64,14 +72,19 @@ public class CouchbaseConfig {
     @Bean
     public Bucket getCouchbaseBucket(Cluster cluster) {
 
-        // Creates the cluster if it does not exist yet
-        if (!cluster.buckets().getAllBuckets().containsKey(dbProp.getBucketName())) {
-            cluster.buckets().createBucket(
-                BucketSettings.create(dbProp.getBucketName())
-                    .bucketType(BucketType.COUCHBASE)
-                    .minimumDurabilityLevel(DurabilityLevel.NONE)
-                    .ramQuotaMB(128));
+        try {
+            // Creates the cluster if it does not exist yet
+            if (!cluster.buckets().getAllBuckets().containsKey(dbProp.getBucketName())) {
+                cluster.buckets().createBucket(
+                        BucketSettings.create(dbProp.getBucketName())
+                                .bucketType(BucketType.COUCHBASE)
+                                .minimumDurabilityLevel(DurabilityLevel.NONE)
+                                .ramQuotaMB(128));
+            }
+            return cluster.bucket(dbProp.getBucketName());
+        } catch (Exception e) {
+            log.error("Could not connect to Couchbase bucket " + dbProp.getBucketName());
+            throw e;
         }
-        return cluster.bucket(dbProp.getBucketName());
     }
 }
