@@ -134,4 +134,17 @@ public class AirlineController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @Operation(summary = "List all airlines by destination airport")
+    @GetMapping("/destination/{destinationAirport}")
+    public ResponseEntity<List<Airline>> listAirlinesByDestinationAirport(
+            @PathVariable String destinationAirport) {
+        try {
+            List<Airline> airlines = airlineService.listAirlinesByDestinationAirport(destinationAirport);
+            return new ResponseEntity<>(airlines, HttpStatus.OK);
+        } catch (Exception e) {
+            log.error(INTERNAL_SERVER_ERROR + ": " + e.getMessage());
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }

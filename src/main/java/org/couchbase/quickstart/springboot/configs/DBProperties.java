@@ -17,7 +17,5 @@ public class DBProperties {
     private String password;
     @Value("${spring.couchbase.bucket.name}")
     private String bucketName;
-    @Value("${spring.couchbase.bucket.scope}")
-    private String scopeName;
 
 }

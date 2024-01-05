@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 import com.couchbase.client.java.Bucket;
 import com.couchbase.client.java.Cluster;
 import com.couchbase.client.java.Collection;
+import com.couchbase.client.java.json.JsonArray;
 import com.couchbase.client.java.json.JsonObject;
 import com.couchbase.client.java.query.QueryOptions;
 import com.couchbase.client.java.query.QueryScanConsistency;
@@ -74,15 +75,19 @@ public class AirlineRepositoryImpl implements AirlineRepository {
 
     @Override
     public List<Airline> findByDestinationAirport(String destinationAirport) {
-        String statement = "SELECT air.callsign, air.country, air.iata, air.icao, air.id, air.name, air.type FROM (SELECT DISTINCT META(airline).id AS airlineId FROM `"
-                + dbProperties.getBucketName() + "`.`inventory`.`route` JOIN `" + dbProperties.getBucketName()
-                + "`.`inventory`.`airline` ON route.airlineid = META(airline).id WHERE route.destinationairport = "
-                + destinationAirport + ") AS subquery JOIN `" + dbProperties.getBucketName()
-                + "`.`inventory`.`airline` AS air ON META(air).id = subquery.airlineId";
-        return cluster
-                .query(statement,
-                        QueryOptions.queryOptions().scanConsistency(QueryScanConsistency.REQUEST_PLUS)
-                                .parameters(JsonObject.create().put("destinationAirport", destinationAirport)))
+        String statement = "SELECT air.callsign, air.country, air.iata, air.icao, air.id, air.name, air.type " +
+                "FROM (SELECT DISTINCT META(airline).id AS airlineId " +
+                "      FROM `" + dbProperties.getBucketName() + "`.`inventory`.`route` " +
+                "      JOIN `" + dbProperties.getBucketName() + "`.`inventory`.`airline` " +
+                "      ON route.airlineid = META(airline).id " +
+                "      WHERE route.destinationairport = $1) AS subquery " +
+                "JOIN `" + dbProperties.getBucketName() + "`.`inventory`.`airline` AS air " +
+                "ON META(air).id = subquery.airlineId";
+
+        return cluster.query(
+                statement,
+                QueryOptions.queryOptions().parameters(JsonArray.from(destinationAirport))
+                        .scanConsistency(QueryScanConsistency.REQUEST_PLUS))
                 .rowsAs(Airline.class);
     }
 

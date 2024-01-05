@@ -7,8 +7,8 @@ import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfi
 
 import lombok.extern.slf4j.Slf4j;
 
-@SpringBootApplication(exclude = SecurityAutoConfiguration.class, proxyBeanMethods = false)
 @Slf4j
+@SpringBootApplication(exclude = SecurityAutoConfiguration.class, proxyBeanMethods = false)
 public class Application implements CommandLineRunner {
 
     public static void main(String[] args) {
