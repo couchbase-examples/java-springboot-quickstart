@@ -3,6 +3,7 @@ package org.couchbase.quickstart.springboot.services;
 import java.util.List;
 
 import org.couchbase.quickstart.springboot.models.Airport;
+import org.couchbase.quickstart.springboot.models.Route;
 import org.couchbase.quickstart.springboot.repositories.AirportRepository;
 import org.springframework.stereotype.Service;
 
@@ -35,7 +36,7 @@ public class AirportServiceImpl implements AirportService {
         return airportRepository.findAll();
     }
 
-    public List<Airport> listDirectConnections(String airportCode) {
+    public List<Route> listDirectConnections(String airportCode) {
         return airportRepository.findDirectConnections(airportCode);
     }
 

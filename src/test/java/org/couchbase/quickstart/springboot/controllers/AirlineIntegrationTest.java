@@ -187,47 +187,39 @@ class AirlineIntegrationTest {
 
         }
 
-        // @Test
-        // void testListAirlinesByDestinationAirport() {
-        // ResponseEntity<List<Airline>> response = restTemplate.exchange(
-        // "http://localhost:" + port + "/api/v1/airline/destination_airport/ATL",
-        // HttpMethod.GET, null, new ParameterizedTypeReference<List<Airline>>() {
-        // });
-        // assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        @Test
+        void testListAirlinesByDestinationAirport() {
+        ResponseEntity<List<Airline>> response = restTemplate.exchange(
+                                "http://localhost:" + port + "/api/v1/airline/destination_airport/SFO",
+                                HttpMethod.GET, null, new ParameterizedTypeReference<List<Airline>>() {
+                                });
+                assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 
-        // List<Airline> airlines = response.getBody();
-        // assert airlines != null;
-        // Airline airline = airlines.stream().filter(a ->
-        // a.getId().equals("24")).findFirst().orElse(null);
-        // assertThat(airline).isNotNull();
-        // assertThat(airline.getId()).isEqualTo("24");
-        // assertThat(airline.getType()).isEqualTo("airline");
-        // assertThat(airline.getName()).isEqualTo("Aerocondor");
-        // assertThat(airline.getIata()).isEqualTo("2B");
-        // assertThat(airline.getIcao()).isEqualTo("ARD");
-        // assertThat(airline.getCallsign()).isEqualTo("AEROCONDOR");
-        // assertThat(airline.getCountry()).isEqualTo("Portugal");
+                List<Airline> airlines = response.getBody();
+                assert airlines != null;
+                assertThat(airlines).hasSize(14);
+                Airline expectedAirline = Airline.builder().id("3029").type("airline").name("JetBlue Airways")
+                                .iata("B6").icao("JBU").callsign("JETBLUE").country("United States").build();
+                Airline expectedAirline2 = Airline.builder().id("137").type("airline").name("Air France").iata("AF")
+                                .icao("AFR").callsign("AIRFRANS").country("France").build();
+                assertThat(airlines.get(0)).isEqualTo(expectedAirline);
+                assertThat(airlines.get(13)).isEqualTo(expectedAirline2);
 
-        // // {"id":1191,"type":"airline","name":"Air
-        // // Austral","iata":"UU","icao":"REU","callsign":"REUNION","country":"France"}
+                ResponseEntity<List<Airline>> response2 = restTemplate.exchange(
+                                "http://localhost:" + port + "/api/v1/airline/destination_airport/MRS",
+                                HttpMethod.GET, null, new ParameterizedTypeReference<List<Airline>>() {
+                                });
+                assertThat(response2.getStatusCode()).isEqualTo(HttpStatus.OK);
 
-        // ResponseEntity<List<Airline>> response2 = restTemplate.exchange(
-        // "http://localhost:" + port + "/api/v1/airline/destination_airport/CDG",
-        // HttpMethod.GET, null, new ParameterizedTypeReference<List<Airline>>() {
-        // });
-        // assertThat(response2.getStatusCode()).isEqualTo(HttpStatus.OK);
+                List<Airline> airlines2 = response2.getBody();
+                assert airlines2 != null;
+                assertThat(airlines2).hasSize(7);
 
-        // List<Airline> airlines2 = response2.getBody();
-        // assert airlines2 != null;
-        // Airline airline2 = airlines2.stream().filter(a ->
-        // a.getId().equals("1191")).findFirst().orElse(null);
-        // assertThat(airline2).isNotNull();
-        // assertThat(airline2.getId()).isEqualTo("1191");
-        // assertThat(airline2.getType()).isEqualTo("airline");
-        // assertThat(airline2.getName()).isEqualTo("Air Austral");
-        // assertThat(airline2.getIata()).isEqualTo("UU");
-        // assertThat(airline2.getIcao()).isEqualTo("REU");
-        // assertThat(airline2.getCallsign()).isEqualTo("REUNION");
-        // assertThat(airline2.getCountry()).isEqualTo("France");
-        // }
+                Airline expectedAirline3 = Airline.builder().id("137").type("airline").name("Air France").iata("AF")
+                                .icao("AFR").callsign("AIRFRANS").country("France").build();
+                Airline expectedAirline4 = Airline.builder().id("1355").type("airline").name("British Airways")
+                                .iata("BA").icao("BAW").callsign("SPEEDBIRD").country("United Kingdom").build();
+                assertThat(airlines2.get(0)).isEqualTo(expectedAirline3);
+                assertThat(airlines2.get(6)).isEqualTo(expectedAirline4);
+        }
 }

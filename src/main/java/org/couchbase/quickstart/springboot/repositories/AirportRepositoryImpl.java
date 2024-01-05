@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.couchbase.quickstart.springboot.configs.DBProperties;
 import org.couchbase.quickstart.springboot.models.Airport;
-
+import org.couchbase.quickstart.springboot.models.Route;
 import org.springframework.stereotype.Repository;
 import com.couchbase.client.java.Bucket;
 import com.couchbase.client.java.Cluster;
@@ -54,14 +54,14 @@ public class AirportRepositoryImpl implements AirportRepository {
                 .rowsAs(Airport.class);
     }
 
-    public List<Airport> findDirectConnections(String airportCode) {
-        String statement = "SELECT airport.* FROM `" + dbProperties.getBucketName()
+    public List<Route> findDirectConnections(String airportCode) {
+        String statement = "SELECT route.* FROM `" + dbProperties.getBucketName()
                 + "`.`inventory`.`airport` as airport JOIN `" + dbProperties.getBucketName()
                 + "`.`inventory`.`route` as route on route.sourceairport = airport.faa WHERE airport.faa = \""
                 + airportCode + "\" and route.stops = 0";
         return cluster
                 .query(statement, QueryOptions.queryOptions().scanConsistency(QueryScanConsistency.REQUEST_PLUS))
-                .rowsAs(Airport.class);
+                .rowsAs(Route.class);
 
     }
 }

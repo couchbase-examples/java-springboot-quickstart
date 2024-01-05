@@ -1,6 +1,8 @@
 package org.couchbase.quickstart.springboot.repositories;
 
 import org.couchbase.quickstart.springboot.models.Airport;
+import org.couchbase.quickstart.springboot.models.Route;
+
 import java.util.List;
 
 public interface AirportRepository {
@@ -15,6 +17,6 @@ public interface AirportRepository {
 
     List<Airport> findAll();
 
-    List<Airport> findDirectConnections(String airportCode);
+    List<Route> findDirectConnections(String airportCode);
 
 }

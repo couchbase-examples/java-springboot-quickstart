@@ -5,6 +5,7 @@ import java.util.List;
 import javax.validation.Valid;
 
 import org.couchbase.quickstart.springboot.models.Airport;
+import org.couchbase.quickstart.springboot.models.Route;
 import org.couchbase.quickstart.springboot.services.AirportService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -124,10 +125,11 @@ public class AirportController {
 
     @Operation(summary = "List all direct connections from an airport")
     @GetMapping("/direct-connections")
-    public ResponseEntity<List<Airport>> listDirectConnections(@RequestParam String airportCode) {
+    public ResponseEntity<List<String>> listDirectConnections(@RequestParam String airportCode) {
         try {
-            List<Airport> airports = airportService.listDirectConnections(airportCode);
-            return new ResponseEntity<>(airports, HttpStatus.OK);
+            List<String> destinationAirports = airportService.listDirectConnections(airportCode).stream()
+                    .map(Route::getDestinationairport).toList();
+            return new ResponseEntity<>(destinationAirports, HttpStatus.OK);
         } catch (Exception e) {
             log.error(INTERNAL_SERVER_ERROR + ": " + e.getMessage());
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);

@@ -3,6 +3,7 @@ package org.couchbase.quickstart.springboot.services;
 
 import java.util.List;
 import org.couchbase.quickstart.springboot.models.Airport;
+import org.couchbase.quickstart.springboot.models.Route;
 
 public interface AirportService {
 
@@ -11,5 +12,5 @@ public interface AirportService {
     Airport updateAirport(String id, Airport airport);
     void deleteAirport(String id);
     List<Airport> listAirports();
-    List<Airport> listDirectConnections(String airportCode);
+    List<Route> listDirectConnections(String airportCode);
 }
