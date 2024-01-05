@@ -124,8 +124,8 @@ public class AirportController {
     }
 
     @Operation(summary = "List all direct connections from an airport")
-    @GetMapping("/direct-connections")
-    public ResponseEntity<List<String>> listDirectConnections(@RequestParam String airportCode) {
+    @GetMapping("/direct-connections/{airportCode}")
+    public ResponseEntity<List<String>> listDirectConnections(@PathVariable String airportCode) {
         try {
             List<String> destinationAirports = airportService.listDirectConnections(airportCode).stream()
                     .map(Route::getDestinationairport).toList();

@@ -3,9 +3,11 @@ package org.couchbase.quickstart.springboot.controllers;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
+import java.util.Map;
 
 import org.couchbase.quickstart.springboot.models.Airport;
 import org.couchbase.quickstart.springboot.models.Airport.Geo;
+import org.couchbase.quickstart.springboot.models.Route;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,6 +19,9 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+
+import com.couchbase.client.java.query.QueryOptions;
+import com.couchbase.client.java.query.QueryScanConsistency;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class AirportIntegrationTest {
@@ -121,12 +126,26 @@ class AirportIntegrationTest {
                 assertThat(airports).hasSize(1967);
         }
 
-        // Uncomment this test and modify it similarly if you want to include it
-        // @Test
-        // void testListDirectConnections() {
-        // ResponseEntity<List> response = restTemplate.getForEntity("http://localhost:"
-        // + port + "/api/v1/airport/direct-connections?airportCode=test", List.class);
-        // assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        // // Add more assertions as needed
-        // }
+        @Test
+        void testListDirectConnections() {
+                List<String> destinationAirportCodes = List.of("SFO", "LAX", "JFK", "MRS");
+                Map<String, Integer> expectedRouteCounts = Map.of(
+                                "SFO", 249,
+                                "LAX", 482,
+                                "JFK", 454,
+                                "MRS", 128);
+
+                for (String airportCode : destinationAirportCodes) {
+                        ResponseEntity<List<String>> response = restTemplate.exchange(
+                                        "http://localhost:" + port + "/api/v1/airport/direct-connections/"
+                                                        + airportCode,
+                                        HttpMethod.GET, null, new ParameterizedTypeReference<List<String>>() {
+                                        });
+                        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+                        List<String> routes = response.getBody();
+                        assertThat(routes).isNotNull();
+                        assertThat(routes).hasSize(expectedRouteCounts.get(airportCode));
+                }
+        }
 }

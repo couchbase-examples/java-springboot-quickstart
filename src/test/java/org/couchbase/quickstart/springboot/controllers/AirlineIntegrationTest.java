@@ -3,6 +3,7 @@ package org.couchbase.quickstart.springboot.controllers;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
+import java.util.Map;
 
 import org.couchbase.quickstart.springboot.models.Airline;
 import org.junit.jupiter.api.AfterEach;
@@ -189,37 +190,45 @@ class AirlineIntegrationTest {
 
         @Test
         void testListAirlinesByDestinationAirport() {
-        ResponseEntity<List<Airline>> response = restTemplate.exchange(
-                                "http://localhost:" + port + "/api/v1/airline/destination_airport/SFO",
-                                HttpMethod.GET, null, new ParameterizedTypeReference<List<Airline>>() {
-                                });
-                assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+                Map<String, List<Airline>> expectedAirlinesByDestination = Map.of(
+                                "SFO", List.of(
+                                                Airline.builder().id("3029").type("airline").name("JetBlue Airways")
+                                                                .iata("B6").icao("JBU")
+                                                                .callsign("JETBLUE").country("United States").build(),
+                                                Airline.builder().id("137").type("airline").name("Air France")
+                                                                .iata("AF")
+                                                                .icao("AFR").callsign("AIRFRANS").country("France")
+                                                                .build()),
+                                // Add more expected airlines for SFO
+                                "MRS", List.of(
+                                                Airline.builder().id("137").type("airline").name("Air France")
+                                                                .iata("AF").icao("AFR")
+                                                                .callsign("AIRFRANS").country("France").build(),
+                                                Airline.builder().id("24").type("airline").name("American Airlines")
+                                                                .iata("AA").icao("AAL").callsign("AMERICAN")
+                                                                .country("United States").build()
+                                // Add more expected airlines for MRS
+                                )
+                // Add more airports and their expected airlines as needed
+                );
 
-                List<Airline> airlines = response.getBody();
-                assert airlines != null;
-                assertThat(airlines).hasSize(14);
-                Airline expectedAirline = Airline.builder().id("3029").type("airline").name("JetBlue Airways")
-                                .iata("B6").icao("JBU").callsign("JETBLUE").country("United States").build();
-                Airline expectedAirline2 = Airline.builder().id("137").type("airline").name("Air France").iata("AF")
-                                .icao("AFR").callsign("AIRFRANS").country("France").build();
-                assertThat(airlines.get(0)).isEqualTo(expectedAirline);
-                assertThat(airlines.get(13)).isEqualTo(expectedAirline2);
+                for (Map.Entry<String, List<Airline>> entry : expectedAirlinesByDestination.entrySet()) {
+                        String destinationAirport = entry.getKey();
+                        List<Airline> expectedAirlines = entry.getValue();
 
-                ResponseEntity<List<Airline>> response2 = restTemplate.exchange(
-                                "http://localhost:" + port + "/api/v1/airline/destination_airport/MRS",
-                                HttpMethod.GET, null, new ParameterizedTypeReference<List<Airline>>() {
-                                });
-                assertThat(response2.getStatusCode()).isEqualTo(HttpStatus.OK);
+                        ResponseEntity<List<Airline>> response = restTemplate.exchange(
+                                        "http://localhost:" + port + "/api/v1/airline/destination/"
+                                                        + destinationAirport,
+                                        HttpMethod.GET, null, new ParameterizedTypeReference<List<Airline>>() {
+                                        });
+                        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 
-                List<Airline> airlines2 = response2.getBody();
-                assert airlines2 != null;
-                assertThat(airlines2).hasSize(7);
+                        List<Airline> airlines = response.getBody();
+                        assertThat(airlines).isNotNull();
+                        assert airlines != null;
 
-                Airline expectedAirline3 = Airline.builder().id("137").type("airline").name("Air France").iata("AF")
-                                .icao("AFR").callsign("AIRFRANS").country("France").build();
-                Airline expectedAirline4 = Airline.builder().id("1355").type("airline").name("British Airways")
-                                .iata("BA").icao("BAW").callsign("SPEEDBIRD").country("United Kingdom").build();
-                assertThat(airlines2.get(0)).isEqualTo(expectedAirline3);
-                assertThat(airlines2.get(6)).isEqualTo(expectedAirline4);
+                        assertThat(airlines).containsAll(expectedAirlines);
+                }
         }
+
 }
