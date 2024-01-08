@@ -1,6 +1,7 @@
 package org.couchbase.quickstart.springboot.controllers;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
@@ -127,7 +128,7 @@ public class AirportController {
     public ResponseEntity<List<String>> listDirectConnections(@PathVariable String airportCode) {
         try {
             List<String> destinationAirports = airportService.listDirectConnections(airportCode).stream()
-                    .map(Route::getDestinationairport).toList();
+                    .map(Route::getDestinationairport).collect(Collectors.toList());
             return new ResponseEntity<>(destinationAirports, HttpStatus.OK);
         } catch (Exception e) {
             log.error(INTERNAL_SERVER_ERROR + ": " + e.getMessage());
