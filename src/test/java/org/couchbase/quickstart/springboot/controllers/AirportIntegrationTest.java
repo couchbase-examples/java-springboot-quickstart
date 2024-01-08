@@ -105,9 +105,13 @@ class AirportIntegrationTest {
 
         @Test
         void testListAirports() {
+                int limit = 10;
+                int offset = 0;
+
                 ResponseEntity<List<Airport>> response = restTemplate.exchange(
-                                "http://localhost:" + port + "/api/v1/airport/list", HttpMethod.GET, null,
-                                new ParameterizedTypeReference<List<Airport>>() {
+                                "http://localhost:" + port + "/api/v1/airport/list?limit=" + limit + "&offset="
+                                                + offset,
+                                HttpMethod.GET, null, new ParameterizedTypeReference<List<Airport>>() {
                                 });
                 assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 
@@ -119,29 +123,34 @@ class AirportIntegrationTest {
                                 .geo(new Geo(12.0, 50.962097, 1.954764)).build();
                 assertThat(airports.get(0)).isEqualTo(airport);
 
-                assertThat(airports).hasSize(1967);
+                assertThat(airports).hasSize(limit);
         }
 
         @Test
         void testListDirectConnections() {
                 List<String> destinationAirportCodes = List.of("SFO", "LAX", "JFK", "MRS");
-                Map<String, Integer> expectedRouteCounts = Map.of(
-                                "SFO", 249,
-                                "LAX", 482,
-                                "JFK", 454,
-                                "MRS", 128);
+                Map<String, List<String>> expectedDirectConnections = Map.of(
+                                "SFO", List.of("HKG", "ICN", "ATL", "BJX", "GDL", "MEX", "MLM", "PVR", "SJD", "DFW"),
+                                "LAX", List.of("NRT", "CUN", "GDL", "HMO", "MEX", "MZT", "PVR", "SJD", "ZIH", "ZLO"),
+                                "JFK", List.of("DEL", "LHR", "EZE", "ATL", "CUN", "MEX", "EZE", "LAX", "SAN", "SEA"),
+                                "MRS", List.of("AAE", "ALG", "BJA", "BLJ", "CZL", "ORN", "QSF", "TLM", "CDG", "CMN"));
 
                 for (String airportCode : destinationAirportCodes) {
+                        int limit = 10;
+                        int offset = 0;
+
                         ResponseEntity<List<String>> response = restTemplate.exchange(
-                                        "http://localhost:" + port + "/api/v1/airport/direct-connections/"
-                                                        + airportCode,
+                                        "http://localhost:" + port + "/api/v1/airport/direct-connections/" + airportCode
+                                                        + "?limit=" + limit + "&offset=" + offset,
                                         HttpMethod.GET, null, new ParameterizedTypeReference<List<String>>() {
                                         });
                         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 
                         List<String> routes = response.getBody();
                         assertThat(routes).isNotNull();
-                        assertThat(routes).hasSize(expectedRouteCounts.get(airportCode));
+                        assertThat(routes).hasSize(limit);
+                        assertThat(routes).containsAll(expectedDirectConnections.get(airportCode));
                 }
         }
+
 }

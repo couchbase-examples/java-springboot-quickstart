@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.couchbase.client.core.error.DocumentExistsException;
@@ -113,9 +114,11 @@ public class AirportController {
 
     @Operation(summary = "List all airports")
     @GetMapping("/list")
-    public ResponseEntity<List<Airport>> listAirports() {
+    public ResponseEntity<List<Airport>> listAirports(
+            @RequestParam(defaultValue = "10") int limit,
+            @RequestParam(defaultValue = "0") int offset) {
         try {
-            List<Airport> airports = airportService.listAirports();
+            List<Airport> airports = airportService.listAirports(limit, offset);
             return new ResponseEntity<>(airports, HttpStatus.OK);
         } catch (Exception e) {
             log.error(INTERNAL_SERVER_ERROR + ": " + e.getMessage());
@@ -125,10 +128,13 @@ public class AirportController {
 
     @Operation(summary = "List all direct connections from an airport")
     @GetMapping("/direct-connections/{airportCode}")
-    public ResponseEntity<List<String>> listDirectConnections(@PathVariable String airportCode) {
+    public ResponseEntity<List<String>> listDirectConnections(@PathVariable String airportCode,
+            @RequestParam(defaultValue = "10") int limit,
+            @RequestParam(defaultValue = "0") int offset) {
         try {
-            List<String> destinationAirports = airportService.listDirectConnections(airportCode).stream()
-                    .map(Route::getDestinationairport).collect(Collectors.toList());
+            List<String> destinationAirports = airportService.listDirectConnections(airportCode, limit, offset).stream()
+                    .map(Route::getDestinationairport)
+                    .collect(Collectors.toList());
             return new ResponseEntity<>(destinationAirports, HttpStatus.OK);
         } catch (Exception e) {
             log.error(INTERNAL_SERVER_ERROR + ": " + e.getMessage());

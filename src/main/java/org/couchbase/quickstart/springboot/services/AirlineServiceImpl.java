@@ -36,17 +36,18 @@ public class AirlineServiceImpl implements AirlineService {
     }
 
     @Override
-    public List<Airline> listAirlines() {
-        return airlineRepository.findAll();
+    public List<Airline> listAirlines(int limit, int offset) {
+        return airlineRepository.findAll(limit, offset);
     }
 
     @Override
-    public List<Airline> listAirlinesByCountry(String country) {
-        return airlineRepository.findByCountry(country);
+    public List<Airline> listAirlinesByCountry(String country, int limit, int offset) {
+        return airlineRepository.findByCountry(country, limit, offset);
     }
 
     @Override
-    public List<Airline> listAirlinesByDestinationAirport(String destinationAirport) {
-        return airlineRepository.findByDestinationAirport(destinationAirport);
+    public List<Airline> listAirlinesByDestinationAirport(String destinationAirport, int limit, int offset) {
+        return airlineRepository.findByDestinationAirport(destinationAirport, limit, offset);
     }
+
 }

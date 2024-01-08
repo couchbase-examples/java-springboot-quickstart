@@ -29,29 +29,34 @@ public class RouteRepositoryImpl implements RouteRepository {
         this.dbProperties = dbProperties;
     }
 
+    @Override
     public Route findById(String id) {
         return routeCol.get(id).contentAs(Route.class);
     }
 
+    @Override
     public Route save(Route route) {
         routeCol.insert(route.getId(), route);
         return route;
     }
 
+    @Override
     public Route update(String id, Route route) {
         routeCol.replace(id, route);
         return route;
     }
 
+    @Override
     public void delete(String id) {
         routeCol.remove(id);
     }
 
-    public List<Route> findAll() {
-        String statement = "SELECT route.* FROM `" + dbProperties.getBucketName() + "`.`inventory`.`route`";
+    @Override
+    public List<Route> findAll(int limit, int offset) {
+        String statement = "SELECT route.* FROM `" + dbProperties.getBucketName() + "`.`inventory`.`route` LIMIT "
+                + limit + " OFFSET " + offset;
         return cluster
                 .query(statement, QueryOptions.queryOptions().scanConsistency(QueryScanConsistency.REQUEST_PLUS))
                 .rowsAs(Route.class);
     }
-
 }

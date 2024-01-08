@@ -16,28 +16,34 @@ public class AirportServiceImpl implements AirportService {
         this.airportRepository = airportRepository;
     }
 
+    @Override
     public Airport getAirportById(String id) {
         return airportRepository.findById(id);
     }
 
+    @Override
     public Airport createAirport(Airport airport) {
         return airportRepository.save(airport);
     }
 
+    @Override
     public Airport updateAirport(String id, Airport airport) {
         return airportRepository.update(id, airport);
     }
 
+    @Override
     public void deleteAirport(String id) {
         airportRepository.delete(id);
     }
 
-    public List<Airport> listAirports() {
-        return airportRepository.findAll();
+    @Override
+    public List<Airport> listAirports(int limit, int offset) {
+        return airportRepository.findAll(limit, offset);
     }
 
-    public List<Route> listDirectConnections(String airportCode) {
-        return airportRepository.findDirectConnections(airportCode);
+    @Override
+    public List<Route> listDirectConnections(String airportCode, int limit, int offset) {
+        return airportRepository.findDirectConnections(airportCode, limit, offset);
     }
 
 }

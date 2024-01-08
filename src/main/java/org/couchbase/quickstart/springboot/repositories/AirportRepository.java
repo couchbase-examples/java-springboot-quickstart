@@ -15,8 +15,7 @@ public interface AirportRepository {
 
     void delete(String id);
 
-    List<Airport> findAll();
+    List<Airport> findAll(int limit, int offset);
 
-    List<Route> findDirectConnections(String airportCode);
-
+    List<Route> findDirectConnections(String airportCode, int limit, int offset);
 }

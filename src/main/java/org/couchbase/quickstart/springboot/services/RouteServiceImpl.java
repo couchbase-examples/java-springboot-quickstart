@@ -31,8 +31,8 @@ public class RouteServiceImpl implements RouteService {
         routeRepository.delete(id);
     }
 
-    public List<Route> listRoutes() {
-        return routeRepository.findAll();
+    public List<Route> listRoutes(int limit, int offset) {
+        return routeRepository.findAll(limit, offset);
     }
 
 }

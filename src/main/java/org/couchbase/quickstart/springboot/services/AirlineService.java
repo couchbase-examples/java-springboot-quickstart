@@ -6,10 +6,16 @@ import java.util.List;
 
 public interface AirlineService {
     Airline getAirlineById(String id);
+
     Airline createAirline(Airline airline);
+
     Airline updateAirline(String id, Airline airline);
+
     void deleteAirline(String id);
-    List<Airline> listAirlines();
-    List<Airline> listAirlinesByCountry(String country);
-    List<Airline> listAirlinesByDestinationAirport(String destinationAirport);
+
+    List<Airline> listAirlines(int limit, int offset);
+
+    List<Airline> listAirlinesByCountry(String country, int limit, int offset);
+
+    List<Airline> listAirlinesByDestinationAirport(String destinationAirport, int limit, int offset);
 }

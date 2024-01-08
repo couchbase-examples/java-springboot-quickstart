@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.couchbase.client.core.error.DocumentExistsException;
@@ -113,9 +114,11 @@ public class AirlineController {
 
     @Operation(summary = "List all airlines")
     @GetMapping("/list")
-    public ResponseEntity<List<Airline>> listAirlines() {
+    public ResponseEntity<List<Airline>> listAirlines(
+            @RequestParam(defaultValue = "10") int limit,
+            @RequestParam(defaultValue = "0") int offset) {
         try {
-            List<Airline> airlines = airlineService.listAirlines();
+            List<Airline> airlines = airlineService.listAirlines(limit, offset);
             return new ResponseEntity<>(airlines, HttpStatus.OK);
         } catch (Exception e) {
             log.error(INTERNAL_SERVER_ERROR + ": " + e.getMessage());
@@ -125,9 +128,11 @@ public class AirlineController {
 
     @Operation(summary = "List all airlines by country")
     @GetMapping("/country/{country}")
-    public ResponseEntity<List<Airline>> listAirlinesByCountry(@PathVariable String country) {
+    public ResponseEntity<List<Airline>> listAirlinesByCountry(@PathVariable String country,
+            @RequestParam(defaultValue = "10") int limit,
+            @RequestParam(defaultValue = "0") int offset) {
         try {
-            List<Airline> airlines = airlineService.listAirlinesByCountry(country);
+            List<Airline> airlines = airlineService.listAirlinesByCountry(country, limit, offset);
             return new ResponseEntity<>(airlines, HttpStatus.OK);
         } catch (Exception e) {
             log.error(INTERNAL_SERVER_ERROR + ": " + e.getMessage());
@@ -138,9 +143,11 @@ public class AirlineController {
     @Operation(summary = "List all airlines by destination airport")
     @GetMapping("/destination/{destinationAirport}")
     public ResponseEntity<List<Airline>> listAirlinesByDestinationAirport(
-            @PathVariable String destinationAirport) {
+            @PathVariable String destinationAirport,
+            @RequestParam(defaultValue = "10") int limit,
+            @RequestParam(defaultValue = "0") int offset) {
         try {
-            List<Airline> airlines = airlineService.listAirlinesByDestinationAirport(destinationAirport);
+            List<Airline> airlines = airlineService.listAirlinesByDestinationAirport(destinationAirport, limit, offset);
             return new ResponseEntity<>(airlines, HttpStatus.OK);
         } catch (Exception e) {
             log.error(INTERNAL_SERVER_ERROR + ": " + e.getMessage());

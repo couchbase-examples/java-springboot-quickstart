@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.couchbase.client.core.error.DocumentExistsException;
@@ -113,9 +114,11 @@ public class RouteController {
 
     @Operation(summary = "List all routes")
     @GetMapping("/list")
-    public ResponseEntity<List<Route>> listRoutes() {
+    public ResponseEntity<List<Route>> listRoutes(
+            @RequestParam(defaultValue = "10") int limit,
+            @RequestParam(defaultValue = "0") int offset) {
         try {
-            List<Route> routes = routeService.listRoutes();
+            List<Route> routes = routeService.listRoutes(limit, offset);
             return new ResponseEntity<>(routes, HttpStatus.OK);
         } catch (Exception e) {
             log.error(INTERNAL_SERVER_ERROR + ": " + e.getMessage());

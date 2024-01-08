@@ -54,18 +54,19 @@ public class AirlineRepositoryImpl implements AirlineRepository {
     }
 
     @Override
-    public List<Airline> findAll() {
+    public List<Airline> findAll(int limit, int offset) {
         String statement = "SELECT airline.id, airline.type, airline.name, airline.iata, airline.icao, airline.callsign, airline.country FROM `"
-                + dbProperties.getBucketName() + "`.`inventory`.`airline`";
+                + dbProperties.getBucketName() + "`.`inventory`.`airline` LIMIT " + limit + " OFFSET " + offset;
         return cluster
                 .query(statement, QueryOptions.queryOptions().scanConsistency(QueryScanConsistency.REQUEST_PLUS))
                 .rowsAs(Airline.class);
     }
 
     @Override
-    public List<Airline> findByCountry(String country) {
+    public List<Airline> findByCountry(String country, int limit, int offset) {
         String statement = "SELECT airline.id, airline.type, airline.name, airline.iata, airline.icao, airline.callsign, airline.country FROM `"
-                + dbProperties.getBucketName() + "`.`inventory`.`airline` WHERE country = '" + country + "'";
+                + dbProperties.getBucketName() + "`.`inventory`.`airline` WHERE country = '" + country + "' LIMIT "
+                + limit + " OFFSET " + offset;
         return cluster
                 .query(statement, QueryOptions.queryOptions().scanConsistency(QueryScanConsistency.REQUEST_PLUS)
                         .parameters(JsonObject.create().put("country", country)))
@@ -74,7 +75,7 @@ public class AirlineRepositoryImpl implements AirlineRepository {
     }
 
     @Override
-    public List<Airline> findByDestinationAirport(String destinationAirport) {
+    public List<Airline> findByDestinationAirport(String destinationAirport, int limit, int offset) {
         String statement = "SELECT air.callsign, air.country, air.iata, air.icao, air.id, air.name, air.type " +
                 "FROM (SELECT DISTINCT META(airline).id AS airlineId " +
                 "      FROM `" + dbProperties.getBucketName() + "`.`inventory`.`route` " +
@@ -82,7 +83,7 @@ public class AirlineRepositoryImpl implements AirlineRepository {
                 "      ON route.airlineid = META(airline).id " +
                 "      WHERE route.destinationairport = $1) AS subquery " +
                 "JOIN `" + dbProperties.getBucketName() + "`.`inventory`.`airline` AS air " +
-                "ON META(air).id = subquery.airlineId";
+                "ON META(air).id = subquery.airlineId LIMIT " + limit + " OFFSET " + offset;
 
         return cluster.query(
                 statement,

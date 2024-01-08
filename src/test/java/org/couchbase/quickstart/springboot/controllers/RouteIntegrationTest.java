@@ -235,15 +235,18 @@ class RouteIntegrationTest {
 
         @Test
         void testListRoutes() throws Exception {
+                int limit = 10;
+                int offset = 0;
+
                 ResponseEntity<List<Route>> response = restTemplate.exchange(
-                                "http://localhost:" + port + "/api/v1/route/list",
+                                "http://localhost:" + port + "/api/v1/route/list?limit=" + limit + "&offset=" + offset,
                                 HttpMethod.GET, null, new ParameterizedTypeReference<List<Route>>() {
                                 });
                 assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 
                 List<Route> routes = response.getBody();
                 assert routes != null;
-                assertThat(routes).hasSize(24025);
+                assertThat(routes).hasSize(limit);
         }
 
 }

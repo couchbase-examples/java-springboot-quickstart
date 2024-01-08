@@ -121,15 +121,18 @@ class AirlineIntegrationTest {
 
         @Test
         void testListAirlines() {
+                int limit = 10;
+                int offset = 0;
                 ResponseEntity<List<Airline>> response = restTemplate.exchange(
-                                "http://localhost:" + port + "/api/v1/airline/list", HttpMethod.GET, null,
-                                new ParameterizedTypeReference<List<Airline>>() {
+                                "http://localhost:" + port + "/api/v1/airline/list?limit=" + limit + "&offset="
+                                                + offset,
+                                HttpMethod.GET, null, new ParameterizedTypeReference<List<Airline>>() {
                                 });
                 assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 
                 List<Airline> airlines = response.getBody();
                 assert airlines != null;
-                assertThat(airlines).hasSize(187);
+                assertThat(airlines).hasSize(10);
                 Airline expectedAirline = Airline.builder()
                                 .id("10")
                                 .type("airline")
@@ -145,13 +148,16 @@ class AirlineIntegrationTest {
         @Test
         void testListAirlinesByCountry() {
                 String country = "United States";
+                int limit = 10;
+                int offset = 0;
                 ResponseEntity<List<Airline>> response = restTemplate.exchange(
-                                "http://localhost:" + port + "/api/v1/airline/country/" + country,
+                                "http://localhost:" + port + "/api/v1/airline/country/" + country + "?limit=" + limit
+                                                + "&offset=" + offset,
                                 HttpMethod.GET, null, new ParameterizedTypeReference<List<Airline>>() {
                                 });
                 assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
                 List<Airline> airlines = response.getBody();
-                assertThat(airlines).hasSize(127);
+                assertThat(airlines).hasSize(10);
 
                 Airline airline = airlines.get(0);
                 Airline expectedAirline = Airline.builder()
@@ -167,12 +173,13 @@ class AirlineIntegrationTest {
 
                 country = "France";
                 ResponseEntity<List<Airline>> response2 = restTemplate.exchange(
-                                "http://localhost:" + port + "/api/v1/airline/country/" + country,
+                                "http://localhost:" + port + "/api/v1/airline/country/" + country + "?limit=" + limit
+                                                + "&offset=" + offset,
                                 HttpMethod.GET, null, new ParameterizedTypeReference<List<Airline>>() {
                                 });
                 assertThat(response2.getStatusCode()).isEqualTo(HttpStatus.OK);
                 List<Airline> airlines2 = response2.getBody();
-                assertThat(airlines2).hasSize(21);
+                assertThat(airlines2).hasSize(10);
 
                 Airline airline2 = airlines2.get(0);
                 Airline expectedAirline2 = Airline.builder()
@@ -185,7 +192,6 @@ class AirlineIntegrationTest {
                                 .country("France")
                                 .build();
                 assertThat(airline2).isEqualTo(expectedAirline2);
-
         }
 
         @Test
@@ -195,9 +201,9 @@ class AirlineIntegrationTest {
                                                 Airline.builder().id("3029").type("airline").name("JetBlue Airways")
                                                                 .iata("B6").icao("JBU")
                                                                 .callsign("JETBLUE").country("United States").build(),
-                                                Airline.builder().id("137").type("airline").name("Air France")
-                                                                .iata("AF")
-                                                                .icao("AFR").callsign("AIRFRANS").country("France")
+                                                Airline.builder().id("1355").type("airline").name("British Airways")
+                                                                .iata("BA").icao("BAW")
+                                                                .callsign("SPEEDBIRD").country("United Kingdom")
                                                                 .build()),
                                 // Add more expected airlines for SFO
                                 "MRS", List.of(
@@ -212,13 +218,15 @@ class AirlineIntegrationTest {
                 // Add more airports and their expected airlines as needed
                 );
 
+                int limit = 10;
+                int offset = 0;
                 for (Map.Entry<String, List<Airline>> entry : expectedAirlinesByDestination.entrySet()) {
                         String destinationAirport = entry.getKey();
                         List<Airline> expectedAirlines = entry.getValue();
 
                         ResponseEntity<List<Airline>> response = restTemplate.exchange(
-                                        "http://localhost:" + port + "/api/v1/airline/destination/"
-                                                        + destinationAirport,
+                                        "http://localhost:" + port + "/api/v1/airline/destination/" + destinationAirport
+                                                        + "?limit=" + limit + "&offset=" + offset,
                                         HttpMethod.GET, null, new ParameterizedTypeReference<List<Airline>>() {
                                         });
                         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
