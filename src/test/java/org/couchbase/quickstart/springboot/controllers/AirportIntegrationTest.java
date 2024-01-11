@@ -100,20 +100,27 @@ class AirportIntegrationTest {
         @Test
         void testUpdateAirport() {
                 Airport airport = Airport.builder().id("airport_update").type("airport")
+                                .airportname("Test Airport").city("Test City")
+                                .country("Test Country").faa("TST").icao("TEST")
+                                .tz("Test Timezone").geo(new Geo(1.0, 2.0, 3.0)).build();
+                restTemplate.postForEntity("/api/v1/airport/" + airport.getId(), airport,
+                                Airport.class);
+
+                Airport updatedAirport = Airport.builder().id("airport_update").type("airport")
                                 .airportname("Updated Test Airport").city("Updated Test City")
                                 .country("Updated Test Country").faa("TST").icao("TEST")
                                 .tz("Updated Test Timezone").geo(new Geo(1.0, 2.0, 3.0)).build();
-                restTemplate.postForEntity("/api/v1/airport/" + airport.getId(), airport,
+
+                restTemplate.put("/api/v1/airport/" + updatedAirport.getId(), updatedAirport);
+
+                ResponseEntity<Airport> response = restTemplate.getForEntity(
+                                "/api/v1/airport/" + updatedAirport.getId(),
                                 Airport.class);
-                restTemplate.put("/api/v1/airport/" + airport.getId(), airport);
-                ResponseEntity<Airport> response = restTemplate
-                                .getForEntity("/api/v1/airport/" + airport.getId(),
-                                                Airport.class);
 
                 assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-                Airport updatedAirport = response.getBody();
-                assert updatedAirport != null;
-                assertThat(updatedAirport).isEqualTo(airport);
+                Airport createdAirport = response.getBody();
+                assert createdAirport != null;
+                assertThat(createdAirport).isEqualTo(updatedAirport);
         }
 
         @Test

@@ -105,7 +105,7 @@ class AirlineIntegrationTest {
                 Airline airline = Airline.builder()
                                 .id("airline_update")
                                 .type("airline")
-                                .name("Updated Test Airline")
+                                .name("Test Airline")
                                 .iata("TA")
                                 .icao("TST")
                                 .callsign("TEST")
@@ -113,16 +113,26 @@ class AirlineIntegrationTest {
                                 .build();
                 restTemplate.postForEntity("/api/v1/airline/" + airline.getId(), airline,
                                 Airline.class);
-                restTemplate.put("/api/v1/airline/" + airline.getId(), airline);
+                
+                Airline updatedAirline = Airline.builder()
+                                .id("airline_update")
+                                .type("airline")
+                                .name("Updated Airline")
+                                .iata("Updated TA")
+                                .icao("Updated TST")
+                                .callsign("Updated TEST")
+                                .country("France")
+                                .build();
+                restTemplate.put("/api/v1/airline/" + updatedAirline.getId(), updatedAirline);
+
                 ResponseEntity<Airline> response = restTemplate
-                                .getForEntity("/api/v1/airline/" + airline.getId(),
+                                .getForEntity("/api/v1/airline/" + updatedAirline.getId(),
                                                 Airline.class);
 
                 assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-                Airline updatedAirline = response.getBody();
-                assertThat(updatedAirline)
-                                .isNotNull()
-                                .isEqualTo(airline);
+                Airline retrievedAirline = response.getBody();
+                assert retrievedAirline != null;
+                assertThat(retrievedAirline).isEqualTo(updatedAirline);
         }
 
         @Test

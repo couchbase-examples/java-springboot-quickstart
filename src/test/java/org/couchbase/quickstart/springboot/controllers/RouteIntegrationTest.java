@@ -166,10 +166,10 @@ class RouteIntegrationTest {
                 Route route = Route.builder()
                                 .id("route_update")
                                 .type("route")
-                                .airline("AF")
-                                .airlineid("airline_137")
-                                .sourceairport("TLV")
-                                .destinationairport("MRS")
+                                .airline("airline")
+                                .airlineid("airlineid")
+                                .sourceairport("sourceairport")
+                                .destinationairport("destinationairport")
                                 .stops(0)
                                 .equipment("320")
                                 .schedule(Arrays.asList(
@@ -201,15 +201,53 @@ class RouteIntegrationTest {
 
                 restTemplate.postForEntity("/api/v1/route/" + route.getId(), route,
                                 Route.class);
-                restTemplate.put("/api/v1/route/" + route.getId(), route);
-                ResponseEntity<Route> response = restTemplate
-                                .getForEntity("/api/v1/route/" + route.getId(),
-                                                Route.class);
+                
+                Route updatedRoute = Route.builder().
+                                id("route_update")
+                                .type("route")
+                                .airline("updated_airline")
+                                .airlineid("updated_airlineid")
+                                .sourceairport("updated_sourceairport")
+                                .destinationairport("updated_destinationairport")
+                                .stops(0)
+                                .equipment("updated_320")
+                                .schedule(Arrays.asList(
+                                                new Route.Schedule(0, "AF198", "10:13:00"),
+                                                new Route.Schedule(0, "AF547", "19:14:00"),
+                                                new Route.Schedule(0, "AF943", "01:31:00"),
+                                                new Route.Schedule(1, "AF356", "12:40:00"),
+                                                new Route.Schedule(1, "AF480", "08:58:00"),
+                                                new Route.Schedule(1, "AF250", "12:59:00"),
+                                                new Route.Schedule(1, "AF130", "04:45:00"),
+                                                new Route.Schedule(2, "AF997", "00:31:00"),
+                                                new Route.Schedule(2, "AF223", "19:41:00"),
+                                                new Route.Schedule(2, "AF890", "15:14:00"),
+                                                new Route.Schedule(2, "AF399", "00:30:00"),
+                                                new Route.Schedule(2, "AF328", "16:18:00"),
+                                                new Route.Schedule(3, "AF074", "23:50:00"),
+                                                new Route.Schedule(3, "AF556", "11:33:00"),
+                                                new Route.Schedule(4, "AF064", "13:23:00"),
+                                                new Route.Schedule(4, "AF596", "12:09:00"),
+                                                new Route.Schedule(4, "AF818", "08:02:00"),
+                                                new Route.Schedule(5, "AF967", "11:33:00"),
+                                                new Route.Schedule(5, "AF730", "19:42:00"),
+                                                new Route.Schedule(6, "AF882", "17:07:00"),
+                                                new Route.Schedule(6, "AF485", "17:03:00"),
+                                                new Route.Schedule(6, "AF898", "10:01:00"),
+                                                new Route.Schedule(6, "AF496", "07:00:00")))
+                                .distance(2881.617376098415)
+                                .build();
+
+                restTemplate.put("/api/v1/route/" + updatedRoute.getId(), updatedRoute);
+
+                ResponseEntity<Route> response = restTemplate.getForEntity(
+                                "/api/v1/route/" + updatedRoute.getId(),
+                                Route.class);
 
                 assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-                Route updatedRoute = response.getBody();
-                assert updatedRoute != null;
-                assertThat(updatedRoute).isEqualTo(route);
+                Route createdRoute = response.getBody();
+                assert createdRoute != null;
+                assertThat(createdRoute).isEqualTo(updatedRoute);
         }
 
         @Test
@@ -261,7 +299,7 @@ class RouteIntegrationTest {
 
         @Test
         void testListRoutes() throws Exception {
-                int limit = 10;
+                int limit = 20;
                 int offset = 0;
 
                 ResponseEntity<List<Route>> response = restTemplate.exchange(
