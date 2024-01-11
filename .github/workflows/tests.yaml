@@ -43,7 +43,7 @@ jobs:
         id: run
         run: |
             chmod +x mvnw
-            ./mvnw package -B
+            ./mvnw clean install -DskipTests=false -Dmaven.javadoc.skip=true -Dgpg.skip=true -B -V -e
             
       - name: Report Status
         if: always()

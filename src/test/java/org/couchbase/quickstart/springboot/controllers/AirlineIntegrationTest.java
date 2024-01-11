@@ -76,7 +76,7 @@ class AirlineIntegrationTest {
                 Airline airline = response.getBody();
                 assert airline != null;
                 assertThat(airline).isEqualTo(
-                                new Airline("10", "airline", "40-Mile Air", "Q5", "MLB", "MILE-AIR", "United States"));
+                                new Airline("10", "airline", "40-Mile Air", "Q5", "MLA", "MILE-AIR", "United States"));
         }
 
         @Test
