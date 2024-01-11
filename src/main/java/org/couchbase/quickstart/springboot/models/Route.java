@@ -51,8 +51,6 @@ public class Route {
     @NotNull(message = "Distance is mandatory")
     private double distance;
 
-    @Getter
-    @Setter
     @AllArgsConstructor
     @NoArgsConstructor
     @Data

@@ -1,0 +1,53 @@
+name: Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: "0 */6 * * *"
+
+jobs:
+  run_tests:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        java-version: ["8", "11", "17"]
+    steps:
+      - name: Update repositories
+        run: |
+          sudo apt update || echo "apt-update failed" # && apt -y upgrade
+
+      - name: Checkout ${{ github.event.repository.name }}
+        uses: actions/checkout@v4
+
+      - name: Set up JDK ${{ matrix.java-version }}
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ matrix.java-version }}
+          distribution: "adopt"
+
+      - name: Replace secrets in application.properties
+        run: |
+          sed -i "s#DB_CONN_STR#${{ vars.DB_CONN_STR }}#g" src/main/resources/application.properties
+          sed -i "s#DB_USERNAME#${{ vars.DB_USERNAME }}#g" src/main/resources/application.properties
+          sed -i "s#DB_PASSWORD#${{ secrets.DB_PASSWORD }}#g" src/main/resources/application.properties
+
+          # Print the updated file for verification
+          cat ./src/main/resources/application.properties
+
+      - name: Run Maven Tests
+        id: run
+        run: |
+            mvn test "-Dtest=org.couchbase.quickstart.springdata.controllers.*Test"
+
+      - name: Report Status
+        if: always()
+        uses: ravsamhq/notify-slack-action@v1
+        with:
+          status: ${{ job.status }}
+          notify_when: "failure"
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}

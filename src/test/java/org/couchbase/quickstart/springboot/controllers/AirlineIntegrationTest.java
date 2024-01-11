@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.couchbase.quickstart.springboot.models.Airline;
+import org.couchbase.quickstart.springboot.services.AirlineService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,10 +15,17 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.ResourceAccessException;
 
+import com.couchbase.client.core.error.DocumentNotFoundException;
+
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class AirlineIntegrationTest {
 
@@ -27,24 +35,41 @@ class AirlineIntegrationTest {
         @Autowired
         private TestRestTemplate restTemplate;
 
+        @Autowired
+        private AirlineService airlineService;
+
+        private void deleteAirline(String airlineId, String cleanupTiming) {
+                try {
+                        if (airlineService.getAirlineById(airlineId) != null) {
+                                restTemplate.delete("/api/v1/airline/" + airlineId);
+                        }
+                } catch (DocumentNotFoundException | DataRetrievalFailureException | ResourceAccessException e) {
+                        log.warn("Document " + airlineId + " not present " + cleanupTiming);
+                } catch (Exception e) {
+                        log.error("Error deleting test data", e.getMessage());
+                }
+        }
+
+        private void deleteTestAirlineData(String cleanupTiming) {
+                deleteAirline("airline_create", cleanupTiming);
+                deleteAirline("airline_update", cleanupTiming);
+                deleteAirline("airline_delete", cleanupTiming);
+        }
+
         @BeforeEach
         void setUp() {
-                restTemplate.delete("http://localhost:" + port + "/api/v1/airline/airline_create");
-                restTemplate.delete("http://localhost:" + port + "/api/v1/airline/airline_update");
-                restTemplate.delete("http://localhost:" + port + "/api/v1/airline/airline_delete");
+                deleteTestAirlineData("prior to test");
         }
 
         @AfterEach
         void tearDown() {
-                restTemplate.delete("http://localhost:" + port + "/api/v1/airline/airline_create");
-                restTemplate.delete("http://localhost:" + port + "/api/v1/airline/airline_update");
-                restTemplate.delete("http://localhost:" + port + "/api/v1/airline/airline_delete");
+                deleteTestAirlineData("after test");
         }
 
         @Test
         void testGetAirline() {
                 ResponseEntity<Airline> response = restTemplate
-                                .getForEntity("http://localhost:" + port + "/api/v1/airline/airline_10", Airline.class);
+                                .getForEntity("/api/v1/airline/airline_10", Airline.class);
                 assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
                 Airline airline = response.getBody();
                 assert airline != null;
@@ -64,7 +89,7 @@ class AirlineIntegrationTest {
                                 .country("United States")
                                 .build();
                 ResponseEntity<Airline> response = restTemplate.postForEntity(
-                                "http://localhost:" + port + "/api/v1/airline/" + airline.getId(), airline,
+                                "/api/v1/airline/" + airline.getId(), airline,
                                 Airline.class);
                 assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
                 Airline createdAirline = response.getBody();
@@ -84,11 +109,11 @@ class AirlineIntegrationTest {
                                 .callsign("TEST")
                                 .country("United States")
                                 .build();
-                restTemplate.postForEntity("http://localhost:" + port + "/api/v1/airline/" + airline.getId(), airline,
+                restTemplate.postForEntity("/api/v1/airline/" + airline.getId(), airline,
                                 Airline.class);
-                restTemplate.put("http://localhost:" + port + "/api/v1/airline/" + airline.getId(), airline);
+                restTemplate.put("/api/v1/airline/" + airline.getId(), airline);
                 ResponseEntity<Airline> response = restTemplate
-                                .getForEntity("http://localhost:" + port + "/api/v1/airline/" + airline.getId(),
+                                .getForEntity("/api/v1/airline/" + airline.getId(),
                                                 Airline.class);
 
                 assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -110,11 +135,11 @@ class AirlineIntegrationTest {
                                 .callsign("TEST")
                                 .country("United States")
                                 .build();
-                restTemplate.postForEntity("http://localhost:" + port + "/api/v1/airline/" + airline.getId(), airline,
+                restTemplate.postForEntity("/api/v1/airline/" + airline.getId(), airline,
                                 Airline.class);
-                restTemplate.delete("http://localhost:" + port + "/api/v1/airline/" + airlineIdToDelete);
+                restTemplate.delete("/api/v1/airline/" + airlineIdToDelete);
                 ResponseEntity<Airline> response = restTemplate
-                                .getForEntity("http://localhost:" + port + "/api/v1/airline/" + airlineIdToDelete,
+                                .getForEntity("/api/v1/airline/" + airlineIdToDelete,
                                                 Airline.class);
                 assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
         }
@@ -124,7 +149,7 @@ class AirlineIntegrationTest {
                 int limit = 10;
                 int offset = 0;
                 ResponseEntity<List<Airline>> response = restTemplate.exchange(
-                                "http://localhost:" + port + "/api/v1/airline/list?limit=" + limit + "&offset="
+                                "/api/v1/airline/list?limit=" + limit + "&offset="
                                                 + offset,
                                 HttpMethod.GET, null, new ParameterizedTypeReference<List<Airline>>() {
                                 });
@@ -151,7 +176,7 @@ class AirlineIntegrationTest {
                 int limit = 10;
                 int offset = 0;
                 ResponseEntity<List<Airline>> response = restTemplate.exchange(
-                                "http://localhost:" + port + "/api/v1/airline/country/" + country + "?limit=" + limit
+                                "/api/v1/airline/country/" + country + "?limit=" + limit
                                                 + "&offset=" + offset,
                                 HttpMethod.GET, null, new ParameterizedTypeReference<List<Airline>>() {
                                 });
@@ -173,7 +198,7 @@ class AirlineIntegrationTest {
 
                 country = "France";
                 ResponseEntity<List<Airline>> response2 = restTemplate.exchange(
-                                "http://localhost:" + port + "/api/v1/airline/country/" + country + "?limit=" + limit
+                                "/api/v1/airline/country/" + country + "?limit=" + limit
                                                 + "&offset=" + offset,
                                 HttpMethod.GET, null, new ParameterizedTypeReference<List<Airline>>() {
                                 });
@@ -225,7 +250,7 @@ class AirlineIntegrationTest {
                         List<Airline> expectedAirlines = entry.getValue();
 
                         ResponseEntity<List<Airline>> response = restTemplate.exchange(
-                                        "http://localhost:" + port + "/api/v1/airline/destination/" + destinationAirport
+                                        "/api/v1/airline/destination/" + destinationAirport
                                                         + "?limit=" + limit + "&offset=" + offset,
                                         HttpMethod.GET, null, new ParameterizedTypeReference<List<Airline>>() {
                                         });
