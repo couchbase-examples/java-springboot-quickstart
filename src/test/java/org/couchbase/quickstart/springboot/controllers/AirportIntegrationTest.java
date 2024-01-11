@@ -19,6 +19,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.dao.DataRetrievalFailureException;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -103,24 +104,21 @@ class AirportIntegrationTest {
                                 .airportname("Test Airport").city("Test City")
                                 .country("Test Country").faa("TST").icao("TEST")
                                 .tz("Test Timezone").geo(new Geo(1.0, 2.0, 3.0)).build();
-                restTemplate.postForEntity("/api/v1/airport/" + airport.getId(), airport,
-                                Airport.class);
+                restTemplate.postForEntity("/api/v1/airport/" + airport.getId(), airport, Airport.class);
 
                 Airport updatedAirport = Airport.builder().id("airport_update").type("airport")
                                 .airportname("Updated Test Airport").city("Updated Test City")
                                 .country("Updated Test Country").faa("TST").icao("TEST")
                                 .tz("Updated Test Timezone").geo(new Geo(1.0, 2.0, 3.0)).build();
 
-                restTemplate.put("/api/v1/airport/" + updatedAirport.getId(), updatedAirport);
+                HttpEntity<Airport> requestEntity = new HttpEntity<>(updatedAirport);
+                ResponseEntity<Airport> responseEntity = restTemplate.exchange("/api/v1/airport/" + updatedAirport.getId(),
+                                HttpMethod.PUT, requestEntity, Airport.class);
 
-                ResponseEntity<Airport> response = restTemplate.getForEntity(
-                                "/api/v1/airport/" + updatedAirport.getId(),
-                                Airport.class);
-
-                assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-                Airport createdAirport = response.getBody();
-                assert createdAirport != null;
-                assertThat(createdAirport).isEqualTo(updatedAirport);
+                assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+                Airport retrievedAirport = responseEntity.getBody();
+                assert retrievedAirport != null;
+                assertThat(retrievedAirport).isEqualTo(updatedAirport);
         }
 
         @Test

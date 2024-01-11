@@ -16,6 +16,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.dao.DataRetrievalFailureException;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -238,16 +239,14 @@ class RouteIntegrationTest {
                                 .distance(2881.617376098415)
                                 .build();
 
-                restTemplate.put("/api/v1/route/" + updatedRoute.getId(), updatedRoute);
+                HttpEntity<Route> requestEntity = new HttpEntity<>(updatedRoute);
+                ResponseEntity<Route> responseEntity = restTemplate.exchange("/api/v1/route/" + updatedRoute.getId(),
+                                HttpMethod.PUT, requestEntity, Route.class);
 
-                ResponseEntity<Route> response = restTemplate.getForEntity(
-                                "/api/v1/route/" + updatedRoute.getId(),
-                                Route.class);
-
-                assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-                Route createdRoute = response.getBody();
-                assert createdRoute != null;
-                assertThat(createdRoute).isEqualTo(updatedRoute);
+                assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+                Route retrievedRoute = responseEntity.getBody();
+                assert retrievedRoute != null;
+                assertThat(retrievedRoute).isEqualTo(updatedRoute);
         }
 
         @Test

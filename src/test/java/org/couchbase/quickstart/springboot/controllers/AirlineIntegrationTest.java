@@ -18,6 +18,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.dao.DataRetrievalFailureException;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -111,26 +112,24 @@ class AirlineIntegrationTest {
                                 .callsign("TEST")
                                 .country("United States")
                                 .build();
-                restTemplate.postForEntity("/api/v1/airline/" + airline.getId(), airline,
-                                Airline.class);
-                
+                restTemplate.postForEntity("/api/v1/airline/" + airline.getId(), airline, Airline.class);
+
                 Airline updatedAirline = Airline.builder()
                                 .id("airline_update")
                                 .type("airline")
-                                .name("Updated Airline")
-                                .iata("Updated TA")
-                                .icao("Updated TST")
-                                .callsign("Updated TEST")
-                                .country("France")
+                                .name("Updated Test Airline")
+                                .iata("TA")
+                                .icao("TST")
+                                .callsign("TEST")
+                                .country("United States")
                                 .build();
-                restTemplate.put("/api/v1/airline/" + updatedAirline.getId(), updatedAirline);
 
-                ResponseEntity<Airline> response = restTemplate
-                                .getForEntity("/api/v1/airline/" + updatedAirline.getId(),
-                                                Airline.class);
+                HttpEntity<Airline> requestEntity = new HttpEntity<>(updatedAirline);
+                ResponseEntity<Airline> responseEntity = restTemplate.exchange("/api/v1/airline/" + updatedAirline.getId(),
+                                HttpMethod.PUT, requestEntity, Airline.class);
 
-                assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-                Airline retrievedAirline = response.getBody();
+                assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+                Airline retrievedAirline = responseEntity.getBody();
                 assert retrievedAirline != null;
                 assertThat(retrievedAirline).isEqualTo(updatedAirline);
         }
