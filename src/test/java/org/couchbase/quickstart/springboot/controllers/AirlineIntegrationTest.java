@@ -2,6 +2,7 @@ package org.couchbase.quickstart.springboot.controllers;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -222,7 +223,7 @@ class AirlineIntegrationTest {
         @Test
         void testListAirlinesByDestinationAirport() {
                 Map<String, List<Airline>> expectedAirlinesByDestination = Map.of(
-                                "SFO", List.of(
+                                "SFO", Arrays.asList(
                                                 Airline.builder().id("3029").type("airline").name("JetBlue Airways")
                                                                 .iata("B6").icao("JBU")
                                                                 .callsign("JETBLUE").country("United States").build(),
@@ -231,7 +232,7 @@ class AirlineIntegrationTest {
                                                                 .callsign("SPEEDBIRD").country("United Kingdom")
                                                                 .build()),
                                 // Add more expected airlines for SFO
-                                "MRS", List.of(
+                                "MRS", Arrays.asList(
                                                 Airline.builder().id("137").type("airline").name("Air France")
                                                                 .iata("AF").icao("AFR")
                                                                 .callsign("AIRFRANS").country("France").build(),

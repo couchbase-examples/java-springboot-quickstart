@@ -2,6 +2,7 @@ package org.couchbase.quickstart.springboot.controllers;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -147,12 +148,12 @@ class AirportIntegrationTest {
 
         @Test
         void testListDirectConnections() {
-                List<String> destinationAirportCodes = List.of("SFO", "LAX", "JFK", "MRS");
+                List<String> destinationAirportCodes = Arrays.asList("SFO", "LAX", "JFK", "MRS");
                 Map<String, List<String>> expectedDirectConnections = Map.of(
-                                "SFO", List.of("JFK", "HKG", "ICN", "ATL", "BJX", "GDL", "MEX", "MLM", "PVR", "SJD"),
-                                "LAX", List.of("NRT", "CUN", "GDL", "HMO", "MEX", "MZT", "PVR", "SJD", "ZIH", "ZLO"),
-                                "JFK", List.of("DEL", "LHR", "EZE", "ATL", "CUN", "MEX", "EZE", "LAX", "SAN", "SEA"),
-                                "MRS", List.of("AAE", "ALG", "BJA", "BLJ", "CZL", "ORN", "QSF", "TLM", "CDG", "CMN"));
+                                "SFO", Arrays.asList("JFK", "HKG", "ICN", "ATL", "BJX", "GDL", "MEX", "MLM", "PVR", "SJD"),
+                                "LAX", Arrays.asList("NRT", "CUN", "GDL", "HMO", "MEX", "MZT", "PVR", "SJD", "ZIH", "ZLO"),
+                                "JFK", Arrays.asList("DEL", "LHR", "EZE", "ATL", "CUN", "MEX", "EZE", "LAX", "SAN", "SEA"),
+                                "MRS", Arrays.asList("AAE", "ALG", "BJA", "BLJ", "CZL", "ORN", "QSF", "TLM", "CDG", "CMN"));
 
                 for (String airportCode : destinationAirportCodes) {
                         int limit = 10;
