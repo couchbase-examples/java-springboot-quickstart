@@ -3,6 +3,7 @@ package org.couchbase.quickstart.springboot.controllers;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -222,27 +223,22 @@ class AirlineIntegrationTest {
 
         @Test
         void testListAirlinesByDestinationAirport() {
-                Map<String, List<Airline>> expectedAirlinesByDestination = Map.of(
-                                "SFO", Arrays.asList(
-                                                Airline.builder().id("3029").type("airline").name("JetBlue Airways")
-                                                                .iata("B6").icao("JBU")
-                                                                .callsign("JETBLUE").country("United States").build(),
-                                                Airline.builder().id("1355").type("airline").name("British Airways")
-                                                                .iata("BA").icao("BAW")
-                                                                .callsign("SPEEDBIRD").country("United Kingdom")
-                                                                .build()),
-                                // Add more expected airlines for SFO
-                                "MRS", Arrays.asList(
-                                                Airline.builder().id("137").type("airline").name("Air France")
-                                                                .iata("AF").icao("AFR")
-                                                                .callsign("AIRFRANS").country("France").build(),
-                                                Airline.builder().id("24").type("airline").name("American Airlines")
-                                                                .iata("AA").icao("AAL").callsign("AMERICAN")
-                                                                .country("United States").build()
-                                // Add more expected airlines for MRS
-                                )
-                // Add more airports and their expected airlines as needed
-                );
+                Map<String, List<Airline>> expectedAirlinesByDestination = new HashMap<>();
+
+                expectedAirlinesByDestination.put("SFO", Arrays.asList(
+                                Airline.builder().id("3029").type("airline").name("JetBlue Airways")
+                                                .iata("B6").icao("JBU").callsign("JETBLUE").country("United States")
+                                                .build(),
+                                Airline.builder().id("1355").type("airline").name("British Airways")
+                                                .iata("BA").icao("BAW").callsign("SPEEDBIRD").country("United Kingdom")
+                                                .build()));
+
+                expectedAirlinesByDestination.put("MRS", Arrays.asList(
+                                Airline.builder().id("137").type("airline").name("Air France")
+                                                .iata("AF").icao("AFR").callsign("AIRFRANS").country("France").build(),
+                                Airline.builder().id("24").type("airline").name("American Airlines")
+                                                .iata("AA").icao("AAL").callsign("AMERICAN").country("United States")
+                                                .build()));
 
                 int limit = 10;
                 int offset = 0;

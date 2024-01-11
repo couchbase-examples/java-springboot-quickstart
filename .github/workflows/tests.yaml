@@ -41,8 +41,10 @@ jobs:
       - name: Run Maven Tests
         id: run
         run: |
-            mvn test "-Dtest=org.couchbase.quickstart.springdata.controllers.*Test"
-
+            chmod +x mvnw
+            ./mvnw clean
+            ./mvnw test "-Dtest=org.couchbase.quickstart.springdata.controllers.*Test" -X
+            
       - name: Report Status
         if: always()
         uses: ravsamhq/notify-slack-action@v1
