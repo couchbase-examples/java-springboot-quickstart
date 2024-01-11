@@ -6,6 +6,9 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
+import com.couchbase.client.core.deps.com.fasterxml.jackson.annotation.JsonAlias;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -31,6 +34,8 @@ public class Route {
     private String airline;
 
     @NotBlank(message = "Airline ID is mandatory")
+    @JsonProperty("airlineid")
+    @JsonAlias({"airline_id", "airlineId"})
     private String airlineid;
 
     @NotBlank(message = "Source airport is mandatory")
