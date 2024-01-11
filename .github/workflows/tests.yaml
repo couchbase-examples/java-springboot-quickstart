@@ -28,6 +28,7 @@ jobs:
         with:
           java-version: ${{ matrix.java-version }}
           distribution: "adopt"
+          cache: "maven"
 
       - name: Replace secrets in application.properties
         run: |
