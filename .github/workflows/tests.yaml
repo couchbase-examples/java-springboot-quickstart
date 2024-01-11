@@ -42,8 +42,7 @@ jobs:
         id: run
         run: |
             chmod +x mvnw
-            ./mvnw clean
-            ./mvnw test "-Dtest=org.couchbase.quickstart.springdata.controllers.*Test" -e
+            ./mvnw package -B
             
       - name: Report Status
         if: always()
