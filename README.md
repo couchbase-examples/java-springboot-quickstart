@@ -57,11 +57,11 @@ Specifically, you need to do the following:
 All configuration for communication with the database is read from the environment variables. We have provided a convenience feature in this quickstart to read the environment variables from a local file, `application.properties` in the `src/main/resources` folder.
 
 ```properties
-spring.couchbase.bootstrap-hosts=#######
-spring.couchbase.bucket.name=travel-sample
-spring.couchbase.bucket.user=#######
-spring.couchbase.bucket.password=#######
 spring.mvc.pathmatch.matching-strategy=ANT_PATH_MATCHER
+spring.couchbase.bucket.name=travel-sample
+spring.couchbase.bootstrap-hosts=DB_CONN_STR
+spring.couchbase.bucket.user=DB_USERNAME
+spring.couchbase.bucket.password=DB_PASSWORD
 ```
 
 Instead of the hash symbols, you need to add the values for the Couchbase connection.
