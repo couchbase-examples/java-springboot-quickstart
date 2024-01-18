@@ -130,7 +130,7 @@ For this quickstart, we use three collections, `airport`, `airline` and `routes`
 
 If you would like to add another entity to the APIs, these are the steps to follow:
 
-- Create the new entity (collection) in the Couchbase bucket. You can create the collection using the [SDK](https://docs.couchbase.com/cloud/management-api-reference/index.html) or via the [Couchbase Server interface](https://docs.couchbase.com/cloud/n1ql/n1ql-language-reference/createcollection.html).
+- Create the new entity (collection) in the Couchbase bucket. You can create the collection using the [SDK](https://docs.couchbase.com/java-sdk/current/howtos/provisioning-cluster-resources.html#collection-management) or via the [Couchbase Server interface](https://docs.couchbase.com/cloud/n1ql/n1ql-language-reference/createcollection.html).
 - Define the routes in a new file in the `controllers` folder similar to the existing routes like `AirportController.java`.
 - Define the service in a new file in the `services` folder similar to the existing services like `AirportService.java`. You'll have to implement the service interface `AirportServiceImpl.java`.
 - Define the repository in a new file in the `repositories` folder similar to the existing repositories like `AirportRepository.java`. You'll have to implement the repository interface `AirportRepositoryImpl.java`.
