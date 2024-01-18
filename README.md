@@ -7,9 +7,7 @@ Often, the first step developers take after creating their database is to create
 1. How to create, read, update, and delete documents using Key-Value[ operations](https://docs.couchbase.com/java-sdk/current/howtos/kv-operations.html) (KV operations). KV operations are unique to Couchbase and provide super fast (think microseconds) queries.
 2. How to write simple parametrized [N1QL queries](https://docs.couchbase.com/java-sdk/current/howtos/n1ql-queries-with-sdk.html) using the built-in travel-sample bucket.
 
-Full documentation for the tutorial can be found on the [Couchbase Developer Portal](https://developer.couchbase.com/tutorial-quickstart-spring-boot-java/).
-
-If you are looking for a quick start using [Micronaut](https://micronaut.io/)](https://micronaut.io/), you can find it in this [repo](https://github.com/couchbase-examples/java-quickstart-micronaut).
+Full documentation for the tutorial can be found on the [Couchbase Developer Portal](https://developer.couchbase.com/tutorial-quickstart-java-springboot/).
 
 ## Prerequisites
 
@@ -17,11 +15,13 @@ To run this prebuilt project, you will need:
 
 - [Couchbase Capella](https://www.couchbase.com/products/capella/) cluster with [travel-sample](https://docs.couchbase.com/java-sdk/current/ref/travel-app-data-model.html) bucket loaded.
   - To run this tutorial using a self-managed Couchbase cluster, please refer to the [appendix](#running-self-managed-couchbase-cluster).
-- [Java](https://www.oracle.com/java/technologies/javase-jdk11-downloads.html) 11 or higher installed
-  - Ensure that the Java version is compatible with the Couchbase SDK.
+- [Java](https://docs.couchbase.com/java-sdk/current/project-docs/compatibility.html#jdk-compat)
+  - Ensure that the Java version is compatible with the Couchbase SDK. (Please check the link for compatibility)
 - Loading Travel Sample Bucket
   If travel-sample is not loaded in your Capella cluster, you can load it by following the instructions for your Capella Cluster:
   - [Load travel-sample bucket in Couchbase Capella](https://docs.couchbase.com/cloud/clusters/data-service/import-data-documents.html#import-sample-data)
+- Maven
+  - [Install Maven](https://maven.apache.org/install.html)
 
 ## App Setup
 
@@ -30,7 +30,7 @@ We will walk through the different steps required to get the application running
 ### Cloning Repo
 
 ```shell
-git clone https://github.com/couchbase-examples/java-springboot-quickstart
+git clone https://github.com/couchbase-examples/java-springboot-quickstart.git
 ```
 
 ### Install Dependencies
@@ -64,7 +64,8 @@ spring.couchbase.bucket.user=DB_USERNAME
 spring.couchbase.bucket.password=DB_PASSWORD
 ```
 
-Instead of the hash symbols, you need to add the values for the Couchbase connection.
+Instead of the DB_CONN_STR, DB_USERNAME and DB_PASSWORD
+, you need to add the values for the Couchbase connection.
 
 > Note: The connection string expects the `couchbases://` or `couchbase://` part.
 
@@ -129,11 +130,10 @@ For this quickstart, we use three collections, `airport`, `airline` and `routes`
 
 If you would like to add another entity to the APIs, these are the steps to follow:
 
-- Create the new entity (collection) in the Couchbase bucket. You can create the collection using the [SDK](https://docs.couchbase.com/sdk-api/couchbase-java-client-3.5.2/com/couchbase/client/java/Collection.html#createScope-java.lang.String-) or via the [Couchbase Server interface](https://docs.couchbase.com/cloud/n1ql/n1ql-language-reference/createcollection.html).
+- Create the new entity (collection) in the Couchbase bucket. You can create the collection using the [SDK](https://docs.couchbase.com/cloud/management-api-reference/index.html) or via the [Couchbase Server interface](https://docs.couchbase.com/cloud/n1ql/n1ql-language-reference/createcollection.html).
 - Define the routes in a new file in the `controllers` folder similar to the existing routes like `AirportController.java`.
 - Define the service in a new file in the `services` folder similar to the existing services like `AirportService.java`. You'll have to implement the service interface `AirportServiceImpl.java`.
 - Define the repository in a new file in the `repositories` folder similar to the existing repositories like `AirportRepository.java`. You'll have to implement the repository interface `AirportRepositoryImpl.java`.
-- Add the new routes to the application in `Application.java`.
 
 ### Running Self-Managed Couchbase Cluster
 
