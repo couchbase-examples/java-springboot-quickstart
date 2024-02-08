@@ -2,7 +2,7 @@ package org.couchbase.quickstart.springboot.repositories;
 
 import java.util.List;
 
-import org.couchbase.quickstart.springboot.configs.DBProperties;
+import org.couchbase.quickstart.springboot.configs.CouchbaseConfig;
 import org.couchbase.quickstart.springboot.models.Airline;
 import org.springframework.stereotype.Repository;
 
@@ -19,16 +19,12 @@ public class AirlineRepositoryImpl implements AirlineRepository {
 
     private final Cluster cluster;
     private final Collection airlineCol;
-    private final DBProperties dbProperties;
+    private final CouchbaseConfig couchbaseConfig;
 
-    @SuppressWarnings("unused")
-    private final Bucket bucket;
-
-    public AirlineRepositoryImpl(Cluster cluster, Bucket bucket, DBProperties dbProperties) {
+    public AirlineRepositoryImpl(Cluster cluster, Bucket bucket, CouchbaseConfig couchbaseConfig) {
         this.cluster = cluster;
-        this.bucket = bucket;
         this.airlineCol = bucket.scope("inventory").collection("airline");
-        this.dbProperties = dbProperties;
+        this.couchbaseConfig = couchbaseConfig;
     }
 
     @Override
@@ -56,7 +52,7 @@ public class AirlineRepositoryImpl implements AirlineRepository {
     @Override
     public List<Airline> findAll(int limit, int offset) {
         String statement = "SELECT airline.id, airline.type, airline.name, airline.iata, airline.icao, airline.callsign, airline.country FROM `"
-                + dbProperties.getBucketName() + "`.`inventory`.`airline` LIMIT " + limit + " OFFSET " + offset;
+                + couchbaseConfig.getBucketName() + "`.`inventory`.`airline` LIMIT " + limit + " OFFSET " + offset;
         return cluster
                 .query(statement, QueryOptions.queryOptions().scanConsistency(QueryScanConsistency.REQUEST_PLUS))
                 .rowsAs(Airline.class);
@@ -65,7 +61,7 @@ public class AirlineRepositoryImpl implements AirlineRepository {
     @Override
     public List<Airline> findByCountry(String country, int limit, int offset) {
         String statement = "SELECT airline.id, airline.type, airline.name, airline.iata, airline.icao, airline.callsign, airline.country FROM `"
-                + dbProperties.getBucketName() + "`.`inventory`.`airline` WHERE country = '" + country + "' LIMIT "
+                + couchbaseConfig.getBucketName() + "`.`inventory`.`airline` WHERE country = '" + country + "' LIMIT "
                 + limit + " OFFSET " + offset;
         return cluster
                 .query(statement, QueryOptions.queryOptions().scanConsistency(QueryScanConsistency.REQUEST_PLUS)
@@ -78,11 +74,11 @@ public class AirlineRepositoryImpl implements AirlineRepository {
     public List<Airline> findByDestinationAirport(String destinationAirport, int limit, int offset) {
         String statement = "SELECT air.callsign, air.country, air.iata, air.icao, air.id, air.name, air.type " +
                 "FROM (SELECT DISTINCT META(airline).id AS airlineId " +
-                "      FROM `" + dbProperties.getBucketName() + "`.`inventory`.`route` " +
-                "      JOIN `" + dbProperties.getBucketName() + "`.`inventory`.`airline` " +
+                "      FROM `" + couchbaseConfig.getBucketName() + "`.`inventory`.`route` " +
+                "      JOIN `" + couchbaseConfig.getBucketName() + "`.`inventory`.`airline` " +
                 "      ON route.airlineid = META(airline).id " +
                 "      WHERE route.destinationairport = $1) AS subquery " +
-                "JOIN `" + dbProperties.getBucketName() + "`.`inventory`.`airline` AS air " +
+                "JOIN `" + couchbaseConfig.getBucketName() + "`.`inventory`.`airline` AS air " +
                 "ON META(air).id = subquery.airlineId LIMIT " + limit + " OFFSET " + offset;
 
         return cluster.query(

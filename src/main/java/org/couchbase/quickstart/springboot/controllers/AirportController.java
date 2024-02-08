@@ -3,11 +3,12 @@ package org.couchbase.quickstart.springboot.controllers;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 
 import org.couchbase.quickstart.springboot.models.Airport;
 import org.couchbase.quickstart.springboot.models.Route;
 import org.couchbase.quickstart.springboot.services.AirportService;
+import org.springframework.context.annotation.Description;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -37,13 +38,13 @@ public class AirportController {
         this.airportService = airportService;
     }
 
-    // All errors
+    // Error messages
     private static final String INTERNAL_SERVER_ERROR = "Internal Server Error";
     private static final String DOCUMENT_NOT_FOUND = "Document Not Found";
-    private static final String DOCUMENT_EXISTS = "Document Exists";
 
-    @Operation(summary = "Get an airport by ID")
     @GetMapping("/{id}")
+    @Operation(summary = "Get an airport by ID")
+    @Description(value = "Get Airport by specified ID.\n\nThis provides an example of using Key Value operations in Couchbase to retrieve a document with a specified ID. \n\n Code: [`controllers/AirportController.java`](https://github.com/couchbase-examples/java-springboot-quickstart/blob/master/src/main/java/org/couchbase/quickstart/springboot/controllers/AirportController.java) \n File: `AirportController.java` \n Method: `getAirport`")
     public ResponseEntity<Airport> getAirport(@PathVariable String id) {
         try {
             Airport airport = airportService.getAirportById(id);
@@ -62,14 +63,15 @@ public class AirportController {
         }
     }
 
-    @Operation(summary = "Create an airport")
     @PostMapping("/{id}")
+    @Operation(summary = "Create an airport")
+    @Description(value = "Create Airport by specified ID.\n\nThis provides an example of using Key Value operations in Couchbase to create a document with a specified ID. \n\n Code: [`controllers/AirportController.java`](https://github.com/couchbase-examples/java-springboot-quickstart/blob/master/src/main/java/org/couchbase/quickstart/springboot/controllers/AirportController.java) \n File: `AirportController.java` \n Method: `createAirport`")
     public ResponseEntity<Airport> createAirport(@PathVariable String id, @Valid @RequestBody Airport airport) {
         try {
             Airport newAirport = airportService.createAirport(airport);
             return new ResponseEntity<>(newAirport, HttpStatus.CREATED);
         } catch (DocumentExistsException e) {
-            log.error(DOCUMENT_EXISTS + ": " + id);
+            log.error("Document already exists: " + id);
             return new ResponseEntity<>(HttpStatus.CONFLICT);
         } catch (Exception e) {
             log.error(INTERNAL_SERVER_ERROR + ": " + e.getMessage());
@@ -80,6 +82,7 @@ public class AirportController {
 
     @Operation(summary = "Update an airport")
     @PutMapping("/{id}")
+    @Description(value = "Update Airport by specified ID.\n\nThis provides an example of using Key Value operations in Couchbase to update a document with a specified ID. \n\n Code: [`controllers/AirportController.java`](https://github.com/couchbase-examples/java-springboot-quickstart/blob/master/src/main/java/org/couchbase/quickstart/springboot/controllers/AirportController.java) \n File: `AirportController.java` \n Method: `updateAirport`")
     public ResponseEntity<Airport> updateAirport(@PathVariable String id, @Valid @RequestBody Airport airport) {
         try {
             Airport updatedAirport = airportService.updateAirport(id, airport);
@@ -89,7 +92,7 @@ public class AirportController {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
         } catch (DocumentNotFoundException e) {
-            log.error("Document not found: " + id);
+            log.error(DOCUMENT_NOT_FOUND + ": " + id);
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } catch (Exception e) {
             log.error(INTERNAL_SERVER_ERROR + ": " + e.getMessage());
@@ -97,14 +100,15 @@ public class AirportController {
         }
     }
 
-    @Operation(summary = "Delete an airport")
     @DeleteMapping("/{id}")
+    @Operation(summary = "Delete an airport")
+    @Description(value = "Delete Airport by specified ID.\n\nThis provides an example of using Key Value operations in Couchbase to delete a document with a specified ID. \n\n Code: [`controllers/AirportController.java`](https://github.com/couchbase-examples/java-springboot-quickstart/blob/master/src/main/java/org/couchbase/quickstart/springboot/controllers/AirportController.java) \n File: `AirportController.java` \n Method: `deleteAirport`")
     public ResponseEntity<Void> deleteAirport(@PathVariable String id) {
         try {
             airportService.deleteAirport(id);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         } catch (DocumentNotFoundException e) {
-            log.error("Document not found: " + id);
+            log.error(DOCUMENT_NOT_FOUND + ": " + id);
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } catch (Exception e) {
             log.error(INTERNAL_SERVER_ERROR + ": " + e.getMessage());
@@ -112,8 +116,9 @@ public class AirportController {
         }
     }
 
-    @Operation(summary = "List all airports")
     @GetMapping("/list")
+    @Operation(summary = "List all airports")
+    @Description(value = "List all Airports.\n\nThis provides an example of using N1QL queries in Couchbase to retrieve all documents of a specified type. \n\n Code: [`controllers/AirportController.java`](https://github.com/couchbase-examples/java-springboot-quickstart/blob/master/src/main/java/org/couchbase/quickstart/springboot/controllers/AirportController.java) \n File: `AirportController.java` \n Method: `listAirports`")
     public ResponseEntity<List<Airport>> listAirports(
             @RequestParam(defaultValue = "10") int limit,
             @RequestParam(defaultValue = "0") int offset) {
@@ -126,8 +131,9 @@ public class AirportController {
         }
     }
 
-    @Operation(summary = "List all direct connections from an airport")
     @GetMapping("/direct-connections/{airportCode}")
+    @Operation(summary = "List all direct connections from an airport")
+    @Description(value = "List all direct connections from an Airport.\n\nThis provides an example of using N1QL queries in Couchbase to retrieve all documents of a specified type. \n\n Code: [`controllers/AirportController.java`](https://github.com/couchbase-examples/java-springboot-quickstart/blob/master/src/main/java/org/couchbase/quickstart/springboot/controllers/AirportController.java) \n File: `AirportController.java` \n Method: `listDirectConnections`")
     public ResponseEntity<List<String>> listDirectConnections(@PathVariable String airportCode,
             @RequestParam(defaultValue = "10") int limit,
             @RequestParam(defaultValue = "0") int offset) {

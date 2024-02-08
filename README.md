@@ -43,7 +43,7 @@ mvn clean install -DskipTests=true
 
 Note: The `-DskipTests=true` option is used to skip the tests. The tests require the application to be running.
 
-Note: The application is tested with Java 17. If you are using a different version of Java, please update the `pom.xml` file accordingly.
+Note: The application is tested with Java 11. If you are using a different version of Java, please update the `pom.xml` file accordingly.
 
 ### Setup Database Configuration
 
@@ -54,7 +54,9 @@ Specifically, you need to do the following:
 - Create the [database credentials](https://docs.couchbase.com/cloud/clusters/manage-database-users.html) to access the travel-sample bucket (Read and Write) used in the application.
 - [Allow access](https://docs.couchbase.com/cloud/clusters/allow-ip-address.html) to the Cluster from the IP on which the application is running.
 
-All configuration for communication with the database is read from the environment variables. We have provided a convenience feature in this quickstart to read the environment variables from a local file, `application.properties` in the `src/main/resources` folder.
+All configuration for communication with the database is read from the application properties. We have provided a convenience feature in this quickstart to read the properties from a local file, `application.properties` in the `src/main/resources` folder.
+
+You can also use your system environment variables to set the properties. The properties are read from the environment variables if they are set. The properties are read from the `application.properties` file if the environment variables are not set.
 
 ```properties
 spring.mvc.pathmatch.matching-strategy=ANT_PATH_MATCHER
@@ -64,8 +66,7 @@ spring.couchbase.bucket.user=DB_USERNAME
 spring.couchbase.bucket.password=DB_PASSWORD
 ```
 
-Instead of the DB_CONN_STR, DB_USERNAME and DB_PASSWORD
-, you need to add the values for the Couchbase connection.
+Instead of the DB_CONN_STR, DB_USERNAME and DB_PASSWORD, you need to add the values for the Couchbase connection.
 
 > Note: The connection string expects the `couchbases://` or `couchbase://` part.
 
@@ -90,32 +91,53 @@ docker build -t java-springboot-quickstart .
 Run the Docker image
 
 ```sh
-docker run -d --name springboot-container -p 8080:8080 java-springboot-quickstart
+docker run -d --name springboot-container -p 9440:8080 java-springboot-quickstart -e DB_CONN_STR=<connection_string> -e DB_USERNAME=<username> -e DB_PASSWORD=<password>
 ```
 
-Note: The `application.properties` file has the connection information to connect to your Capella cluster. These will be part of the environment variables in the Docker container.
+Note: The `application.properties` file has the connection information to connect to your Capella cluster. You can also pass the connection information as environment variables to the Docker container.
+If you choose not to pass the environment variables, you can update the `application.properties` file in the `src/main/resources` folder.
 
 ### Verifying the Application
 
 Once the application starts, you can see the details of the application on the logs.
 
-![Application Startup](app_startup.png)
+![Application Startup](./assets/images/app-startup-spring-boot.png)
 
 The application will run on port 8080 of your local machine (http://localhost:8080). You will find the interactive Swagger documentation of the API if you go to the URL in your browser. Swagger documentation is used in this demo to showcase the different API endpoints and how they can be invoked. More details on the Swagger documentation can be found in the [appendix](#swagger-documentation).
 
-![Swagger Documentation](swagger_documentation.png)
-
+![Swagger Documentation](./assets/images/swagger-documentation-spring-boot.png)
 ## Running Tests
 
-To run the integration tests, use the following commands:
+To test your application, you can use Maven (mvn) to run the test suite. Here are the steps to run the tests:
+
+### Run All Tests:
+
+```sh
+mvn test
+```
+
+This command will execute all the test cases in your project.
+
+### Run Individual Tests:
+
+Additionally, you can run individual test classes or methods using the following commands:
+
+To run the tests for the AirlineIntegrationTest class:
 
 ```sh
 mvn test -Dtest=org.couchbase.quickstart.springboot.controllers.AirlineIntegrationTest
-mvn test -Dtest=org.couchbase.quickstart.springboot.controllers.AirportIntegrationTest
-mvn test -Dtest=org.couchbase.quickstart.springboot.controllers.RouteIntegrationTest
+```
 
-You can also run all the tests using the following command:
-mvn test
+To run the tests for the AirportIntegrationTest class:
+
+```sh
+mvn test -Dtest=org.couchbase.quickstart.springboot.controllers.AirportIntegrationTest
+```
+
+To run the tests for the RouteIntegrationTest class:
+
+```sh
+mvn test -Dtest=org.couchbase.quickstart.springboot.controllers.Rout
 ```
 
 ## Appendix
@@ -124,16 +146,16 @@ mvn test
 
 For this quickstart, we use three collections, `airport`, `airline` and `routes` that contain sample airports, airlines and airline routes respectively. The routes collection connects the airports and airlines as seen in the figure below. We use these connections in the quickstart to generate airports that are directly connected and airlines connecting to a destination airport. Note that these are just examples to highlight how you can use SQL++ queries to join the collections.
 
-![travel-sample data model](travel_sample_data_model.png)
+![travel-sample data model](/assets/images/travel_sample_data_model.png)
 
 ### Extending API by Adding New Entity
 
 If you would like to add another entity to the APIs, these are the steps to follow:
 
-- Create the new entity (collection) in the Couchbase bucket. You can create the collection using the [SDK](https://docs.couchbase.com/java-sdk/current/howtos/provisioning-cluster-resources.html#collection-management) or via the [Couchbase Server interface](https://docs.couchbase.com/cloud/n1ql/n1ql-language-reference/createcollection.html).
-- Define the routes in a new file in the `controllers` folder similar to the existing routes like `AirportController.java`.
-- Define the service in a new file in the `services` folder similar to the existing services like `AirportService.java`. You'll have to implement the service interface `AirportServiceImpl.java`.
-- Define the repository in a new file in the `repositories` folder similar to the existing repositories like `AirportRepository.java`. You'll have to implement the repository interface `AirportRepositoryImpl.java`.
+- Create the new entity (collection) in the Couchbase scope. You can create the collection using the [SDK](https://docs.couchbase.com/java-sdk/current/howtos/provisioning-cluster-resources.html#collection-management) or via the [Couchbase Server interface](https://docs.couchbase.com/cloud/n1ql/n1ql-language-reference/createcollection.html).
+- Define the routes in a new class in the `controllers` package similar to the existing routes like `AirportController.java`.
+- Define the service in a new class in the `services` package similar to the existing services like `AirportService.java`. You'll have to implement the service interface `AirportServiceImpl.java`.
+- Define the repository in a new class in the `repositories` package similar to the existing repositories like `AirportRepository.java`. You'll have to implement the repository interface `AirportRepositoryImpl.java`.
 
 ### Running Self-Managed Couchbase Cluster
 

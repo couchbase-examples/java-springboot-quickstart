@@ -12,9 +12,13 @@ jobs:
   run_tests:
     name: Run Tests
     runs-on: ubuntu-latest
+    env:
+      DB_CONN_STR: ${{ vars.DB_CONN_STR }}
+      DB_USERNAME: ${{ vars.DB_USERNAME }}
+      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
     strategy:
       matrix:
-        java-version: ["8", "11", "17"]
+        java-version: ["17", "21"]
     steps:
       - name: Update repositories
         run: |
@@ -30,21 +34,12 @@ jobs:
           distribution: "adopt"
           cache: "maven"
 
-      - name: Replace secrets in application.properties
-        run: |
-          sed -i "s#DB_CONN_STR#${{ vars.DB_CONN_STR }}#g" src/main/resources/application.properties
-          sed -i "s#DB_USERNAME#${{ vars.DB_USERNAME }}#g" src/main/resources/application.properties
-          sed -i "s#DB_PASSWORD#${{ secrets.DB_PASSWORD }}#g" src/main/resources/application.properties
-
-          # Print the updated file for verification
-          cat ./src/main/resources/application.properties
-
       - name: Run Maven Tests
         id: run
         run: |
-            chmod +x mvnw
-            ./mvnw clean install -DskipTests=false -Dmaven.javadoc.skip=true -Dgpg.skip=true -B -V -e
-            
+          chmod +x mvnw
+          ./mvnw clean install -DskipTests=false -Dmaven.javadoc.skip=true -Dgpg.skip=true -B -V -e
+
       - name: Report Status
         if: always()
         uses: ravsamhq/notify-slack-action@v1

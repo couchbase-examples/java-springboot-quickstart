@@ -76,8 +76,16 @@ class AirlineIntegrationTest {
                 assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
                 Airline airline = response.getBody();
                 assert airline != null;
-                assertThat(airline).isEqualTo(
-                                new Airline("10", "airline", "40-Mile Air", "Q5", "MLA", "MILE-AIR", "United States"));
+                Airline expectedAirline = Airline.builder()
+                                .id("10")
+                                .type("airline")
+                                .name("40-Mile Air")
+                                .iata("Q5")
+                                .icao("MLA")
+                                .callsign("MILE-AIR")
+                                .country("United States")
+                                .build();
+                assertThat(airline).isEqualTo(expectedAirline);
         }
 
         @Test
@@ -162,8 +170,8 @@ class AirlineIntegrationTest {
                 ResponseEntity<List<Airline>> response = restTemplate.exchange(
                                 "/api/v1/airline/list?limit=" + limit + "&offset="
                                                 + offset,
-                                HttpMethod.GET, null, new ParameterizedTypeReference<List<Airline>>() {
-                                });
+                                HttpMethod.GET, null, new ParameterizedTypeReference<>() {
+                        });
                 assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 
                 List<Airline> airlines = response.getBody();
@@ -189,8 +197,8 @@ class AirlineIntegrationTest {
                 ResponseEntity<List<Airline>> response = restTemplate.exchange(
                                 "/api/v1/airline/country/" + country + "?limit=" + limit
                                                 + "&offset=" + offset,
-                                HttpMethod.GET, null, new ParameterizedTypeReference<List<Airline>>() {
-                                });
+                                HttpMethod.GET, null, new ParameterizedTypeReference<>() {
+                        });
                 assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
                 List<Airline> airlines = response.getBody();
                 assertThat(airlines).hasSize(10);
@@ -211,8 +219,8 @@ class AirlineIntegrationTest {
                 ResponseEntity<List<Airline>> response2 = restTemplate.exchange(
                                 "/api/v1/airline/country/" + country + "?limit=" + limit
                                                 + "&offset=" + offset,
-                                HttpMethod.GET, null, new ParameterizedTypeReference<List<Airline>>() {
-                                });
+                                HttpMethod.GET, null, new ParameterizedTypeReference<>() {
+                        });
                 assertThat(response2.getStatusCode()).isEqualTo(HttpStatus.OK);
                 List<Airline> airlines2 = response2.getBody();
                 assertThat(airlines2).hasSize(10);
@@ -258,12 +266,11 @@ class AirlineIntegrationTest {
                         ResponseEntity<List<Airline>> response = restTemplate.exchange(
                                         "/api/v1/airline/destination/" + destinationAirport
                                                         + "?limit=" + limit + "&offset=" + offset,
-                                        HttpMethod.GET, null, new ParameterizedTypeReference<List<Airline>>() {
-                                        });
+                                        HttpMethod.GET, null, new ParameterizedTypeReference<>() {
+                                });
                         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 
                         List<Airline> airlines = response.getBody();
-                        assertThat(airlines).isNotNull();
                         assert airlines != null;
 
                         assertThat(airlines).containsAll(expectedAirlines);

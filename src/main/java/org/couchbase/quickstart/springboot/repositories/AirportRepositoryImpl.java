@@ -2,7 +2,7 @@ package org.couchbase.quickstart.springboot.repositories;
 
 import java.util.List;
 
-import org.couchbase.quickstart.springboot.configs.DBProperties;
+import org.couchbase.quickstart.springboot.configs.CouchbaseConfig;
 import org.couchbase.quickstart.springboot.models.Airport;
 import org.couchbase.quickstart.springboot.models.Route;
 import org.springframework.stereotype.Repository;
@@ -17,16 +17,12 @@ public class AirportRepositoryImpl implements AirportRepository {
 
     private final Cluster cluster;
     private final Collection airportCol;
-    private final DBProperties dbProperties;
+    private final CouchbaseConfig couchbaseConfig;
 
-    @SuppressWarnings("unused")
-    private final Bucket bucket;
-
-    public AirportRepositoryImpl(Cluster cluster, Bucket bucket, DBProperties dbProperties) {
+    public AirportRepositoryImpl(Cluster cluster, Bucket bucket, CouchbaseConfig couchbaseConfig) {
         this.cluster = cluster;
-        this.bucket = bucket;
         this.airportCol = bucket.scope("inventory").collection("airport");
-        this.dbProperties = dbProperties;
+        this.couchbaseConfig = couchbaseConfig;
     }
 
     @Override
@@ -53,7 +49,7 @@ public class AirportRepositoryImpl implements AirportRepository {
 
     @Override
     public List<Airport> findAll(int limit, int offset) {
-        String statement = "SELECT airport.* FROM `" + dbProperties.getBucketName() + "`.`inventory`.`airport` LIMIT "
+        String statement = "SELECT airport.* FROM `" + couchbaseConfig.getBucketName() + "`.`inventory`.`airport` LIMIT "
                 + limit + " OFFSET " + offset;
         return cluster
                 .query(statement, QueryOptions.queryOptions().scanConsistency(QueryScanConsistency.REQUEST_PLUS))
@@ -62,8 +58,8 @@ public class AirportRepositoryImpl implements AirportRepository {
 
     @Override
     public List<Route> findDirectConnections(String airportCode, int limit, int offset) {
-        String statement = "SELECT route.* FROM `" + dbProperties.getBucketName()
-                + "`.`inventory`.`airport` as airport JOIN `" + dbProperties.getBucketName()
+        String statement = "SELECT route.* FROM `" + couchbaseConfig.getBucketName()
+                + "`.`inventory`.`airport` as airport JOIN `" + couchbaseConfig.getBucketName()
                 + "`.`inventory`.`route` as route on route.sourceairport = airport.faa WHERE airport.faa = \""
                 + airportCode + "\" and route.stops = 0 LIMIT " + limit + " OFFSET " + offset;
         return cluster

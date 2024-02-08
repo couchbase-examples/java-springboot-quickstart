@@ -32,5 +32,8 @@ EXPOSE 8080
 # Set the entrypoint command to run the JAR file
 ENTRYPOINT java -jar /app/runner.jar
 
-# docker build -t java-springboot-quickstart .
-# docker run -d --name springboot-container -p 9440:8080 java-springboot-quickstart
+# This Dockerfile is used to build a Docker image for a Java Spring Boot application.
+# To build the image, run:
+#  docker build -t java-springboot-quickstart .
+# To run the container, use:
+#  docker run -d --name springboot-container -p 9440:8080 java-springboot-quickstart -e DB_CONN_STR=<connection_string> -e DB_USERNAME=<username> -e DB_PASSWORD=<password>

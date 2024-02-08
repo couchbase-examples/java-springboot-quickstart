@@ -68,7 +68,7 @@ class RouteIntegrationTest {
         }
 
         @Test
-        void testGetRoute() throws Exception {
+        void testGetRoute() {
                 ResponseEntity<Route> response = restTemplate
                                 .getForEntity("/api/v1/route/route_10001", Route.class);
                 assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -115,7 +115,7 @@ class RouteIntegrationTest {
         }
 
         @Test
-        void testCreateRoute() throws Exception {
+        void testCreateRoute() {
 
                 Route route = Route.builder()
                                 .id("route_create")
@@ -162,7 +162,7 @@ class RouteIntegrationTest {
         }
 
         @Test
-        void testUpdateRoute() throws Exception {
+        void testUpdateRoute() {
 
                 Route route = Route.builder()
                                 .id("route_update")
@@ -250,7 +250,7 @@ class RouteIntegrationTest {
         }
 
         @Test
-        void testDeleteRoute() throws Exception {
+        void testDeleteRoute() {
 
                 Route route = Route.builder()
                                 .id("route_delete")
@@ -297,14 +297,14 @@ class RouteIntegrationTest {
         }
 
         @Test
-        void testListRoutes() throws Exception {
+        void testListRoutes() {
                 int limit = 20;
                 int offset = 0;
 
                 ResponseEntity<List<Route>> response = restTemplate.exchange(
                                 "/api/v1/route/list?limit=" + limit + "&offset=" + offset,
-                                HttpMethod.GET, null, new ParameterizedTypeReference<List<Route>>() {
-                                });
+                                HttpMethod.GET, null, new ParameterizedTypeReference<>() {
+                        });
                 assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 
                 List<Route> routes = response.getBody();

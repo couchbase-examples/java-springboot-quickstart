@@ -78,9 +78,10 @@ class AirportIntegrationTest {
                 assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
                 Airport airport = response.getBody();
                 assert airport != null;
+
                 Airport expectedAirport = Airport.builder().id("1254").type("airport").airportname("Calais Dunkerque")
                                 .city("Calais").country("France").faa("CQF").icao("LFAC").tz("Europe/Paris")
-                                .geo(new Geo(14.0, 50.962097, 1.954764)).build();
+                                .geo(Geo.builder().alt(14.0).lat(50.962097).lon(1.954764).build()).build();
                 assertThat(airport).isEqualTo(expectedAirport);
         }
 
@@ -88,7 +89,7 @@ class AirportIntegrationTest {
         void testCreateAirport() {
                 Airport airport = Airport.builder().id("airport_create").type("airport").airportname("Test Airport")
                                 .city("Test City").country("Test Country").faa("TST").icao("TEST")
-                                .tz("Test Timezone").geo(new Geo(1.0, 2.0, 3.0)).build();
+                                .tz("Test Timezone").geo(Geo.builder().alt(1.0).lat(2.0).lon(3.0).build()).build();
                 ResponseEntity<Airport> response = restTemplate.postForEntity(
                                 "/api/v1/airport/" + airport.getId(), airport,
                                 Airport.class);
@@ -100,17 +101,17 @@ class AirportIntegrationTest {
 
         @Test
         void testUpdateAirport() {
-                Airport airport = Airport.builder().id("airport_update").type("airport")
-                                .airportname("Test Airport").city("Test City")
-                                .country("Test Country").faa("TST").icao("TEST")
-                                .tz("Test Timezone").geo(new Geo(1.0, 2.0, 3.0)).build();
+
+                Airport airport = Airport.builder().id("airport_update").type("airport").airportname("Test Airport")
+                                .city("Test City").country("Test Country").faa("TST").icao("TEST")
+                                .tz("Test Timezone").geo(Geo.builder().alt(1.0).lat(2.0).lon(3.0).build()).build();
                 restTemplate.postForEntity("/api/v1/airport/" + airport.getId(), airport, Airport.class);
 
                 Airport updatedAirport = Airport.builder().id("airport_update").type("airport")
                                 .airportname("Updated Test Airport").city("Updated Test City")
                                 .country("Updated Test Country").faa("TST").icao("TEST")
-                                .tz("Updated Test Timezone").geo(new Geo(1.0, 2.0, 3.0)).build();
-
+                                .tz("Updated Test Timezone").geo(Geo.builder().alt(1.0).lat(2.0).lon(3.0).build()).build();
+                        
                 HttpEntity<Airport> requestEntity = new HttpEntity<>(updatedAirport);
                 ResponseEntity<Airport> responseEntity = restTemplate.exchange("/api/v1/airport/" + updatedAirport.getId(),
                                 HttpMethod.PUT, requestEntity, Airport.class);
@@ -125,7 +126,7 @@ class AirportIntegrationTest {
         void testDeleteAirport() {
                 Airport airport = Airport.builder().id("airport_delete").type("airport").airportname("Test Airport")
                                 .city("Test City").country("Test Country").faa("TST").icao("TEST")
-                                .tz("Test Timezone").geo(new Geo(1.0, 2.0, 3.0)).build();
+                                .tz("Test Timezone").geo(Geo.builder().alt(1.0).lat(2.0).lon(3.0).build()).build();
                 restTemplate.postForEntity("/api/v1/airport/" + airport.getId(), airport,
                                 Airport.class);
                 restTemplate.delete("/api/v1/airport/" + airport.getId());
@@ -143,8 +144,8 @@ class AirportIntegrationTest {
                 ResponseEntity<List<Airport>> response = restTemplate.exchange(
                                 "/api/v1/airport/list?limit=" + limit + "&offset="
                                                 + offset,
-                                HttpMethod.GET, null, new ParameterizedTypeReference<List<Airport>>() {
-                                });
+                                HttpMethod.GET, null, new ParameterizedTypeReference<>() {
+                        });
                 assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 
                 List<Airport> airports = response.getBody();
@@ -173,8 +174,8 @@ class AirportIntegrationTest {
                         ResponseEntity<List<String>> response = restTemplate.exchange(
                                         "/api/v1/airport/direct-connections/" + airportCode
                                                         + "?limit=" + limit + "&offset=" + offset,
-                                        HttpMethod.GET, null, new ParameterizedTypeReference<List<String>>() {
-                                        });
+                                        HttpMethod.GET, null, new ParameterizedTypeReference<>() {
+                                });
                         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 
                         List<String> routes = response.getBody();
