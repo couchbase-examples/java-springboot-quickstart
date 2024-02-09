@@ -1,4 +1,4 @@
-# Quickstart in Couchbase with Spring Boot and Java
+t# Quickstart in Couchbase with Spring Boot and Java
 
 #### REST API using Couchbase Capella in Java using Spring Boot
 
@@ -43,7 +43,7 @@ mvn clean install -DskipTests=true
 
 Note: The `-DskipTests=true` option is used to skip the tests. The tests require the application to be running.
 
-Note: The application is tested with Java 11. If you are using a different version of Java, please update the `pom.xml` file accordingly.
+Note: The application is tested with Java 17 and 21. If you are using a different version of Java, please update the `pom.xml` file accordingly.
 
 ### Setup Database Configuration
 
@@ -137,7 +137,7 @@ mvn test -Dtest=org.couchbase.quickstart.springboot.controllers.AirportIntegrati
 To run the tests for the RouteIntegrationTest class:
 
 ```sh
-mvn test -Dtest=org.couchbase.quickstart.springboot.controllers.Rout
+mvn test -Dtest=org.couchbase.quickstart.springboot.controllers.RouteIntegrationTest
 ```
 
 ## Appendix
