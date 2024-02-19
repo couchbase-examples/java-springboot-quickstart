@@ -202,9 +202,8 @@ class RouteIntegrationTest {
 
                 restTemplate.postForEntity("/api/v1/route/" + route.getId(), route,
                                 Route.class);
-                
-                Route updatedRoute = Route.builder().
-                                id("route_update")
+
+                Route updatedRoute = Route.builder().id("route_update")
                                 .type("route")
                                 .airline("updated_airline")
                                 .airlineid("updated_airlineid")
@@ -304,7 +303,7 @@ class RouteIntegrationTest {
                 ResponseEntity<List<Route>> response = restTemplate.exchange(
                                 "/api/v1/route/list?limit=" + limit + "&offset=" + offset,
                                 HttpMethod.GET, null, new ParameterizedTypeReference<>() {
-                        });
+                                });
                 assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 
                 List<Route> routes = response.getBody();

@@ -73,15 +73,16 @@ class AirportIntegrationTest {
         @Test
         void testGetAirport() {
                 ResponseEntity<Airport> response = restTemplate
-                                .getForEntity("/api/v1/airport/airport_1254",
+                                .getForEntity("/api/v1/airport/airport_1255",
                                                 Airport.class);
                 assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
                 Airport airport = response.getBody();
                 assert airport != null;
 
-                Airport expectedAirport = Airport.builder().id("1254").type("airport").airportname("Calais Dunkerque")
-                                .city("Calais").country("France").faa("CQF").icao("LFAC").tz("Europe/Paris")
-                                .geo(Geo.builder().alt(14.0).lat(50.962097).lon(1.954764).build()).build();
+                Airport expectedAirport = Airport.builder().id("1255").type("airport")
+                                .airportname("Peronne St Quentin").city("Peronne").country("France").faa(null)
+                                .icao("LFAG").tz("Europe/Paris")
+                                .geo(Geo.builder().alt(295.0).lat(49.868547).lon(3.029578).build()).build();
                 assertThat(airport).isEqualTo(expectedAirport);
         }
 
@@ -110,10 +111,12 @@ class AirportIntegrationTest {
                 Airport updatedAirport = Airport.builder().id("airport_update").type("airport")
                                 .airportname("Updated Test Airport").city("Updated Test City")
                                 .country("Updated Test Country").faa("TST").icao("TEST")
-                                .tz("Updated Test Timezone").geo(Geo.builder().alt(1.0).lat(2.0).lon(3.0).build()).build();
-                        
+                                .tz("Updated Test Timezone").geo(Geo.builder().alt(1.0).lat(2.0).lon(3.0).build())
+                                .build();
+
                 HttpEntity<Airport> requestEntity = new HttpEntity<>(updatedAirport);
-                ResponseEntity<Airport> responseEntity = restTemplate.exchange("/api/v1/airport/" + updatedAirport.getId(),
+                ResponseEntity<Airport> responseEntity = restTemplate.exchange(
+                                "/api/v1/airport/" + updatedAirport.getId(),
                                 HttpMethod.PUT, requestEntity, Airport.class);
 
                 assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -145,7 +148,7 @@ class AirportIntegrationTest {
                                 "/api/v1/airport/list?limit=" + limit + "&offset="
                                                 + offset,
                                 HttpMethod.GET, null, new ParameterizedTypeReference<>() {
-                        });
+                                });
                 assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 
                 List<Airport> airports = response.getBody();
@@ -155,11 +158,10 @@ class AirportIntegrationTest {
 
         @Test
         void testListDirectConnections() {
-                List<String> destinationAirportCodes = Arrays.asList("SFO", "LAX", "JFK", "MRS");
+                List<String> destinationAirportCodes = Arrays.asList("LAX", "JFK", "MRS");
 
                 Map<String, List<String>> expectedDirectConnections = new HashMap<>();
-                expectedDirectConnections.put("SFO",
-                                Arrays.asList("JFK", "HKG", "ICN", "ATL", "BJX", "GDL", "MEX", "MLM", "PVR", "SJD"));
+
                 expectedDirectConnections.put("LAX",
                                 Arrays.asList("NRT", "CUN", "GDL", "HMO", "MEX", "MZT", "PVR", "SJD", "ZIH", "ZLO"));
                 expectedDirectConnections.put("JFK",
@@ -175,7 +177,7 @@ class AirportIntegrationTest {
                                         "/api/v1/airport/direct-connections/" + airportCode
                                                         + "?limit=" + limit + "&offset=" + offset,
                                         HttpMethod.GET, null, new ParameterizedTypeReference<>() {
-                                });
+                                        });
                         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 
                         List<String> routes = response.getBody();

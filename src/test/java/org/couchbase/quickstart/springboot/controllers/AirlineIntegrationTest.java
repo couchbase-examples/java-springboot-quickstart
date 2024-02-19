@@ -133,7 +133,8 @@ class AirlineIntegrationTest {
                                 .build();
 
                 HttpEntity<Airline> requestEntity = new HttpEntity<>(updatedAirline);
-                ResponseEntity<Airline> responseEntity = restTemplate.exchange("/api/v1/airline/" + updatedAirline.getId(),
+                ResponseEntity<Airline> responseEntity = restTemplate.exchange(
+                                "/api/v1/airline/" + updatedAirline.getId(),
                                 HttpMethod.PUT, requestEntity, Airline.class);
 
                 assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -171,7 +172,7 @@ class AirlineIntegrationTest {
                                 "/api/v1/airline/list?limit=" + limit + "&offset="
                                                 + offset,
                                 HttpMethod.GET, null, new ParameterizedTypeReference<>() {
-                        });
+                                });
                 assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 
                 List<Airline> airlines = response.getBody();
@@ -198,7 +199,7 @@ class AirlineIntegrationTest {
                                 "/api/v1/airline/country/" + country + "?limit=" + limit
                                                 + "&offset=" + offset,
                                 HttpMethod.GET, null, new ParameterizedTypeReference<>() {
-                        });
+                                });
                 assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
                 List<Airline> airlines = response.getBody();
                 assertThat(airlines).hasSize(10);
@@ -220,7 +221,7 @@ class AirlineIntegrationTest {
                                 "/api/v1/airline/country/" + country + "?limit=" + limit
                                                 + "&offset=" + offset,
                                 HttpMethod.GET, null, new ParameterizedTypeReference<>() {
-                        });
+                                });
                 assertThat(response2.getStatusCode()).isEqualTo(HttpStatus.OK);
                 List<Airline> airlines2 = response2.getBody();
                 assertThat(airlines2).hasSize(10);
@@ -267,7 +268,7 @@ class AirlineIntegrationTest {
                                         "/api/v1/airline/destination/" + destinationAirport
                                                         + "?limit=" + limit + "&offset=" + offset,
                                         HttpMethod.GET, null, new ParameterizedTypeReference<>() {
-                                });
+                                        });
                         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 
                         List<Airline> airlines = response.getBody();
