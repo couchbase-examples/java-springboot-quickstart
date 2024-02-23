@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 import com.couchbase.client.java.Bucket;
 import com.couchbase.client.java.Cluster;
 import com.couchbase.client.java.Collection;
+import com.couchbase.client.java.json.JsonArray;
 import com.couchbase.client.java.query.QueryOptions;
 import com.couchbase.client.java.query.QueryScanConsistency;
 
@@ -49,10 +50,12 @@ public class AirportRepositoryImpl implements AirportRepository {
 
     @Override
     public List<Airport> findAll(int limit, int offset) {
-        String statement = "SELECT airport.* FROM `" + couchbaseConfig.getBucketName() + "`.`inventory`.`airport` LIMIT "
-                + limit + " OFFSET " + offset;
+        String statement = "SELECT airport.* FROM `" + couchbaseConfig.getBucketName()
+                + "`.`inventory`.`airport` LIMIT $1 OFFSET $2";
         return cluster
-                .query(statement, QueryOptions.queryOptions().scanConsistency(QueryScanConsistency.REQUEST_PLUS))
+                .query(statement,
+                        QueryOptions.queryOptions().parameters(JsonArray.from(limit, offset))
+                                .scanConsistency(QueryScanConsistency.REQUEST_PLUS))
                 .rowsAs(Airport.class);
     }
 
@@ -60,11 +63,12 @@ public class AirportRepositoryImpl implements AirportRepository {
     public List<Route> findDirectConnections(String airportCode, int limit, int offset) {
         String statement = "SELECT route.* FROM `" + couchbaseConfig.getBucketName()
                 + "`.`inventory`.`airport` as airport JOIN `" + couchbaseConfig.getBucketName()
-                + "`.`inventory`.`route` as route on route.sourceairport = airport.faa WHERE airport.faa = \""
-                + airportCode + "\" and route.stops = 0 LIMIT " + limit + " OFFSET " + offset;
+                + "`.`inventory`.`route` as route on route.sourceairport = airport.faa WHERE airport.faa = $1 and route.stops = 0 LIMIT $2 OFFSET $3";
         return cluster
-                .query(statement, QueryOptions.queryOptions().scanConsistency(QueryScanConsistency.REQUEST_PLUS))
+                .query(statement,
+                        QueryOptions.queryOptions().parameters(JsonArray.from(airportCode, limit, offset))
+                                .scanConsistency(QueryScanConsistency.REQUEST_PLUS))
                 .rowsAs(Route.class);
-
     }
+
 }

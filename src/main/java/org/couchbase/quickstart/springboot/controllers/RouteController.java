@@ -2,12 +2,8 @@ package org.couchbase.quickstart.springboot.controllers;
 
 import java.util.List;
 
-// import javax.validation.Valid;
-import jakarta.validation.Valid;
-
 import org.couchbase.quickstart.springboot.models.Route;
 import org.couchbase.quickstart.springboot.services.RouteService;
-import org.springframework.context.annotation.Description;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -24,6 +20,10 @@ import com.couchbase.client.core.error.DocumentExistsException;
 import com.couchbase.client.core.error.DocumentNotFoundException;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 
 @RestController
@@ -42,8 +42,14 @@ public class RouteController {
     private static final String DOCUMENT_NOT_FOUND = "Document Not Found";
 
     @GetMapping("/{id}")
-    @Operation(summary = "Get a route by ID")
-    @Description(value = "Get Route by specified ID.\n\nThis provides an example of using Key Value operations in Couchbase to retrieve a document with a specified ID. \n\n Code: [`controllers/RouteController.java`](https://github.com/couchbase-examples/java-springboot-quickstart/blob/master/src/main/java/org/couchbase/quickstart/springboot/controllers/RouteController.java) \n File: `RouteController.java` \n Method: `getRoute`")
+    @Operation(summary = "Get a route by ID", description = "Get Route by specified ID.\n\nThis provides an example of using Key Value operations in Couchbase to retrieve a document with a specified ID. \n\n Code: [`controllers/RouteController.java`](https://github.com/couchbase-examples/java-springboot-quickstart/blob/main/src/main/java/org/couchbase/quickstart/springboot/controllers/RouteController.java) \n File: `RouteController.java` \n Method: `getRoute`", tags = {
+            "Route" })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Route found"),
+            @ApiResponse(responseCode = "404", description = "Route not found"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    @Parameter(name = "id", description = "Route ID", required = true, example = "route_10000")
     public ResponseEntity<Route> getRoute(@PathVariable String id) {
         try {
             Route route = routeService.getRouteById(id);
@@ -63,8 +69,14 @@ public class RouteController {
     }
 
     @PostMapping("/{id}")
-    @Operation(summary = "Create a route")
-    @Description(value = "Create a new Route.\n\nThis provides an example of using Key Value operations in Couchbase to create a new document with a specified ID. \n\n Code: [`controllers/RouteController.java`](https://github.com/couchbase-examples/java-springboot-quickstart/blob/master/src/main/java/org/couchbase/quickstart/springboot/controllers/RouteController.java) \n File: `RouteController.java` \n Method: `createRoute`")
+    @Operation(summary = "Create a route", description = "Create a Route.\n\nThis provides an example of using Key Value operations in Couchbase to create a new document with a specified ID. \n\n Code: [`controllers/RouteController.java`](https://github.com/couchbase-examples/java-springboot-quickstart/blob/main/src/main/java/org/couchbase/quickstart/springboot/controllers/RouteController.java) \n File: `RouteController.java` \n Method: `createRoute`", tags = {
+            "Route" })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Route created"),
+            @ApiResponse(responseCode = "409", description = "Route already exists"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    @Parameter(name = "id", description = "Route ID", required = true, example = "route_10000")
     public ResponseEntity<Route> createRoute(@PathVariable String id, @Valid @RequestBody Route route) {
         try {
             Route newRoute = routeService.createRoute(route);
@@ -80,8 +92,14 @@ public class RouteController {
     }
 
     @PutMapping("/{id}")
-    @Operation(summary = "Update a route")
-    @Description(value = "Update a Route.\n\nThis provides an example of using Key Value operations in Couchbase to update a document with a specified ID. \n\n Code: [`controllers/RouteController.java`](https://github.com/couchbase-examples/java-springboot-quickstart/blob/master/src/main/java/org/couchbase/quickstart/springboot/controllers/RouteController.java) \n File: `RouteController.java` \n Method: `updateRoute`")
+    @Operation(summary = "Update a route", description = "Update a Route.\n\nThis provides an example of using Key Value operations in Couchbase to update a document with a specified ID. \n\n Code: [`controllers/RouteController.java`](https://github.com/couchbase-examples/java-springboot-quickstart/blob/main/src/main/java/org/couchbase/quickstart/springboot/controllers/RouteController.java) \n File: `RouteController.java` \n Method: `updateRoute`", tags = {
+            "Route" })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Route updated"),
+            @ApiResponse(responseCode = "404", description = "Route not found"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    @Parameter(name = "id", description = "Route ID", required = true, example = "route_10000")
     public ResponseEntity<Route> updateRoute(@PathVariable String id, @Valid @RequestBody Route route) {
         try {
             Route updatedRoute = routeService.updateRoute(id, route);
@@ -100,8 +118,14 @@ public class RouteController {
     }
 
     @DeleteMapping("/{id}")
-    @Operation(summary = "Delete a route")
-    @Description(value = "Delete a Route.\n\nThis provides an example of using Key Value operations in Couchbase to delete a document with a specified ID. \n\n Code: [`controllers/RouteController.java`](https://github.com/couchbase-examples/java-springboot-quickstart/blob/master/src/main/java/org/couchbase/quickstart/springboot/controllers/RouteController.java) \n File: `RouteController.java` \n Method: `deleteRoute`")
+    @Operation(summary = "Delete a route", description = "Delete a Route.\n\nThis provides an example of using Key Value operations in Couchbase to delete a document with a specified ID. \n\n Code: [`controllers/RouteController.java`](https://github.com/couchbase-examples/java-springboot-quickstart/blob/main/src/main/java/org/couchbase/quickstart/springboot/controllers/RouteController.java) \n File: `RouteController.java` \n Method: `deleteRoute`", tags = {
+            "Route" })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Route deleted"),
+            @ApiResponse(responseCode = "404", description = "Route not found"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    @Parameter(name = "id", description = "Route ID", required = true, example = "route_10000")
     public ResponseEntity<Void> deleteRoute(@PathVariable String id) {
         try {
             routeService.deleteRoute(id);
@@ -116,8 +140,12 @@ public class RouteController {
     }
 
     @GetMapping("/list")
-    @Operation(summary = "List all routes")
-    @Description(value = "List all Routes.\n\nThis provides an example of using Key Value operations in Couchbase to list all documents. \n\n Code: [`controllers/RouteController.java`](https://github.com/couchbase-examples/java-springboot-quickstart/blob/master/src/main/java/org/couchbase/quickstart/springboot/controllers/RouteController.java) \n File: `RouteController.java` \n Method: `listRoutes`")
+    @Operation(summary = "List all routes", description = "List all Routes.\n\nThis provides an example of using N1QL queries in Couchbase to retrieve all documents of a specified type. \n\n Code: [`controllers/RouteController.java`](https://github.com/couchbase-examples/java-springboot-quickstart/blob/main/src/main/java/org/couchbase/quickstart/springboot/controllers/RouteController.java) \n File: `RouteController.java` \n Method: `listRoutes`", tags = {
+            "Route" })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Routes found"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
     public ResponseEntity<List<Route>> listRoutes(
             @RequestParam(defaultValue = "10") int limit,
             @RequestParam(defaultValue = "0") int offset) {

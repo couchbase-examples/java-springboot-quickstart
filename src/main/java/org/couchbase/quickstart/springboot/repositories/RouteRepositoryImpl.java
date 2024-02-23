@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 import com.couchbase.client.java.Bucket;
 import com.couchbase.client.java.Cluster;
 import com.couchbase.client.java.Collection;
+import com.couchbase.client.java.json.JsonArray;
 import com.couchbase.client.java.query.QueryOptions;
 import com.couchbase.client.java.query.QueryScanConsistency;
 
@@ -49,10 +50,12 @@ public class RouteRepositoryImpl implements RouteRepository {
 
     @Override
     public List<Route> findAll(int limit, int offset) {
-        String statement = "SELECT route.* FROM `" + couchbaseConfig.getBucketName() + "`.`inventory`.`route` LIMIT "
-                + limit + " OFFSET " + offset;
+        String statement = "SELECT route.* FROM `" + couchbaseConfig.getBucketName()
+                + "`.`inventory`.`route` LIMIT $1 OFFSET $2";
         return cluster
-                .query(statement, QueryOptions.queryOptions().scanConsistency(QueryScanConsistency.REQUEST_PLUS))
+                .query(statement,
+                        QueryOptions.queryOptions().parameters(JsonArray.from(limit, offset))
+                                .scanConsistency(QueryScanConsistency.REQUEST_PLUS))
                 .rowsAs(Route.class);
     }
 }
