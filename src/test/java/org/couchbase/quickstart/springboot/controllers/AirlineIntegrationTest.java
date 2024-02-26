@@ -196,8 +196,7 @@ class AirlineIntegrationTest {
                 int limit = 10;
                 int offset = 0;
                 ResponseEntity<List<Airline>> response = restTemplate.exchange(
-                                "/api/v1/airline/country/" + country + "?limit=" + limit
-                                                + "&offset=" + offset,
+                                "/api/v1/airline/list?country=" + country + "&limit=" + limit + "&offset=" + offset,
                                 HttpMethod.GET, null, new ParameterizedTypeReference<>() {
                                 });
                 assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -218,8 +217,7 @@ class AirlineIntegrationTest {
 
                 country = "France";
                 ResponseEntity<List<Airline>> response2 = restTemplate.exchange(
-                                "/api/v1/airline/country/" + country + "?limit=" + limit
-                                                + "&offset=" + offset,
+                                "/api/v1/airline/list?country=" + country + "&limit=" + limit + "&offset=" + offset,
                                 HttpMethod.GET, null, new ParameterizedTypeReference<>() {
                                 });
                 assertThat(response2.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -265,8 +263,8 @@ class AirlineIntegrationTest {
                         List<Airline> expectedAirlines = entry.getValue();
 
                         ResponseEntity<List<Airline>> response = restTemplate.exchange(
-                                        "/api/v1/airline/destination/" + destinationAirport
-                                                        + "?limit=" + limit + "&offset=" + offset,
+                                        "/api/v1/airline/to-airport?destinationAirport=" + destinationAirport
+                                                        + "&limit=" + limit + "&offset=" + offset,
                                         HttpMethod.GET, null, new ParameterizedTypeReference<>() {
                                         });
                         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);

@@ -31,6 +31,12 @@ We will walk through the different steps required to get the application running
 git clone https://github.com/couchbase-examples/java-springboot-quickstart.git
 ```
 
+### Navigate to the Project Directory
+
+```shell
+cd java-springboot-quickstart
+```
+
 ### Install Dependencies
 
 The dependencies for the application are specified in the `pom.xml` file in the root folder. Dependencies can be installed through `mvn` the default package manager for Java.

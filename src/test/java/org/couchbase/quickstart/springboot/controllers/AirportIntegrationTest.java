@@ -174,8 +174,8 @@ class AirportIntegrationTest {
                         int offset = 0;
 
                         ResponseEntity<List<String>> response = restTemplate.exchange(
-                                        "/api/v1/airport/direct-connections/" + airportCode
-                                                        + "?limit=" + limit + "&offset=" + offset,
+                                        "/api/v1/airport/direct-connections?airportCode=" + airportCode + "&limit="
+                                                        + limit + "&offset=" + offset,
                                         HttpMethod.GET, null, new ParameterizedTypeReference<>() {
                                         });
                         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
