@@ -15,7 +15,7 @@ To run this prebuilt project, you will need:
 
 - [Couchbase Capella](https://www.couchbase.com/products/capella/) cluster with [travel-sample](https://docs.couchbase.com/java-sdk/current/ref/travel-app-data-model.html) bucket loaded.
   - To run this tutorial using a self-managed Couchbase cluster, please refer to the [appendix](#running-self-managed-couchbase-cluster).
-- [Java SDK 17+](
+- [Java SDK 17+](https://www.oracle.com/in/java/technologies/downloads/#java17)
   - Ensure that the Java version is compatible with the Couchbase SDK. [Please check the link for compatibility](https://docs.couchbase.com/java-sdk/current/project-docs/compatibility.html#jdk-compat)
 - Loading Travel Sample Bucket:
   - If `travel-sample` is not loaded in your Capella cluster, you can load it by following the instructions for your Capella Cluster. [Load travel-sample bucket in Couchbase Capella](https://docs.couchbase.com/cloud/clusters/data-service/import-data-documents.html#import-sample-data)
