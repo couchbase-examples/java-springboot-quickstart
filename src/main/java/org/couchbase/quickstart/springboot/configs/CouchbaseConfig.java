@@ -2,6 +2,8 @@ package org.couchbase.quickstart.springboot.configs;
 
 import java.time.Duration;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,11 +14,12 @@ import com.couchbase.client.java.Bucket;
 import com.couchbase.client.java.Cluster;
 
 import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
+
 @Configuration
-@Slf4j
 @Getter
 public class CouchbaseConfig {
+
+    private static final Logger log = LoggerFactory.getLogger(CouchbaseConfig.class);
 
     @Value("#{systemEnvironment['DB_CONN_STR'] ?: '${spring.couchbase.bootstrap-hosts:localhost}'}")
     private String host;

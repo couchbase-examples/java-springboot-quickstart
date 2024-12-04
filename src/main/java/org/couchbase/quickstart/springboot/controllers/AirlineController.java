@@ -4,6 +4,8 @@ import java.util.List;
 
 import org.couchbase.quickstart.springboot.models.Airline;
 import org.couchbase.quickstart.springboot.services.AirlineService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -24,12 +26,12 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
-import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @RequestMapping("/api/v1/airline")
-@Slf4j
 public class AirlineController {
+
+    private static final Logger log = LoggerFactory.getLogger(AirlineController.class);
 
     private final AirlineService airlineService;
 

@@ -6,6 +6,8 @@ import java.util.stream.Collectors;
 import org.couchbase.quickstart.springboot.models.Airport;
 import org.couchbase.quickstart.springboot.models.Route;
 import org.couchbase.quickstart.springboot.services.AirportService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -26,12 +28,12 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
-import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @RequestMapping("/api/v1/airport")
-@Slf4j
 public class AirportController {
+
+    private static final Logger log = LoggerFactory.getLogger(AirportController.class);
 
     private final AirportService airportService;
 
@@ -181,5 +183,4 @@ public class AirportController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
 }
