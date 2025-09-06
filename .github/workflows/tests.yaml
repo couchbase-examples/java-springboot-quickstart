@@ -13,19 +13,17 @@ jobs:
   run_tests:
     name: Run Tests
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     env:
       DB_CONN_STR: ${{ vars.DB_CONN_STR }}
       DB_USERNAME: ${{ vars.DB_USERNAME }}
       DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
     strategy:
+      fail-fast: false
       matrix:
         java-version: ["17", "21"]
     steps:
-      - name: Update repositories
-        run: |
-          sudo apt update || echo "apt-update failed" # && apt -y upgrade
-
-      - name: Checkout ${{ github.event.repository.name }}
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Set up JDK ${{ matrix.java-version }}
@@ -35,11 +33,22 @@ jobs:
           distribution: "temurin"
           cache: "maven"
 
+      - name: Make Maven wrapper executable
+        run: chmod +x mvnw
+
       - name: Run Maven Tests
         id: run
-        run: |
-          chmod +x mvnw
-          ./mvnw clean install -DskipTests=false -Dmaven.javadoc.skip=true -Dgpg.skip=true -B -V -e
+        run: ./mvnw clean test -B
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-java-${{ matrix.java-version }}
+          path: |
+            target/surefire-reports/
+            target/failsafe-reports/
+          retention-days: 7
 
       - name: Report Status
         if: always()
