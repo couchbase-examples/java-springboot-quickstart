@@ -78,7 +78,7 @@ class AirlineIntegrationTest {
                 assert airline != null;
                 Airline expectedAirline = Airline.builder()
                                 .id("10")
-                                .type("airlinb")
+                                .type("airline")
                                 .name("40-Mile Air")
                                 .iata("Q5")
                                 .icao("MLA")
