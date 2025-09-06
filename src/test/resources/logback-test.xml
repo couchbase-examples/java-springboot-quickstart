@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <!-- Console appender for test output -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- Set root logger to INFO level (reduces noise) -->
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+    </root>
+
+    <!-- Suppress noisy Spring Framework warnings during tests -->
+    <logger name="org.springframework.context.support.AbstractApplicationContext" level="ERROR"/>
+    <logger name="org.springframework.beans.factory.support.DefaultListableBeanFactory" level="ERROR"/>
+    <logger name="org.springframework.boot.autoconfigure.AutoConfigurationPackages" level="ERROR"/>
+    <logger name="org.springframework.data.repository.config.RepositoryConfigurationDelegate" level="ERROR"/>
+    
+    <!-- Suppress Couchbase client noise -->
+    <logger name="com.couchbase" level="WARN"/>
+    <logger name="com.couchbase.tracing" level="ERROR"/>
+    <logger name="com.couchbase.client.core.compression.snappy.SnappyHelper" level="ERROR"/>
+    
+    <!-- Suppress Spring Data pagination warning -->
+    <logger name="org.springframework.data.web.config.PageableHandlerMethodArgumentResolverCustomizer" level="ERROR"/>
+    <logger name="org.springframework.data.web.config.HateoasAwareSpringDataWebConfiguration" level="ERROR"/>
+    
+    <!-- Suppress Jakarta persistence warnings -->
+    <logger name="jakarta.persistence.spi" level="ERROR"/>
+    
+    <!-- Suppress Spring Boot DevTools noise -->
+    <logger name="org.springframework.boot.devtools" level="ERROR"/>
+    
+    <!-- Suppress Tomcat initialization noise in tests -->
+    <logger name="org.apache.catalina" level="WARN"/>
+    <logger name="org.springframework.boot.web.embedded.tomcat" level="WARN"/>
+    
+    <!-- Keep our application logs at appropriate levels -->
+    <logger name="org.couchbase.quickstart.springboot" level="INFO"/>
+    
+    <!-- Show test-related logs for debugging when needed -->
+    <logger name="org.couchbase.quickstart.springboot.controllers" level="WARN"/>
+    
+    <!-- Suppress JVM warnings -->
+    <logger name="jdk.internal" level="ERROR"/>
+</configuration>

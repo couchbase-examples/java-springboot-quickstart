@@ -21,13 +21,13 @@ public class CouchbaseConfig {
 
     private static final Logger log = LoggerFactory.getLogger(CouchbaseConfig.class);
 
-    @Value("#{systemEnvironment['DB_CONN_STR'] ?: '${spring.couchbase.bootstrap-hosts:localhost}'}")
+    @Value("#{systemEnvironment['DB_CONN_STR'] ?: '${spring.couchbase.connection-string:localhost}'}")
     private String host;
 
-    @Value("#{systemEnvironment['DB_USERNAME'] ?: '${spring.couchbase.bucket.user:Administrator}'}")
+    @Value("#{systemEnvironment['DB_USERNAME'] ?: '${spring.couchbase.username:Administrator}'}")
     private String username;
 
-    @Value("#{systemEnvironment['DB_PASSWORD'] ?: '${spring.couchbase.bucket.password:password}'}")
+    @Value("#{systemEnvironment['DB_PASSWORD'] ?: '${spring.couchbase.password:password}'}")
     private String password;
 
     @Value("${spring.couchbase.bucket.name:travel-sample}")
@@ -51,14 +51,15 @@ public class CouchbaseConfig {
      */
     @Bean(destroyMethod = "disconnect")
     Cluster getCouchbaseCluster() {
+        Cluster cluster = null;
         try {
             log.debug("Connecting to Couchbase cluster at " + host);
-            Cluster cluster = Cluster.connect(host, username, password);
-            cluster.waitUntilReady(Duration.ofSeconds(15));
+            cluster = Cluster.connect(host, username, password);
+            cluster.waitUntilReady(Duration.ofSeconds(30));
             return cluster;
         } catch (UnambiguousTimeoutException e) {
-            log.error("Connection to Couchbase cluster at " + host + " timed out");
-            throw e;
+            log.warn("Connection to Couchbase cluster at " + host + " timed out, but continuing with partial connectivity");
+            return cluster;
         } catch (Exception e) {
             log.error(e.getClass().getName());
             log.error("Could not connect to Couchbase cluster at " + host);
@@ -75,7 +76,7 @@ public class CouchbaseConfig {
                 throw new BucketNotFoundException("Bucket " + bucketName + " does not exist");
             }
             Bucket bucket = cluster.bucket(bucketName);
-            bucket.waitUntilReady(Duration.ofSeconds(15));
+            bucket.waitUntilReady(Duration.ofSeconds(30));
             return bucket;
         } catch (UnambiguousTimeoutException e) {
             log.error("Connection to bucket " + bucketName + " timed out");

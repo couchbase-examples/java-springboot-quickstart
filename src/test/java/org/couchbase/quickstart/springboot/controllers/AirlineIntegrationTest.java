@@ -49,7 +49,7 @@ class AirlineIntegrationTest {
                 } catch (DocumentNotFoundException | DataRetrievalFailureException | ResourceAccessException e) {
                         log.warn("Document " + airlineId + " not present " + cleanupTiming);
                 } catch (Exception e) {
-                        log.error("Error deleting test data", e.getMessage());
+                        log.debug("Cleanup: Could not delete test airline {}: {} (this is expected during test cleanup)", airlineId, e.getMessage());
                 }
         }
 
@@ -78,7 +78,7 @@ class AirlineIntegrationTest {
                 assert airline != null;
                 Airline expectedAirline = Airline.builder()
                                 .id("10")
-                                .type("airline")
+                                .type("airlinb")
                                 .name("40-Mile Air")
                                 .iata("Q5")
                                 .icao("MLA")

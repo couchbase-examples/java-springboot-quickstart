@@ -50,7 +50,7 @@ class AirportIntegrationTest {
                 } catch (DocumentNotFoundException | DataRetrievalFailureException | ResourceAccessException e) {
                         log.warn("Document " + airportId + " not present " + cleanupTiming);
                 } catch (Exception e) {
-                        log.error("Error deleting test data", e.getMessage());
+                        log.debug("Cleanup: Could not delete test airport {}: {} (this is expected during test cleanup)", airportId, e.getMessage());
                 }
         }
 

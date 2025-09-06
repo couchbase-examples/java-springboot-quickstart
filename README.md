@@ -63,20 +63,24 @@ All configuration for communication with the database is read from the applicati
 ```properties
 spring.mvc.pathmatch.matching-strategy=ANT_PATH_MATCHER
 spring.couchbase.bucket.name=travel-sample
-spring.couchbase.bootstrap-hosts=DB_CONN_STR
-spring.couchbase.bucket.user=DB_USERNAME
-spring.couchbase.bucket.password=DB_PASSWORD
+spring.couchbase.connection-string=${DB_CONN_STR}
+spring.couchbase.username=${DB_USERNAME}
+spring.couchbase.password=${DB_PASSWORD}
 ```
 
-Instead of the DB_CONN_STR, DB_USERNAME and DB_PASSWORD, you need to add the values for the Couchbase connection.
+The application uses environment variables for database configuration. You can set these in your system environment or create a `.env` file in the project root:
+
+```env
+DB_CONN_STR=couchbases://your-cluster.cloud.couchbase.com
+DB_USERNAME=your-username
+DB_PASSWORD=your-password
+```
 
 > Note: The connection string expects the `couchbases://` or `couchbase://` part.
 
-You can also use your system environment variables to set the properties. The properties are read from the environment variables if they are set. The properties are read from the `application.properties` file if the environment variables are not set.
-
 ## Running The Application
 
-You can add environment variables DB_CONN_STR, DB_USERNAME and DB_PASSWORD to your system environment variables or you can update the `application.properties` file in the `src/main/resources` folder.
+The application will automatically load environment variables from a `.env` file if present, or use system environment variables.
 
 ### Directly on Machine
 
@@ -100,8 +104,7 @@ Run the Docker image
 docker run -d --name springboot-container -p 9440:8080 java-springboot-quickstart -e DB_CONN_STR=<connection_string> -e DB_USERNAME=<username> -e DB_PASSWORD=<password>
 ```
 
-Note: The `application.properties` file has the connection information to connect to your Capella cluster. You can also pass the connection information as environment variables to the Docker container.
-If you choose not to pass the environment variables, you can update the `application.properties` file in the `src/main/resources` folder.
+Note: You can pass the connection information as environment variables to the Docker container or include a `.env` file in your Docker build context.
 
 ### Verifying the Application
 
@@ -168,7 +171,7 @@ If you would like to add another entity to the APIs, these are the steps to foll
 
 If you are running this quickstart with a self-managed Couchbase cluster, you need to [load](https://docs.couchbase.com/server/current/manage/manage-settings/install-sample-buckets.html) the travel-sample data bucket in your cluster and generate the credentials for the bucket.
 
-You need to update the connection string and the credentials in the `application.properties` file in the `src/main/resources` folder.
+You need to set the connection string and credentials using environment variables or a `.env` file as described above.
 
 Note: Couchbase Server version 7 or higher must be installed and running before running the Spring Boot Java app.
 

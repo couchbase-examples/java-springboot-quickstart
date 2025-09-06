@@ -1,6 +1,7 @@
 *.iml
 .docker/
 .vscode/
+.env
 
 # maven target directory
 target/

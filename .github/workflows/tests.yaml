@@ -31,7 +31,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           java-version: ${{ matrix.java-version }}
-          distribution: "adopt"
+          distribution: "temurin"
           cache: "maven"
 
       - name: Run Maven Tests
