@@ -16,9 +16,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.boot.resttestclient.TestRestTemplate;
+import org.springframework.boot.resttestclient.autoconfigure.AutoConfigureTestRestTemplate;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -31,6 +31,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@AutoConfigureTestRestTemplate
 class AirportIntegrationTest {
 
         @Value("${local.server.port}")
@@ -47,7 +48,7 @@ class AirportIntegrationTest {
                         if (airportService.getAirportById(airportId) != null) {
                                 restTemplate.delete("/api/v1/airport/" + airportId);
                         }
-                } catch (DocumentNotFoundException | DataRetrievalFailureException | ResourceAccessException e) {
+                } catch (DocumentNotFoundException | ResourceAccessException e) {
                         log.warn("Document " + airportId + " not present " + cleanupTiming);
                 } catch (Exception e) {
                         log.debug("Cleanup: Could not delete test airport {}: {} (this is expected during test cleanup)", airportId, e.getMessage());
