@@ -20,7 +20,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
-        <couchbase.version>3.10.0</couchbase.version>
+        <couchbase.version>3.10.1</couchbase.version>
         <lombok.version>1.18.42</lombok.version>
         <springdoc.version>3.0.1</springdoc.version>
         <junit.version>4.13.2</junit.version>
