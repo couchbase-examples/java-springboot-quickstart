@@ -24,7 +24,7 @@
         <lombok.version>1.18.42</lombok.version>
         <springdoc.version>3.0.1</springdoc.version>
         <junit.version>4.13.2</junit.version>
-        <maven-surefire.version>3.5.4</maven-surefire.version>
+        <maven-surefire.version>3.5.5</maven-surefire.version>
     </properties>
 
     <dependencies>
