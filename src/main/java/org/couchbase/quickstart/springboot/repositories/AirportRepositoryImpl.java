@@ -2,13 +2,11 @@ package org.couchbase.quickstart.springboot.repositories;
 
 import java.util.List;
 
-import org.couchbase.quickstart.springboot.configs.CouchbaseConfig;
 import org.couchbase.quickstart.springboot.models.Airport;
 import org.couchbase.quickstart.springboot.models.Route;
 import org.springframework.stereotype.Repository;
-import com.couchbase.client.java.Bucket;
-import com.couchbase.client.java.Cluster;
 import com.couchbase.client.java.Collection;
+import com.couchbase.client.java.Scope;
 import com.couchbase.client.java.json.JsonArray;
 import com.couchbase.client.java.query.QueryOptions;
 import com.couchbase.client.java.query.QueryScanConsistency;
@@ -16,14 +14,12 @@ import com.couchbase.client.java.query.QueryScanConsistency;
 @Repository
 public class AirportRepositoryImpl implements AirportRepository {
 
-    private final Cluster cluster;
+    private final Scope inventoryScope;
     private final Collection airportCol;
-    private final CouchbaseConfig couchbaseConfig;
 
-    public AirportRepositoryImpl(Cluster cluster, Bucket bucket, CouchbaseConfig couchbaseConfig) {
-        this.cluster = cluster;
-        this.airportCol = bucket.scope("inventory").collection("airport");
-        this.couchbaseConfig = couchbaseConfig;
+    public AirportRepositoryImpl(Scope inventoryScope) {
+        this.inventoryScope = inventoryScope;
+        this.airportCol = inventoryScope.collection("airport");
     }
 
     @Override
@@ -50,9 +46,8 @@ public class AirportRepositoryImpl implements AirportRepository {
 
     @Override
     public List<Airport> findAll(int limit, int offset) {
-        String statement = "SELECT airport.* FROM `" + couchbaseConfig.getBucketName()
-                + "`.`inventory`.`airport` LIMIT $1 OFFSET $2";
-        return cluster
+        String statement = "SELECT airport.* FROM airport LIMIT $1 OFFSET $2";
+        return inventoryScope
                 .query(statement,
                         QueryOptions.queryOptions().parameters(JsonArray.from(limit, offset))
                                 .scanConsistency(QueryScanConsistency.REQUEST_PLUS))
@@ -61,10 +56,9 @@ public class AirportRepositoryImpl implements AirportRepository {
 
     @Override
     public List<Route> findDirectConnections(String airportCode, int limit, int offset) {
-        String statement = "SELECT route.* FROM `" + couchbaseConfig.getBucketName()
-                + "`.`inventory`.`airport` as airport JOIN `" + couchbaseConfig.getBucketName()
-                + "`.`inventory`.`route` as route on route.sourceairport = airport.faa WHERE airport.faa = $1 and route.stops = 0 LIMIT $2 OFFSET $3";
-        return cluster
+        String statement = "SELECT route.* FROM airport JOIN route"
+                + " on route.sourceairport = airport.faa WHERE airport.faa = $1 and route.stops = 0 LIMIT $2 OFFSET $3";
+        return inventoryScope
                 .query(statement,
                         QueryOptions.queryOptions().parameters(JsonArray.from(airportCode, limit, offset))
                                 .scanConsistency(QueryScanConsistency.REQUEST_PLUS))
