@@ -12,6 +12,7 @@ import com.couchbase.client.core.error.BucketNotFoundException;
 import com.couchbase.client.core.error.UnambiguousTimeoutException;
 import com.couchbase.client.java.Bucket;
 import com.couchbase.client.java.Cluster;
+import com.couchbase.client.java.Scope;
 
 import lombok.Getter;
 
@@ -32,6 +33,9 @@ public class CouchbaseConfig {
 
     @Value("${spring.couchbase.bucket.name:travel-sample}")
     private String bucketName;
+
+    /** Scope that holds the airline, airport and route collections. */
+    public static final String INVENTORY_SCOPE = "inventory";
 
 
     /**
@@ -89,5 +93,18 @@ public class CouchbaseConfig {
             log.error("Could not connect to bucket " + bucketName);
             throw e;
         }
+    }
+
+    /**
+     * The {@code inventory} scope of the travel-sample bucket.
+     * <p>
+     * Repositories use this scope for both Key Value operations
+     * ({@code scope.collection(...)}) and scoped SQL++ queries
+     * ({@code scope.query(...)}), so collection names in queries do not need to
+     * be qualified with the bucket and scope.
+     */
+    @Bean
+    Scope getInventoryScope(Bucket bucket) {
+        return bucket.scope(INVENTORY_SCOPE);
     }
 }

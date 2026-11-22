@@ -2,13 +2,11 @@ package org.couchbase.quickstart.springboot.repositories;
 
 import java.util.List;
 
-import org.couchbase.quickstart.springboot.configs.CouchbaseConfig;
 import org.couchbase.quickstart.springboot.models.Airline;
 import org.springframework.stereotype.Repository;
 
-import com.couchbase.client.java.Bucket;
-import com.couchbase.client.java.Cluster;
 import com.couchbase.client.java.Collection;
+import com.couchbase.client.java.Scope;
 import com.couchbase.client.java.json.JsonArray;
 import com.couchbase.client.java.query.QueryOptions;
 import com.couchbase.client.java.query.QueryScanConsistency;
@@ -16,14 +14,12 @@ import com.couchbase.client.java.query.QueryScanConsistency;
 @Repository
 public class AirlineRepositoryImpl implements AirlineRepository {
 
-    private final Cluster cluster;
+    private final Scope inventoryScope;
     private final Collection airlineCol;
-    private final CouchbaseConfig couchbaseConfig;
 
-    public AirlineRepositoryImpl(Cluster cluster, Bucket bucket, CouchbaseConfig couchbaseConfig) {
-        this.cluster = cluster;
-        this.airlineCol = bucket.scope("inventory").collection("airline");
-        this.couchbaseConfig = couchbaseConfig;
+    public AirlineRepositoryImpl(Scope inventoryScope) {
+        this.inventoryScope = inventoryScope;
+        this.airlineCol = inventoryScope.collection("airline");
     }
 
     @Override
@@ -50,9 +46,8 @@ public class AirlineRepositoryImpl implements AirlineRepository {
 
     @Override
     public List<Airline> findAll(int limit, int offset) {
-        String statement = "SELECT airline.id, airline.type, airline.name, airline.iata, airline.icao, airline.callsign, airline.country FROM `"
-                + couchbaseConfig.getBucketName() + "`.`inventory`.`airline` LIMIT $1 OFFSET $2";
-        return cluster
+        String statement = "SELECT airline.id, airline.type, airline.name, airline.iata, airline.icao, airline.callsign, airline.country FROM airline LIMIT $1 OFFSET $2";
+        return inventoryScope
                 .query(statement,
                         QueryOptions.queryOptions().parameters(JsonArray.from(limit, offset))
                                 .scanConsistency(QueryScanConsistency.REQUEST_PLUS))
@@ -61,9 +56,8 @@ public class AirlineRepositoryImpl implements AirlineRepository {
 
     @Override
     public List<Airline> findByCountry(String country, int limit, int offset) {
-        String statement = "SELECT airline.id, airline.type, airline.name, airline.iata, airline.icao, airline.callsign, airline.country FROM `"
-                + couchbaseConfig.getBucketName() + "`.`inventory`.`airline` WHERE country = $1 LIMIT $2 OFFSET $3";
-        return cluster
+        String statement = "SELECT airline.id, airline.type, airline.name, airline.iata, airline.icao, airline.callsign, airline.country FROM airline WHERE country = $1 LIMIT $2 OFFSET $3";
+        return inventoryScope
                 .query(statement,
                         QueryOptions.queryOptions().parameters(JsonArray.from(country, limit, offset))
                                 .scanConsistency(QueryScanConsistency.REQUEST_PLUS))
@@ -74,14 +68,14 @@ public class AirlineRepositoryImpl implements AirlineRepository {
     public List<Airline> findByDestinationAirport(String destinationAirport, int limit, int offset) {
         String statement = "SELECT air.callsign, air.country, air.iata, air.icao, air.id, air.name, air.type " +
                 "FROM (SELECT DISTINCT META(airline).id AS airlineId " +
-                "      FROM `" + couchbaseConfig.getBucketName() + "`.`inventory`.`route` " +
-                "      JOIN `" + couchbaseConfig.getBucketName() + "`.`inventory`.`airline` " +
+                "      FROM route " +
+                "      JOIN airline " +
                 "      ON route.airlineid = META(airline).id " +
                 "      WHERE route.destinationairport = $1) AS subquery " +
-                "JOIN `" + couchbaseConfig.getBucketName() + "`.`inventory`.`airline` AS air " +
+                "JOIN airline AS air " +
                 "ON META(air).id = subquery.airlineId LIMIT $2 OFFSET $3";
 
-        return cluster.query(
+        return inventoryScope.query(
                 statement,
                 QueryOptions.queryOptions().parameters(JsonArray.from(destinationAirport, limit, offset))
                         .scanConsistency(QueryScanConsistency.REQUEST_PLUS))

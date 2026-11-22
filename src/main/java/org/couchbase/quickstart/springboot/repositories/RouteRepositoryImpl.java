@@ -2,13 +2,11 @@ package org.couchbase.quickstart.springboot.repositories;
 
 import java.util.List;
 
-import org.couchbase.quickstart.springboot.configs.CouchbaseConfig;
 import org.couchbase.quickstart.springboot.models.Route;
 import org.springframework.stereotype.Repository;
 
-import com.couchbase.client.java.Bucket;
-import com.couchbase.client.java.Cluster;
 import com.couchbase.client.java.Collection;
+import com.couchbase.client.java.Scope;
 import com.couchbase.client.java.json.JsonArray;
 import com.couchbase.client.java.query.QueryOptions;
 import com.couchbase.client.java.query.QueryScanConsistency;
@@ -16,14 +14,12 @@ import com.couchbase.client.java.query.QueryScanConsistency;
 @Repository
 public class RouteRepositoryImpl implements RouteRepository {
 
-    private final Cluster cluster;
+    private final Scope inventoryScope;
     private final Collection routeCol;
-    private final CouchbaseConfig couchbaseConfig;
 
-    public RouteRepositoryImpl(Cluster cluster, Bucket bucket, CouchbaseConfig couchbaseConfig) {
-        this.cluster = cluster;
-        this.routeCol = bucket.scope("inventory").collection("route");
-        this.couchbaseConfig = couchbaseConfig;
+    public RouteRepositoryImpl(Scope inventoryScope) {
+        this.inventoryScope = inventoryScope;
+        this.routeCol = inventoryScope.collection("route");
     }
 
     @Override
@@ -50,9 +46,8 @@ public class RouteRepositoryImpl implements RouteRepository {
 
     @Override
     public List<Route> findAll(int limit, int offset) {
-        String statement = "SELECT route.* FROM `" + couchbaseConfig.getBucketName()
-                + "`.`inventory`.`route` LIMIT $1 OFFSET $2";
-        return cluster
+        String statement = "SELECT route.* FROM route LIMIT $1 OFFSET $2";
+        return inventoryScope
                 .query(statement,
                         QueryOptions.queryOptions().parameters(JsonArray.from(limit, offset))
                                 .scanConsistency(QueryScanConsistency.REQUEST_PLUS))
